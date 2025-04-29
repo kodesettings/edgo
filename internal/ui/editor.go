@@ -458,7 +458,7 @@ func (e *Editor) HandleMouse(mx int, my int, buttons ButtonMask, modifiers ModMa
 
 func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 	if key == KeyCtrlF && !e.IsProcessPanelFocused { e.OnSearch() }
-	if key == KeyCtrlY { e.OnLangLinesCount() }
+	if ev.Rune() == 'Y' && modifiers&ModAlt != 0 { e.OnLangLinesCount() } // control + shift + Y
 
 	if e.Filename == "" && key != KeyCtrlQ { return }
 
@@ -559,7 +559,8 @@ func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 	if key == KeyF18 { e.OnRename() }
 	if key == KeyF22 { e.OnProcessRun(true) }
 	if key == KeyF23 { e.OnDebug() }
-	if key == KeyCtrlU { e.OnUndo() }
+	if key == KeyCtrlZ { e.OnUndo() }
+	if key == KeyCtrlY { e.OnRedo() }
 	if key == KeyCtrlO { e.OnCursorBack() }
 	if key == KeyCtrlRightSq { e.OnCursorBackUndo() }
 	if key == KeyCtrlSpace { e.OnCompletion() }
