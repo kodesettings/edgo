@@ -13,7 +13,8 @@ https://github.com/vipmax/edgo/wiki/Features
 - `Control + x` - cut 
 - `Control + c` - copy 
 - `Control + v` - paste
-- `Control + u` - undo
+- `Control + z` - undo
+- `Control + y` - redo
 - `Control + f` - find
 - `Control + f, type prefix, Control + g` - global find
 - `Control + t` - files selection tree
@@ -23,7 +24,7 @@ https://github.com/vipmax/edgo/wiki/Features
 - `Control + j` - cursor to the top 
 - `Control + k` - cursor to the bottom 
 - `Control + l + line number` - cursor to the line 
-- `Control + y` - lines count report 
+- `Alt + Shift + y` - lines count report
 
 
 - `Shift + arrow` - select text

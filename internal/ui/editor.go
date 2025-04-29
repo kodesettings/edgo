@@ -458,7 +458,7 @@ func (e *Editor) HandleMouse(mx int, my int, buttons ButtonMask, modifiers ModMa
 
 func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 	if key == KeyCtrlF && !e.IsProcessPanelFocused { e.OnSearch() }
-	if ev.Rune() == 'Y' && modifiers&ModAlt != 0 { e.OnLangLinesCount() } // control + shift + Y
+	if ev.Rune() == 'Y' && modifiers&ModAlt != 0 { e.OnLangLinesCount() } // alt + shift + y
 
 	if e.Filename == "" && key != KeyCtrlQ { return }
 
