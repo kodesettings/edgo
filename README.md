@@ -1,8 +1,10 @@
-# edgo
-Yet another console text editor, but with lsp support  
-!!! Check out my new code editor, red, at https://github.com/red-rs/red. It's like Edgo but rewritten in Rust!
+# the classic edgo
+Yet another console text editor, but with native lsp support.
 ![editor](assets/screen0.png)
 ![editor](assets/screen1.png)
+
+# an edgo derivative
+Check out my new code editor, red, at https://github.com/red-rs/red. It's like Edgo but rewritten in Rust!
 
 ### Demo
 https://github.com/vipmax/edgo/wiki/Features
@@ -93,6 +95,7 @@ export EDGO_CONF="/Users/max/apps/go/edgo/config.yaml"
 - idea-light
 - nord
 - monokai
+- vesper
 
 ### Lsp
 
