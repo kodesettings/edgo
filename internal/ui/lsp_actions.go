@@ -168,7 +168,7 @@ func (e *Editor) OnSignatureHelp() {
 				if key == KeyUp { selected = Max(0, selected-1) }
 				if key == KeyRight { e.OnRight(); e.Screen.Clear(); e.DrawEverything(); selectionEnd = true }
 				if key == KeyLeft { e.OnLeft(); e.Screen.Clear(); e.DrawEverything(); selectionEnd = true }
-				if key == KeyRune { e.AddChar(ev.Rune()); e.WriteFile(); e.Screen.Clear(); e.DrawEverything(); selectionEnd = true  }
+				if key == KeyRune { e.AddChar(ev.Rune()); e.Screen.Clear(); e.DrawEverything(); selectionEnd = true  }
 			}
 		}
 	}
@@ -463,7 +463,6 @@ func (e *Editor) completionApply(completion CompletionResponse, selected int) {
 
 	e.Update = true
 	e.IsContentChanged = true
-	if len(e.Content) <= 10000 { go e.WriteFile() }
 }
 
 func (e *Editor) OnRename() {
@@ -559,8 +558,6 @@ func (e *Editor) applyRename(renameResponse RenameResponse) {
 
 				e.UpdateColors()
 			}
-
-			e.WriteFile()
 		}
 	}
 

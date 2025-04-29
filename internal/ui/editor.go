@@ -1904,7 +1904,6 @@ func (e *Editor) UpdateColors() {
 func (e *Editor) UpdateNeeded() {
 	e.Update = true
 	e.IsContentChanged = true
-	if len(e.Content) <= 10000 { go e.WriteFile() }
 	e.UpdateColors()
 	e.FindTests()
 }
