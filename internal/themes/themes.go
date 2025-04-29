@@ -3,7 +3,6 @@ package themes
 import "github.com/alecthomas/chroma"
 import "github.com/alecthomas/chroma/styles"
 
-
 var EdgoDark = styles.Register(chroma.MustNewStyle("edgo", chroma.StyleEntries{
 	chroma.Comment: "#a8a8a8",
 	chroma.Keyword: "#FF69B4",
@@ -40,7 +39,6 @@ var EdgoLight = styles.Register(chroma.MustNewStyle("edgo-light", chroma.StyleEn
 	chroma.NameBuiltinPseudo: "#FF69B4",
 }))
 
-
 var Darcula = styles.Register(chroma.MustNewStyle("darcula", chroma.StyleEntries{
 	chroma.Comment: "#707070",
 	//chroma.NameConstant: "#7A9EC2",
@@ -61,7 +59,6 @@ var Darcula = styles.Register(chroma.MustNewStyle("darcula", chroma.StyleEntries
 	//chroma.NameOther: "#AD9E7E",
 }))
 
-
 var IdeaLight = styles.Register(chroma.MustNewStyle("idea-light", chroma.StyleEntries{
 	chroma.Comment: "#707070",
 	chroma.KeywordConstant: "#1232AC",
@@ -78,4 +75,20 @@ var IdeaLight = styles.Register(chroma.MustNewStyle("idea-light", chroma.StyleEn
 	chroma.NameFunction: "#286077",
 	chroma.NameFunctionMagic: "#A320AC",
 	chroma.NameBuiltinPseudo: "#8B588A",
+}))
+
+var Vesper = styles.Register(chroma.MustNewStyle("vesper", chroma.StyleEntries{
+	chroma.Comment: "#585858",
+	chroma.KeywordConstant: "#F6C99F",
+	chroma.Keyword: "#A0A0A0",
+	chroma.KeywordNamespace: "#F6C99F",
+	chroma.String: "#B1FCE5",
+	chroma.LiteralStringDouble: "#B1FCE5",
+	chroma.Literal: "#B1FCE5",
+	chroma.StringChar: "#B1FCE5",
+	chroma.KeywordType: "#A0A0A0",
+	chroma.KeywordDeclaration: "#F6C99F",
+	chroma.KeywordReserved: "#A0A0A0",
+	chroma.NumberInteger: "#F6C99F",
+	chroma.NameFunction: "#F6C99F",
 }))

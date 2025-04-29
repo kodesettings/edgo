@@ -17,14 +17,8 @@ type Highlighter struct {
 
 }
 
-//var theme = IdeaLight
-//var theme = Edgo
+var theme = Vesper
 
-// var theme = IdeaLight
-//var theme = EdgoLight
-var theme = EdgoDark
-
-//var theme = Darcula
 //var theme = styles.Get("edgo")
 //var theme = styles.Get("dracula")
 //var theme = styles.Get("nord")
