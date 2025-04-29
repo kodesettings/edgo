@@ -1160,7 +1160,6 @@ func (e *Editor) OnErrors() {
 					diagnostic := maybeDiagnostics.Diagnostics[selected]
 					clipboard.WriteAll(diagnostic.Message)
 				}
-				//if key == tcell.KeyRight { e.OnRight(); e.Screen.Clear(); e.DrawEverything(); selectionEnd = true }
 				if key == KeyRight {
 					diagnostic := maybeDiagnostics.Diagnostics[selected]
 					e.Row = int(diagnostic.Range.Start.Line)
@@ -1172,7 +1171,6 @@ func (e *Editor) OnErrors() {
 					e.DrawEverything()
 					e.Screen.Show()
 				}
-				//if key == tcell.KeyRune { e.AddChar(ev.Rune()); e.WriteFile(); e.Screen.Clear(); e.DrawEverything(); selectionEnd = true  }
 				if key == KeyEnter {
 					selectionEnd = true
 					end = true
