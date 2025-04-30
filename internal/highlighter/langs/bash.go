@@ -75,6 +75,5 @@ func (this *Bash) Query() string {
 
 ((program . (comment) @preproc)
  (#lua-match? @preproc "^#!/"))
-
 `
 }

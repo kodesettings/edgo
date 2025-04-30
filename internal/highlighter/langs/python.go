@@ -230,6 +230,5 @@ func (this *Python) Query() string {
 
 (ERROR) @error
 `
-
 }
 

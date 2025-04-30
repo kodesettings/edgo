@@ -6,8 +6,6 @@ type Yaml struct {
 
 func (this *Yaml) Query() string {
 	return `
-
-
 (block_mapping_pair
   key: (flow_node [(double_quote_scalar) (single_quote_scalar)] @identifier))
 (block_mapping_pair

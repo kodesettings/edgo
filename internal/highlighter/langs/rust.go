@@ -52,9 +52,9 @@ func (this *Rust) Query() string {
 (lifetime
   "'" @label
   (identifier) @label)
-(loop_label
-  "'" @label
-  (identifier) @label)
+;(loop_label
+;  "'" @label
+;  (identifier) @label)
 
 
 ; ---
@@ -68,7 +68,7 @@ func (this *Rust) Query() string {
       (identifier) @variable))
   ])
 
-; It needs to be anonymous to not conflict with  further below.
+; It needs to be anonymous to not conflict with "call_expression" further below.
 (_
  value: (field_expression
   value: (identifier)? @variable
@@ -166,7 +166,7 @@ func (this *Rust) Query() string {
  (#match? @constant "^[A-Z][A-Z\\d_]*$"))
 
 ; ---
-; PascalCase identifiers in call_expressions (e.g. )
+; PascalCase identifiers in call_expressions (e.g. "Ok()")
 ; are assumed to be enum constructors.
 ; ---
 
@@ -181,7 +181,7 @@ func (this *Rust) Query() string {
 
 ; ---
 ; Assume that types in match arms are enums and not
-; tuple structs. Same for  expressions.
+; tuple structs. Same for "if let" expressions.
 ; ---
 
 (match_pattern
@@ -308,7 +308,6 @@ func (this *Rust) Query() string {
 (type_identifier) @type
 (identifier) @variable
 (field_identifier) @variable.other.member
-
 `
 }
 

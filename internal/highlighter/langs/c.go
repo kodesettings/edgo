@@ -6,8 +6,6 @@ type C struct {
 
 func (this *C) Query() string {
 	return `
-"sizeof" @keyword
-
 [
   "enum"
   "struct"

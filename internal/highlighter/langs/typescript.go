@@ -6,91 +6,28 @@ type Typescript struct {
 
 func (this *Typescript) Query() string {
 	return `
-[
-  "async"
-  "debugger"
-  "delete"
-  "extends"
-  "from"
-  "get"
-  "new"
-  "set"
-  "target"
-  "typeof"
-  "instanceof"
-  "void"
-  "with"
-] @keyword
+; Variables
 
-[
-  "of"
-  "as"
-  "in"
-] @keyword.operator
+(identifier) @variable
 
-[
-  "function"
-] @keyword.function
+; Properties
 
-[
-  "class"
-  "let"
-  "var"
-] @keyword.storage.type
+(property_identifier) @property
+(shorthand_property_identifier) @property
+(shorthand_property_identifier_pattern) @property
 
-[
-  "const"
-  "static"
-] @keyword.storage.modifier
+; Function and method calls
 
-[
-  "default"
-  "yield"
-  "finally"
-  "do"
-  "await"
-] @keyword.control
+(call_expression
+  function: (identifier) @function)
 
-[
-  "if"
-  "else"
-  "switch"
-  "case"
-  "while"
-] @keyword.control.conditional
-
-
-[
-  (true)
-  (false)
-] @keyword
-
-
-[
-  "for"
-] @keyword.control.repeat
-
-[
-  "import"
-  "export"
-] @keyword.control.import 
-
-[
-  "return"
-  "break"
-  "continue"
-] @keyword.control.return
-
-[
-  "throw"
-  "try"
-  "catch"
-] @keyword.control.exception
+(call_expression
+  function: (member_expression
+    property: (property_identifier) @function.method))
 
 ; Function and method definitions
-;--------------------------------
 
-(function
+(function_expression
   name: (identifier) @function)
 (function_declaration
   name: (identifier) @function)
@@ -99,68 +36,218 @@ func (this *Typescript) Query() string {
 
 (pair
   key: (property_identifier) @function.method
-  value: [(function) (arrow_function)])
+  value: [(function_expression) (arrow_function)])
 
 (assignment_expression
   left: (member_expression
     property: (property_identifier) @function.method)
-  right: [(function) (arrow_function)])
+  right: [(function_expression) (arrow_function)])
 
 (variable_declarator
   name: (identifier) @function
-  value: [(function) (arrow_function)])
+  value: [(function_expression) (arrow_function)])
 
 (assignment_expression
   left: (identifier) @function
-  right: [(function) (arrow_function)])
+  right: [(function_expression) (arrow_function)])
 
+; Special identifiers
 
-; Function and method calls
-;--------------------------
+((identifier) @constructor
+ (#match? @constructor "^[A-Z]"))
 
-(call_expression
-  function: (identifier) @function)
-
-(call_expression
-  function: (member_expression
-    property: (property_identifier) @function.method)) 
-
-[
-  (string)
-  (template_string)
-] @string
-
-
-[
-  (this)
-  (super)
-] @variable.builtin
-
-; Types
-
+((identifier) @type
+ (#match? @type "^[A-Z]"))
 (type_identifier) @type
 (predefined_type) @type.builtin
 
-; ({ p }: { p: t })
-(required_parameter
-  (object_pattern
-    (shorthand_property_identifier_pattern) @variable.parameter))
+([
+  (identifier)
+  (shorthand_property_identifier)
+  (shorthand_property_identifier_pattern)
+ ] @constant
+ (#match? @constant "^_*[A-Z_][A-Z\\d_]*$"))
 
-(shorthand_property_identifier) @property 
+; Literals
 
-; { i }
-(object_pattern
-  (shorthand_property_identifier_pattern) @variable)
-
-(variable_declarator
-  name: (object_pattern
-    (shorthand_property_identifier_pattern))) @variable
+(this) @variable.special
+(super) @variable.special
 
 [
   (null)
   (undefined)
 ] @constant.builtin
 
+[
+  (true)
+  (false)
+] @boolean
+
+(comment) @comment
+
+[
+  (string)
+  (template_string)
+  (template_literal_type)
+] @string
+
+(escape_sequence) @string.escape
+
+(regex) @string.regex
+(number) @number
+
+; Tokens
+
+[
+  ";"
+  "?."
+  "."
+  ","
+  ":"
+  "?"
+] @punctuation.delimiter
+
+[
+  "..."
+  "-"
+  "--"
+  "-="
+  "+"
+  "++"
+  "+="
+  "*"
+  "*="
+  "**"
+  "**="
+  "/"
+  "/="
+  "%"
+  "%="
+  "<"
+  "<="
+  "<<"
+  "<<="
+  "="
+  "=="
+  "==="
+  "!"
+  "!="
+  "!=="
+  "=>"
+  ">"
+  ">="
+  ">>"
+  ">>="
+  ">>>"
+  ">>>="
+  "~"
+  "^"
+  "&"
+  "|"
+  "^="
+  "&="
+  "|="
+  "&&"
+  "||"
+  "??"
+  "&&="
+  "||="
+  "??="
+] @operator
+
+[
+  "("
+  ")"
+  "["
+  "]"
+  "{"
+  "}"
+]  @punctuation.bracket
+
+(ternary_expression
+  [
+    "?"
+    ":"
+  ] @operator
+)
+
+[
+  "as"
+  "async"
+  "await"
+  "break"
+  "case"
+  "catch"
+  "class"
+  "const"
+  "continue"
+  "debugger"
+  "default"
+  "delete"
+  "do"
+  "else"
+  "export"
+  "extends"
+  "finally"
+  "for"
+  "from"
+  "function"
+  "get"
+  "if"
+  "import"
+  "in"
+  "instanceof"
+  "is"
+  "let"
+  "new"
+  "of"
+  "return"
+  "satisfies"
+  "set"
+  "static"
+  "switch"
+  "target"
+  "throw"
+  "try"
+  "typeof"
+  "using"
+  "var"
+  "void"
+  "while"
+  "with"
+  "yield"
+] @keyword
+
+(template_substitution
+  "${" @punctuation.special
+  "}" @punctuation.special) @embedded
+
+(template_type
+  "${" @punctuation.special
+  "}" @punctuation.special) @embedded
+
+(type_arguments
+  "<" @punctuation.bracket
+  ">" @punctuation.bracket)
+
+; Keywords
+
+[ "abstract"
+  "declare"
+  "enum"
+  "export"
+  "implements"
+  "infer"
+  "interface"
+  "keyof"
+  "namespace"
+  "private"
+  "protected"
+  "public"
+  "type"
+  "readonly"
+  "override"
+] @keyword
 `
 }
 

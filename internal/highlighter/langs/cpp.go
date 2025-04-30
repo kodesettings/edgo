@@ -6,7 +6,6 @@ type Cpp struct {
 
 func (this *Cpp) Query() string {
 	return `
-
 "sizeof" @keyword
 
 [
@@ -140,7 +139,6 @@ func (this *Cpp) Query() string {
  "public"
  "private"
  "protected"
- "virtual"
  "final"
 ] @type.qualifier @keyword
 

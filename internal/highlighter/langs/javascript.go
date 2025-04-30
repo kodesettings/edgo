@@ -5,7 +5,7 @@ type Javascript struct {
 }
 
 func (this *Javascript) Query() string {
-query :=`
+	return `
 ; Special identifiers
 ;--------------------
 
@@ -20,40 +20,40 @@ query :=`
 ((identifier) @constructor
  (#match? @constructor "^[A-Z]"))
 
-;((identifier) @variable.builtin
-; (#match? @variable.builtin "^(arguments|module|console|window|document)$")
-; (#is-not? local))
+((identifier) @variable.builtin
+ (#match? @variable.builtin "^(arguments|module|console|window|document)$")
+ (#is-not? local))
 
-;((identifier) @function.builtin
-; (#eq? @function.builtin "require")
-; (#is-not? local))
+((identifier) @function.builtin
+ (#eq? @function.builtin "require")
+ (#is-not? local))
 
 ; Function and method definitions
 ;--------------------------------
 
-;(function_expression
-;  name: (identifier) @function)
+(function_expression
+  name: (identifier) @function)
 (function_declaration
   name: (identifier) @function)
 (method_definition
   name: (property_identifier) @function.method)
 
-;(pair
-;  key: (property_identifier) @function.method
-;  value: [(function_expression) (arrow_function)])
+(pair
+  key: (property_identifier) @function.method
+  value: [(function_expression) (arrow_function)])
 
-;(assignment_expression
-;  left: (member_expression
-;    property: (property_identifier) @function.method)
-;  right: [(function_expression) (arrow_function)])
+(assignment_expression
+  left: (member_expression
+    property: (property_identifier) @function.method)
+  right: [(function_expression) (arrow_function)])
 
-;(variable_declarator
-;  name: (identifier) @function
-;  value: [(function_expression) (arrow_function)])
+(variable_declarator
+  name: (identifier) @function
+  value: [(function_expression) (arrow_function)])
 
-;(assignment_expression
-;  left: (identifier) @function
-;  right: [(function_expression) (arrow_function)])
+(assignment_expression
+  left: (identifier) @function
+  right: [(function_expression) (arrow_function)])
 
 ; Function and method calls
 ;--------------------------
@@ -107,7 +107,7 @@ query :=`
 
 [
   ";"
-;  (optional_chain)
+  (optional_chain)
   "."
   ","
 ] @punctuation.delimiter
@@ -211,7 +211,5 @@ query :=`
   "with"
   "yield"
 ] @keyword
-
 `
-	return query
 }
