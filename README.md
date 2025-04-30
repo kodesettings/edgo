@@ -220,14 +220,3 @@ Usage:
 In debug mode editing is not allowed  
 - `c` - continue to the next breakpoint  
 - `q` - quit debug  
-
-
-
-### Notes:  
-- Map `Caps lock` to `Control` button, everything will be easier.  
-- Use `Alacritty` as default terminal, it is fast, power efficient end easy to config, use `alacritty.toml` as example .  
-- Use `edgo ` as `e`, add alias to shell environment - `alias e="edgo"`
-- Use `tmux`. Checkout my `.tmux.conf`(shift and option keys works)
-- For `iterm2` use `Natural text editing` preset at `Profiles > Keys > Key Mappings > Presets > Natural text editing > Reset `
-- Do not use iterm2, it uses 3 times more cpu then alacritty 
-- add bindkey "^[[1;3C" forward-word" and  "bindkey "^[[1;3D" backward-word" to .zshrc to enable word moving with option + arrows in terminak 
