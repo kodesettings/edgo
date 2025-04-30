@@ -463,6 +463,7 @@ func (e *Editor) completionApply(completion CompletionResponse, selected int) {
 
 	e.Update = true
 	e.IsContentChanged = true
+	e.UpdateLsp()
 }
 
 func (e *Editor) OnRename() {
@@ -558,6 +559,8 @@ func (e *Editor) applyRename(renameResponse RenameResponse) {
 
 				e.UpdateColors()
 			}
+
+			e.UpdateLsp()
 		}
 	}
 

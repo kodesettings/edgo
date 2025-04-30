@@ -548,7 +548,7 @@ func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 	}
 
 	if /*key == tcell.KeyEscape ||*/ key == KeyCtrlQ { e.Screen.Fini(); os.Exit(1) }
-	if key == KeyCtrlS { e.WriteFile() }
+	if key == KeyCtrlS { e.WriteFile(true) }
 	if key == KeyEnter { e.OnEnter(); return }
 	if key == KeyBackspace || key == KeyBackspace2 { e.OnDelete() }
 	if key == KeyDown { e.OnDown(); e.Selection.CleanSelection() }

@@ -179,6 +179,7 @@ func (e *Editor) OnEnter() {
 	e.Update = true
 	e.IsContentChanged = true
 	e.FindTests()
+	e.UpdateLsp()
 }
 
 func (e *Editor) OnDelete() {
@@ -211,6 +212,7 @@ func (e *Editor) OnDelete() {
 	e.Update = true
 	e.IsContentChanged = true
 	e.FindTests()
+	e.UpdateLsp()
 }
 
 func (e *Editor) OnTab() {
@@ -241,6 +243,7 @@ func (e *Editor) OnTab() {
 	e.Update = true
 	e.IsContentChanged = true
 	e.FindTests()
+	e.UpdateLsp()
 }
 
 func (e *Editor) OnBackTab() {
@@ -271,6 +274,7 @@ func (e *Editor) OnBackTab() {
 	e.Update = true
 	e.IsContentChanged = true
 	e.FindTests()
+	e.UpdateLsp()
 }
 
 func (e *Editor) AddChar(ch rune) {
@@ -288,6 +292,7 @@ func (e *Editor) AddChar(ch rune) {
 	e.Update = true
 	e.IsContentChanged = true
 	e.FindTests()
+	e.UpdateLsp()
 }
 
 func (e *Editor) InsertCharacter(line, pos int, ch rune) {
@@ -384,6 +389,7 @@ func (e *Editor) OnSwapLinesUp() {
 	e.Update = true
 	e.IsContentChanged = true
 	e.FindTests()
+	e.UpdateLsp()
 }
 
 func (e *Editor) OnSwapLinesDown() {
@@ -410,6 +416,7 @@ func (e *Editor) OnSwapLinesDown() {
 	e.Update = true
 	e.IsContentChanged = true
 	e.FindTests()
+	e.UpdateLsp()
 }
 
 func (e *Editor) OnCopy() {
@@ -507,6 +514,7 @@ func (e *Editor) Cut(isCopySelected bool) {
 		e.UpdateColors()
 		e.Update = true
 		e.IsContentChanged = true
+		e.UpdateLsp()
 		e.UpdateNeeded() // optimize
 
 	} else { // cut selection
@@ -564,7 +572,7 @@ func (e *Editor) Cut(isCopySelected bool) {
 		e.Selection.CleanSelection()
 		e.Update = true
 		e.IsContentChanged = true
-
+		e.UpdateLsp()
 		e.UpdateNeeded() // optimize
 	}
 
@@ -595,6 +603,7 @@ func (e *Editor) Duplicate() {
 		e.Update = true
 		e.IsContentChanged = true
 		e.FindTests()
+		e.UpdateLsp()
 	} else {
 		selection := e.Selection.GetSelectionString(e.Content)
 		if len(selection) == 0 { return }
@@ -787,6 +796,7 @@ func (e *Editor) OnCommentLine() {
 		e.OnDown()
 		e.Update = true
 		e.IsContentChanged = true
+		e.UpdateLsp()
 		return
 	}
 
@@ -810,6 +820,7 @@ func (e *Editor) OnCommentLine() {
 	e.OnDown()
 	e.Update = true
 	e.IsContentChanged = true
+	e.UpdateLsp()
 }
 
 func (e *Editor) HandleSmartMove(char rune) {
@@ -863,6 +874,7 @@ func (e *Editor) HandleSmartMoveDown() {
 	e.Undo = append(e.Undo, ops)
 	e.Update = true
 	e.IsContentChanged = true
+	e.UpdateLsp()
 }
 
 func (e *Editor) HandleSmartMoveUp() {
@@ -889,6 +901,7 @@ func (e *Editor) HandleSmartMoveUp() {
 	e.Undo = append(e.Undo, ops)
 	e.Update = true
 	e.IsContentChanged = true
+	e.UpdateLsp()
 }
 
 func (e *Editor) MaybeAddPair(ch rune) {

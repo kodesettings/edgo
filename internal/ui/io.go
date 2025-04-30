@@ -31,7 +31,20 @@ func (e *Editor) ReadFile(fileToRead string) string {
 	return code
 }
 
-func (e *Editor) WriteFile() {
+func (e *Editor) UpdateLsp() {
+	if e.Lang != "" {
+		lsp := e.lsp2lang[e.Lang]
+		if lsp.IsReady {
+			code := ConvertContentToString(e.Content)
+			go lsp.DidOpen(e.AbsoluteFilePath, &code) // todo remove it in future
+			//go lsp.didChange(AbsoluteFilePath)
+			//go lsp.didSave(AbsoluteFilePath)
+		}
+
+	}
+}
+
+func (e *Editor) WriteFile(saveFile bool) {
 	//too much cpu usage for big files
 	//added, removed := Diff(e.LastCommitFileContent, ConvertContentToString(e.Content))
 	//e.Added = added
@@ -43,6 +56,8 @@ func (e *Editor) WriteFile() {
 
 	// Create a buffered writer from the file
 	w := bufio.NewWriter(f)
+
+	if !saveFile { f.Close(); goto update }
 
 	for _, row := range e.Content {
 		for j := 0; j < len(row); {
@@ -62,17 +77,8 @@ func (e *Editor) WriteFile() {
 
 	e.IsContentChanged = false
 	e.FileWatcher.UpdateStats()
-
-	if e.Lang != "" {
-		lsp := e.lsp2lang[e.Lang]
-		if lsp.IsReady {
-			code := ConvertContentToString(e.Content)
-			go lsp.DidOpen(e.AbsoluteFilePath, &code) // todo remove it in future
-			//go lsp.didChange(AbsoluteFilePath)
-			//go lsp.didSave(AbsoluteFilePath)
-		}
-
-	}
+update:
+	go e.UpdateLsp()
 }
 
 func (e *Editor) BuildContent(filename string, limit int) string {
