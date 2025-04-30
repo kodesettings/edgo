@@ -9,31 +9,47 @@ import (
 )
 
 
-func (e *Editor) OnDown() {
+func (e *Editor) OnDown(isPaging bool) {
 	e.Update = false
+	var numberOfLines int
+
+	if e.ROWS / 3 < 30 { numberOfLines = 30 } else { numberOfLines = e.ROWS / 3 } // adjustment
+	if !isPaging { numberOfLines = 1; } // normal scroll
+
 	if len(e.Content) == 0 { return }
-	if e.Row+1 >= len(e.Content) {
-		e.Y = e.Row - e.ROWS + 1
-		if e.Y < 0 { e.Y = 0; }
-		return
+	if e.Row + numberOfLines >= len(e.Content) {
+		if !isPaging {
+			e.Y = e.Row - e.ROWS + 1
+			if e.Y < 0 { e.Y = 0; }
+			return
+		} else {
+			numberOfLines = len(e.Content) - e.Row - 1
+		}
 	}
-	e.Row++
+
+	e.Row += numberOfLines
 	if e.Col > len(e.Content[e.Row]) { e.Col = len(e.Content[e.Row]) } // fit to e.Content
 	if e.Row < e.Y { e.Y = e.Row }
-	if e.Row >= e.Y+ e.ROWS { e.Y = e.Row - e.ROWS + 1  }
+	if e.Row >= e.Y + e.ROWS { e.Y = e.Row - e.ROWS + 1  }
 
 	e.Update = true
 	clear(e.HighlightElements)
 }
 
-func (e *Editor) OnUp() {
+func (e *Editor) OnUp(isPaging bool) {
 	e.Update = false
+	var numberOfLines int
+
+	if e.ROWS / 3 < 30 { numberOfLines = 30 } else { numberOfLines = e.ROWS / 3 } // adjustment
+	if !isPaging { numberOfLines = 1; } // normal scroll
+
 	if len(e.Content) == 0 { return }
 	if e.Row == 0 { e.Y = 0; return }
-	e.Row--
+	if e.Row - numberOfLines <= 0 {e.Row = 0 } else { e.Row -= numberOfLines }
 	if e.Col > len(e.Content[e.Row]) { e.Col = len(e.Content[e.Row]) } // fit to e.Content
 	if e.Row < e.Y { e.Y = e.Row }
-	if e.Row > e.Y+ e.ROWS { e.Y = e.Row - e.ROWS + 1  }
+	if e.Row > e.Y + e.ROWS { e.Y = e.Row - e.ROWS + 1  }
+
 	e.Update = true
 	clear(e.HighlightElements)
 }
@@ -81,7 +97,7 @@ func (e *Editor) GoBottom() {
 		e.Row = len(e.Content)-1; e.Col = 0;
 		e.X = 0;
 		if e.Row > e.TERMINAL_HEIGHT { e.FocusCenter()}
-		e.OnDown()
+		e.OnDown(false)
 	}
 }
 
@@ -796,7 +812,7 @@ func (e *Editor) OnCommentLine() {
 
 	if found {
 		if e.Col < 0 { e.Col = 0 }
-		e.OnDown()
+		e.OnDown(false)
 		e.Update = true
 		e.IsContentChanged = true
 		e.UpdateLsp()
@@ -820,7 +836,7 @@ func (e *Editor) OnCommentLine() {
 
 	e.Undo = append(e.Undo, ops)
 	if e.Col < 0 { e.Col = 0 }
-	e.OnDown()
+	e.OnDown(false)
 	e.Update = true
 	e.IsContentChanged = true
 	e.UpdateLsp()

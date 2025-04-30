@@ -505,8 +505,8 @@ func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 		if e.Selection.Ssx < 0 { e.Selection.Ssx, e.Selection.Ssy = e.Col, e.Row }
 		if key == KeyRight { e.OnRight() }
 		if key == KeyLeft { e.OnLeft() }
-		if key == KeyUp { e.OnUp() }
-		if key == KeyDown { e.OnDown() }
+		if key == KeyUp { e.OnUp(false) }
+		if key == KeyDown { e.OnDown(false) }
 		if e.Selection.Ssx >= 0 {
 			e.Selection.Sex, e.Selection.Sey = e.Col, e.Row
 			e.Selection.IsSelected = true
@@ -551,8 +551,10 @@ func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 	if key == KeyCtrlS { e.WriteFile(true) }
 	if key == KeyEnter { e.OnEnter(); return }
 	if key == KeyBackspace || key == KeyBackspace2 { e.OnDelete() }
-	if key == KeyDown { e.OnDown(); e.Selection.CleanSelection() }
-	if key == KeyUp { e.OnUp(); e.Selection.CleanSelection() }
+	if key == KeyDown { e.OnDown(false); e.Selection.CleanSelection() }
+	if key == KeyUp { e.OnUp(false); e.Selection.CleanSelection() }
+	if key == KeyPgDn { e.OnDown(true); e.Selection.CleanSelection() }
+	if key == KeyPgUp { e.OnUp(true); e.Selection.CleanSelection() }
 	if key == KeyLeft { e.OnLeft(); e.Selection.CleanSelection() }
 	if key == KeyRight { e.OnRight(); e.Selection.CleanSelection() }
 	if key == KeyCtrlT { e.OnFilesTree(true) }
