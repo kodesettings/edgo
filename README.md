@@ -1,63 +1,19 @@
 # the classic edgo
+
 Yet another console text editor, but with native lsp support.
-![editor](assets/screen0.png)
-![editor](assets/screen1.png)
 
 # an edgo derivative
+
 Check out my new code editor, red, at https://github.com/red-rs/red. It's like Edgo but rewritten in Rust!
 
-### Demo
-https://github.com/vipmax/edgo/wiki/Features
-
 ### Key bindings and features:
-- `Control + q` - quit
-- `Control + d` - duplicate line
-- `Control + x` - cut 
-- `Control + c` - copy 
-- `Control + v` - paste
-- `Control + z` - undo
-- `Control + y` - redo
-- `Control + f` - find
-- `Control + f, type prefix, Control + g` - global find
-- `Control + t` - files selection tree
-- `Option + /` - comment line
-- `Control + o` - cursor back
-- `Control + ]` - cursor forward
-- `Control + j` - cursor to the top 
-- `Control + k` - cursor to the bottom 
-- `Control + l + line number` - cursor to the line 
-- `Alt + Shift + y` - lines count report
 
-
-- `Shift + arrow` - select text
-- `Option + right/left` - smart horizontal movement by words
-- `Option + down/up` - smart selection
-- `Control + Shift + down/up` - lines swap
-
-
-- `mouse selection`  - select text 
-- `mouse double click`  - select word 
-- `mouse triple click`  - select line
-
-
-- `Control + space` - lsp completion
-- `Control + h` - lsp hover
-- `Control + p` - lsp signature help
-- `Control + g / Control + mouse click` - lsp definition
-- `Control + r / Option + mouse click` - lsp references
-- `Control + e` - lsp diagnostic (errors)
-- `Shift + F6` - lsp rename 
-- `Control + w` - method extraction
-
+Please check the manual page in your console for all the key bindings.
 
 ### Installation:
 
-Install Go for MacOS:
-```
-brew install go 
-echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> ~/.zshrc
-```
-Clone:   
+Install golang on your OS and then clone the repository.
+
 ```shell
 git clone https://github.com/vipmax/edgo && cd edgo
 make 
@@ -66,36 +22,19 @@ make
 ### Usage:
 ```
 edgo [filename]
-edgo ~/.zshrc 
 
 # with no args it will open current directory
 edgo 
 ```
 
-### Support
-If you like the project, please support it.  
-https://www.buymeacoffee.com/vipmax/edgo
-
-
-
 ### Configuration
 
-`edgo` uses yaml file for configuration.  
-Set `EDGO_CONF` env var to conf file path 
-```shell
-export EDGO_CONF="/Users/max/apps/go/edgo/config.yaml"
-```
+Please check the manual page in your console for usage of config files.
 
 ### Themes
-`edgo` supports themes, set it in config file.  
-- edgo
-- edgo-light
-- dracula
-- darcula
-- idea-light
-- nord
-- monokai
-- vesper
+
+Themes are supported via the configuration file and the theme sources can be found
+in internal/highlighter/themes directory for now.
 
 ### Lsp
 
@@ -109,92 +48,17 @@ Following lsp features are supported:
 - method extraction
 - diagnostic
 
+### Languages
 
+Following languages are currently supported:
 
-Following languages are supported:
+bash, c/c++, c#, go, html, java, javascript, kotlin, lua, python, rust, scala, toml, typescript and yaml files.
 
-`go`
-```shell  
-go install golang.org/x/tools/gopls@latest
-```
+Install your language server for interaction with the edgo text editor.
 
-`python`
-```shell  
-pip install -U 'python-lsp-server[all]'
-```
+### Support
 
-`javascript/typescript`
-```shell  
-npm i -g typescript typescript-language-server
-```
-
-`html`
-```shell  
-npm i -g vscode-langservers-extracted
-```
-
-`vue`
-```shell  
-npm i -g vls
-```
-
-`rust`
-```shell  
-#curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-rustup component add rust-analyzer
-```
-
-`c/c++`
-```shell  
-# go to https://clangd.llvm.org/installation.html
-clangd
-```
-
-`java`
-```shell  
-# jdtls requires at least Java 17, check also JAVA_HOME must be set 
-brew install jdtls
-```
-
-`kotlin`
-```shell  
-# https://github.com/fwcd/kotlin-language-server
-brew install kotlin-language-server
-```
-
-`swift`
-```shell  
-# https://github.com/apple/sourcekit-lsp
-xcrun
-```
-
-`haskell`
-```shell  
-# https://haskell-language-server.readthedocs.io/en/latest/installation.html
-ghcup install hls
-```
-
-`zig`
-```shell  
-npm i -g bash-language-server
-```
-
-`d`
-```shell  
-dub fetch serve-d
-```
-
-`ocaml`
-```shell  
-opam install ocaml-lsp-server
-```
-
-`bash`
-```shell  
-# https://haskell-language-server.readthedocs.io/en/latest/installation.html
-brew install zls
-```
-
+If you like the project, please support it: https://www.buymeacoffee.com/vipmax/edgo
 
 ### Tests
 
@@ -203,16 +67,12 @@ Edgo provides a seamless testing experience with the ability to execute tests us
 Edgo supports testing functionality using Tree Sitter for `go`, `python`, `javascript`, `java`.  
 WIP for other langs
 
-![editor](assets/screen4.png)
-
 ### Debug
 
 Added Debug first implementation
 
 Debug is working via dap protocol for `go` (dlv)  and `python` (debugpy)
 WIP for other langs
-
-![editor](assets/screen3.png)
 
 Usage:
 - `control + b` - set/delete breakpoint  

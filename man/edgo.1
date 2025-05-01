@@ -1,0 +1,87 @@
+.TH edgo 1 "2025-05-01"
+.SH NAME
+edgo \- Yet another console text editor, but with native lsp support
+.SH SYNOPSIS
+.B edgo
+.RB [OPTIONS]
+[FILE]\&...
+
+.SH DESCRIPTION
+
+Edgo is a terminal-based classic text editor that is providing user experience of the usual and simple
+workflows needed for the user. It works solely in the terminal and provides full support for language
+server protocol (LSP).
+
+Use Control + q to quit, Control + s to save, Control + r for reference over symbols and Control + g
+to jump to sources.
+
+Use Ctrl-f, type prefix and then Ctrl-g to global find text in your source directory.
+
+.SH KEY BINDINGS
+
+Below are the usual key bindings that are used for editing source files.
+
+.TS
+left tab(#);
+Lb Lb
+L L.
+Key#Description of function
+Arrows#move the cursor around
+Shift + arrows#move and select text
+Shift + Alt + y#lines count report
+PageUp#move cursor up one page
+PageDown#move cursor down one page
+
+Control + q#quit
+Control + d#duplicate line
+Control + x#cut
+Control + c#copy
+Control + v#paste
+Control + z#undo
+Control + y#redo
+Control + f#find
+Control + t#files selection tree
+Option + /#comment line
+Control + o#cursor back
+Control + ]#cursor forward
+Control + j#cursor to the top
+Control + k#cursor to the bottom
+Control + l#line number - cursor to the line
+
+Shift + arrow#select text
+Option + right/left#smart horizontal movement by words
+Option + down/up#smart selection
+Control + Shift + down/up#lines swap
+
+mouse selection#select text
+mouse double click#select word
+mouse triple click#select line
+
+Control + space#lsp completion
+Control + h#lsp hover
+Control + p#lsp signature help
+Control + g / Control + mouse click#lsp definition
+Control + r / Option + mouse click#lsp references
+Control + e#lsp diagnostic (errors)
+Shift + F6#lsp rename
+Control + w#method extraction
+.TE
+
+.SH CONFIGURATION
+
+Edgo uses the EDGO_CONF environment variable to set path to the configuration file called
+by default config.yaml where you can store log file path, set new themes for the editor
+or configure custom LSP servers if neeeded. Although we aim to provide builtin LSP server
+configurations for every languages that are supported.
+
+.SH BUGS
+
+A comprehensive list of bugs will not be listed in this manpage. See the Github
+page at \fBhttps://github.com/vipmax/edgo/issues\fP for a list of known bugs
+and to report any newly encountered bugs you may find. We strive to correct
+bugs as swiftly as possible.
+
+.SH AUTHOR
+
+Copyright (c) 2025 Max Petrov and contributors. MIT license.
+See \fBhttps://github.com/vipmax/edgo\fP for details.
