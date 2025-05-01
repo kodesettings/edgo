@@ -2,7 +2,9 @@
 
 Yet another console text editor, but with native lsp support.
 
-# an edgo derivative
+For demonstration of it's features visit https://github.com/vipmax/edgo/wiki/Features
+
+### an edgo derivative
 
 Check out my new code editor, red, at https://github.com/red-rs/red. It's like Edgo but rewritten in Rust!
 
