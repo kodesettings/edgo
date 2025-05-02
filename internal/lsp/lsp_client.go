@@ -135,98 +135,97 @@ func (this *LspClient) send(o interface{})  {
 //	return string(body)
 //}
 
-func (this *LspClient) receive() string {
+func (this *LspClient) receiveDiagnostics() string {
 
 	const LEN_HEADER = "Content-Length: "
 	var messageSize int
 	var responseMustBeNext bool
 	var line string
 	var err error
+repeat:
+	if messageSize != 0 && responseMustBeNext {
+		buf := make([]byte, messageSize)
+		_, err = io.ReadFull(this.reader, buf)
+		if err != nil { Log.Error(err.Error()); goto repeat; }
+		line = string(buf)
+		messageSize = 0
 
-	for !this.isStopped {
+		responseJSON := make(map[string]interface{})
+		err = json.Unmarshal(buf, &responseJSON)
+		if err != nil { Log.Error(err.Error()); goto repeat; }
 
-		if messageSize != 0 && responseMustBeNext {
-			buf := make([]byte, messageSize)
-			_, err = io.ReadFull(this.reader, buf)
-			if err != nil { Log.Error(err.Error()); continue }
-			line = string(buf)
-			messageSize = 0
+		method, methodFound := responseJSON["method"]
+		if methodFound && method.(string) == "textDocument/publishDiagnostics" {
+			var dr DiagnosticResponse
+			err = json.Unmarshal(buf, &dr)
+			if err != nil { Log.Error(err.Error()); goto repeat; }
+			return line
+		}
 
-			responseJSON := make(map[string]interface{})
-			err = json.Unmarshal(buf, &responseJSON)
-			if err != nil { Log.Error(err.Error()); continue }
-
-			method, methodFound := responseJSON["method"]
-			if methodFound && method.(string) == "textDocument/publishDiagnostics" {
-				var dr DiagnosticResponse
-				err = json.Unmarshal(buf, &dr)
-				if err != nil { Log.Error(err.Error()); continue }
+		if value, idFound := responseJSON["id"]; idFound {
+			if _, ok := value.(float64); ok {
 				return line
 			}
-
-			if value, idFound := responseJSON["id"]; idFound {
-				if _, ok := value.(float64); ok {
-					return line
-				}
-			}
-
-		} else {
-			line, err = this.reader.ReadString('\n') // it stuck sometimes
-			if err != nil { Log.Error("[445 lsp]", err.Error()); continue }
 		}
-
-		line = strings.TrimSuffix(line, "\r\n")
-
-		if strings.HasPrefix(line, LEN_HEADER) {
-			sizeStr := strings.TrimPrefix(line, LEN_HEADER)
-			msize, _ := strconv.Atoi(sizeStr)
-			messageSize = msize
-			responseMustBeNext = false
-			continue
-		}
-
-		if line == "" {
-			responseMustBeNext = true
-			continue
-		}
+	} else {
+		line, err = this.reader.ReadString('\n') // it stuck sometimes
+		if err != nil { Log.Error("[445 lsp]", err.Error()); goto repeat; }
 	}
+
+	line = strings.TrimSuffix(line, "\r\n")
+
+	if strings.HasPrefix(line, LEN_HEADER) {
+		sizeStr := strings.TrimPrefix(line, LEN_HEADER)
+		msize, _ := strconv.Atoi(sizeStr)
+		messageSize = msize
+		responseMustBeNext = false
+		goto repeat;
+	}
+
+	if line == "" {
+		responseMustBeNext = true
+		goto repeat;
+	} else if !this.isStopped {
+		goto repeat;
+	}
+
 	return ""
 }
 
-
 func (l *LspClient) receiveLoop() {
-	for !l.isStopped {
-		message := l.receive()
-		Log.Info("<-", message)
+repeat:
+	message := l.receiveDiagnostics()
+	Log.Info("<-", message)
 
-		if strings.Contains(message,"publishDiagnostics") {
-			var dr DiagnosticResponse
-			err := json.Unmarshal([]byte(message), &dr)
-			if err != nil { Log.Error(err.Error()); continue }
-			l.file2diagnostic[dr.Params.Uri] = dr.Params
-			l.DiagnosticsChannel <- message
-			continue
-		}
-		if strings.Contains(message,"workspace/applyEdit") {
-			l.otherMessages <- message
-			continue
-		}
+	if strings.Contains(message,"publishDiagnostics") {
+		var dr DiagnosticResponse
+		err := json.Unmarshal([]byte(message), &dr)
+		if err != nil { Log.Error(err.Error()); goto repeat; }
+		l.file2diagnostic[dr.Params.Uri] = dr.Params
+		l.DiagnosticsChannel <- message
+		goto repeat;
+	}
+	if strings.Contains(message,"workspace/applyEdit") {
+		l.otherMessages <- message
+		goto repeat;
+	}
 
-		responseJSON := make(map[string]interface{})
-		err := json.Unmarshal([]byte(message), &responseJSON)
-		if err != nil { Log.Error(err.Error()); continue }
+	responseJSON := make(map[string]interface{})
+	err := json.Unmarshal([]byte(message), &responseJSON)
+	if err != nil { Log.Error(err.Error()); goto repeat; }
 
-		if value, found := responseJSON["id"]; found { // json has id
-			if id, ok := value.(float64); ok {
-				channel, foundRequest := l.message2chan[int(id)]
-				if foundRequest {
-					channel <- message
-				} else  {
-					//skip message
-				}
+	if value, found := responseJSON["id"]; found { // json has id
+		if id, ok := value.(float64); ok {
+			channel, foundRequest := l.message2chan[int(id)]
+			if foundRequest {
+				channel <- message
+			} else  {
+				//skip message
 			}
 		}
 	}
+
+	if !l.isStopped { goto repeat; }
 }
 
 func (this *LspClient) GetDiagnostic(filename string) (DiagnosticParams, bool) {
