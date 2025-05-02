@@ -13,27 +13,18 @@ import (
 	assert "github.com/stretchr/testify/assert"
 )
 
-func walk(node *sitter.Node) {
-	// Process the current node here (e.g., print node information).
-	fmt.Println(node.StartPoint(), node.EndPoint(), node.Type(), node.String())
+func validation_helper(t *testing.T, node *sitter.Node, code []byte) {
+	// Process the current node here.
+	assert.NotNil(t, node.StartPoint(), "node startpoint is nil")
+	assert.NotNil(t, node.EndPoint(), "node endpoint is nil")
+	assert.NotNil(t, node.Type(), "node type is nil")
+	assert.NotNil(t, node.Content(code), "content is nil")
 
 	// Visit each child node recursively.
 	childCount := int(node.NamedChildCount())
 	for i := 0; i < childCount; i++ {
 		child := node.NamedChild(i)
-		walk(child)
-	}
-}
-
-func print(node *sitter.Node, code []byte) {
-	// Process the current node here (e.g., print node information).
-	fmt.Println(node.StartPoint(), node.EndPoint(), node.Type(), node.Content(code))
-
-	// Visit each child node recursively.
-	childCount := int(node.NamedChildCount())
-	for i := 0; i < childCount; i++ {
-		child := node.NamedChild(i)
-		print(child, code)
+		validation_helper(t, child, code) // recursive validation
 	}
 }
 
@@ -85,7 +76,6 @@ func main() {
 	assert.NotNil(t, n, "error occurred in tree sitter go")
 
 	fmt.Println("parsed, elapsed", time.Since(start))
-
 }
 
 func TestTreeSitterPython(t *testing.T) {
@@ -134,7 +124,7 @@ function hello() {
 	assert.NotNil(t, tree, "error occurred in tree sitter js")
 
 	fmt.Println("parsed, elapsed", time.Since(start))
-	print(tree.RootNode(), code)
+	validation_helper(t, tree.RootNode(), code)
 }
 
 func TestTreeSitterJsEdit(t *testing.T) {
@@ -152,7 +142,7 @@ func TestTreeSitterJsEdit(t *testing.T) {
 
 	elapsedFirst := time.Since(start)
 	fmt.Println("parsed, elapsed", elapsedFirst)
-	print(tree.RootNode(), code)
+	validation_helper(t, tree.RootNode(), code)
 
 	fmt.Println("Edit input")
 
@@ -178,9 +168,8 @@ func TestTreeSitterJsEdit(t *testing.T) {
 	speedup := float64(elapsedFirst) / float64(elapsedSecond)
 	fmt.Printf("Speedup factor: %.2f\n", speedup)
 
-	print(tree.RootNode(), code)
+	validation_helper(t, tree.RootNode(), code)
 }
-
 
 func TestTreeSitterJsEditDelete(t *testing.T) {
 	parser := sitter.NewParser()
@@ -197,7 +186,7 @@ func TestTreeSitterJsEditDelete(t *testing.T) {
 
 	elapsedFirst := time.Since(start)
 	fmt.Println("parsed, elapsed", elapsedFirst)
-	print(tree.RootNode(), code)
+	validation_helper(t, tree.RootNode(), code)
 
 	fmt.Println("Edit input")
 
@@ -223,7 +212,7 @@ func TestTreeSitterJsEditDelete(t *testing.T) {
 	speedup := float64(elapsedFirst) / float64(elapsedSecond)
 	fmt.Printf("Speedup factor: %.2f\n", speedup)
 
-	print(tree.RootNode(), code)
+	validation_helper(t, tree.RootNode(), code)
 }
 
 func TestTreeSitterJsEditDeleteMultiple(t *testing.T) {
@@ -241,7 +230,7 @@ func TestTreeSitterJsEditDeleteMultiple(t *testing.T) {
 
 	elapsedFirst := time.Since(start)
 	fmt.Println("parsed, elapsed", elapsedFirst)
-	print(tree.RootNode(), code)
+	validation_helper(t, tree.RootNode(), code)
 
 	fmt.Println("Edit input")
 
@@ -262,7 +251,7 @@ func TestTreeSitterJsEditDeleteMultiple(t *testing.T) {
 	fmt.Println("parsed again, elapsed", elapsedSecond)
 	speedup := float64(elapsedFirst) / float64(elapsedSecond)
 	fmt.Printf("Speedup factor: %.2f\n", speedup)
-	print(tree.RootNode(), code)
+	validation_helper(t, tree.RootNode(), code)
 
 	fmt.Println("Edit input")
 
@@ -285,9 +274,8 @@ func TestTreeSitterJsEditDeleteMultiple(t *testing.T) {
 	fmt.Println("parsed again, elapsed", elapsedSecond)
 	speedup = float64(elapsedFirst) / float64(elapsedSecond)
 	fmt.Printf("Speedup factor: %.2f\n", speedup)
-	print(tree.RootNode(), code)
+	validation_helper(t, tree.RootNode(), code)
 }
-
 
 func TestTreeSitterJsEditEnter(t *testing.T) {
 	parser := sitter.NewParser()
@@ -304,7 +292,7 @@ func TestTreeSitterJsEditEnter(t *testing.T) {
 
 	elapsedFirst := time.Since(start)
 	fmt.Println("parsed, elapsed", elapsedFirst)
-	print(tree.RootNode(), code)
+	validation_helper(t, tree.RootNode(), code)
 
 	fmt.Println("Edit input")
 
@@ -331,7 +319,7 @@ console.log('hello')}`)
 	speedup := float64(elapsedFirst) / float64(elapsedSecond)
 	fmt.Printf("Speedup factor: %.2f\n", speedup)
 
-	print(tree.RootNode(), code)
+	validation_helper(t, tree.RootNode(), code)
 }
 
 func TestTreeSitterQuery(t *testing.T) {
@@ -373,7 +361,6 @@ function hello() {
 		for _, c := range m.Captures {
 			name := q.CaptureNameForId(c.Index)
 			content := c.Node.Content(code)
-			// fmt.Println(c.Node.StartPoint(), c.Node.EndPoint(), name, c.Node.Type(), content)
 			assert.NotNil(t, c.Node.StartPoint(), "node startpoint is nil")
 			assert.NotNil(t, c.Node.EndPoint(), "node endpoint is nil")
 			assert.NotNil(t, name, "name is nil")
