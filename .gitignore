@@ -1,2 +1,5 @@
 # ignoring build target from repo
 edgo
+
+# ignoring log files
+*.log
