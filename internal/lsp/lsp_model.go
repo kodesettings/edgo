@@ -33,12 +33,6 @@ type InitializeRequest struct {
 	Params  InitializeParams `json:"params"`
 }
 
-type Position struct {
-	Line      int `json:"line"`
-	Character int `json:"character"`
-}
-
-
 type Context struct {
 	IncludeDeclaration bool `json:"includeDeclaration,omitempty"`
 	Only        []string `json:"only,omitempty"`
@@ -109,8 +103,8 @@ type VersionedTextDocumentIdentifier struct {
 }
 
 type TextDocumentContentChangeEvent struct {
-	Range ChangeRange `json:"range"`
-	Text  string      `json:"text"`
+	Range Range  `json:"range"`
+	Text  string `json:"text"`
 }
 
 type CompletionResponse struct {
@@ -182,13 +176,13 @@ type TextEdit struct {
 }
 
 type Range struct {
-	Start PositionResponse `json:"start"`
-	End   PositionResponse `json:"end"`
+	Start Position `json:"start"`
+	End   Position `json:"end"`
 }
 
-type PositionResponse struct {
-	Line      float64 `json:"line"`
-	Character float64 `json:"character"`
+type Position struct {
+	Line      int `json:"line"`
+	Character int `json:"character"`
 }
 
 type Contents struct {

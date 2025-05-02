@@ -449,10 +449,10 @@ func (e *Editor) completionApply(completion CompletionResponse, selected int) {
 		// text edit not supported by lsp
 		prev := FindPrevWord(e.Content[e.Row], e.Col)
 		next := FindNextWord(e.Content[e.Row], e.Col)
-		from = float64(prev)
+		from = int(prev)
 		newText = item.InsertText
 		if len(newText) == 0 { newText = item.Label }
-		end = float64(next)
+		end = int(next)
 		e.Col = prev
 		e.Content[e.Row] = append(e.Content[e.Row][:e.Col], e.Content[e.Row][int(end) :]...)
 	}

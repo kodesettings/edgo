@@ -309,9 +309,9 @@ func (this *LspClient) DidChange(file string, spc int, spl int, epc int, epl int
 		JSONRPC: "2.0",  Method:  "textDocument/didChange",
 		Params: DidChangeTextDocumentParams{
 			ContentChanges: []TextDocumentContentChangeEvent{{
-				Range: ChangeRange{
-					Start: Character{ Line: spl, Character: spc},
-					End: Character{ Line: epl, Character: epc},
+				Range: Range{
+					Start: Position{ Line: spl, Character: spc},
+					End: Position{ Line: epl, Character: epc},
 				},
 				Text: *text,
 			}},
