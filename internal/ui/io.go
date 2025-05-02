@@ -40,6 +40,7 @@ func (e *Editor) UpdateLsp() {
 			//go lsp.didChange(AbsoluteFilePath)
 			//go lsp.didSave(AbsoluteFilePath)
 		}
+
 	}
 }
 

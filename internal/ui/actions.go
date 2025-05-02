@@ -724,9 +724,7 @@ func (e *Editor) OnUndo() {
 	e.UpdateColors()
 	e.Redo = append(e.Redo, lastOperation)
 	e.UpdateNeeded()
-	e.UpdateLsp()
 }
-
 func (e *Editor) OnRedo() {
 	if len(e.Redo) == 0 { return }
 
@@ -764,7 +762,6 @@ func (e *Editor) OnRedo() {
 	e.UpdateColors()
 	e.Undo = append(e.Undo, lastRedoOperation)
 	e.UpdateNeeded()
-	e.UpdateLsp()
 }
 func (e *Editor) OnCommentLine() {
 	e.Focus()
