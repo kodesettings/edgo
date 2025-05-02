@@ -58,14 +58,14 @@ type TextDocument struct {
 	Version    int    `json:"version,omitempty"`
 }
 
-type DidOpenParams struct {
+type DidOpenTextDocumentParams struct {
 	TextDocument TextDocument `json:"textDocument"`
 }
 
 type DidOpenRequest struct {
-	JSONRPC string        `json:"jsonrpc"`
-	Method  string        `json:"method"`
-	Params  DidOpenParams `json:"params"`
+	JSONRPC string                    `json:"jsonrpc"`
+	Method  string                    `json:"method"`
+	Params  DidOpenTextDocumentParams `json:"params"`
 }
 
 type InitializedRequest struct {
@@ -92,9 +92,15 @@ type BaseRequest struct {
 	Params  Params `json:"params"`
 }
 
-type TextDocumentDidChangeParams struct {
+type DidChangeTextDocumentParams struct {
 	TextDocument   VersionedTextDocumentIdentifier  `json:"textDocument"`
 	ContentChanges []TextDocumentContentChangeEvent `json:"contentChanges"`
+}
+
+type DidChangeRequest struct {
+	JSONRPC string                      `json:"jsonrpc"`
+	Method  string                      `json:"method"`
+	Params  DidChangeTextDocumentParams `json:"params"`
 }
 
 type VersionedTextDocumentIdentifier struct {
@@ -103,7 +109,8 @@ type VersionedTextDocumentIdentifier struct {
 }
 
 type TextDocumentContentChangeEvent struct {
-	Text string `json:"text"`
+	Range ChangeRange `json:"range"`
+	Text  string      `json:"text"`
 }
 
 type CompletionResponse struct {
@@ -386,22 +393,6 @@ type Character struct {
 type ChangeRange struct {
 	Start Character `json:"start"`
 	End   Character `json:"end"`
-}
-
-type ContentChange struct {
-	Range ChangeRange  `json:"range"`
-	Text  string `json:"text"`
-}
-
-type DidChangeParams struct {
-	ContentChanges []ContentChange `json:"contentChanges"`
-	TextDocument   TextDocument    `json:"textDocument"`
-}
-
-type DidChangeRequest struct {
-	JSONRPC string `json:"jsonrpc"`
-	Method  string `json:"method"`
-	Params  DidChangeParams `json:"params"`
 }
 
 type DidSaveParams struct {

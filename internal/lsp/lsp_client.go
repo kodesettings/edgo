@@ -291,7 +291,7 @@ func (l *LspClient) Init(dir string) {
 func (this *LspClient) DidOpen(file string, text *string) {
 	didOpenRequest := DidOpenRequest{
 		JSONRPC: "2.0",  Method:  "textDocument/didOpen",
-		Params: DidOpenParams{
+		Params: DidOpenTextDocumentParams{
 			TextDocument: TextDocument{
 				LanguageID: this.Lang,
 				Text:       *text,
@@ -307,15 +307,15 @@ func (this *LspClient) DidOpen(file string, text *string) {
 func (this *LspClient) DidChange(file string, spc int, spl int, epc int, epl int, text *string) {
 	didChangeRequest := DidChangeRequest{
 		JSONRPC: "2.0",  Method:  "textDocument/didChange",
-		Params: DidChangeParams{
-			ContentChanges: []ContentChange{{
+		Params: DidChangeTextDocumentParams{
+			ContentChanges: []TextDocumentContentChangeEvent{{
 				Range: ChangeRange{
 					Start: Character{ Line: spl, Character: spc},
 					End: Character{ Line: epl, Character: epc},
 				},
 				Text: *text,
 			}},
-			TextDocument: TextDocument{
+			TextDocument: VersionedTextDocumentIdentifier{
 				URI:        "file://" + file,
 				Version:    1,
 			},
