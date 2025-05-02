@@ -6,11 +6,11 @@ import (
 	. "github.com/smacker/go-tree-sitter"
 	"github.com/smacker/go-tree-sitter/golang"
 	"testing"
+	assert "github.com/stretchr/testify/assert"
 )
 
 func TestGoFindTest(t *testing.T) {
 	filename := "main.go"
-
 	lang := "go"
 
 	code := `
@@ -56,21 +56,12 @@ func main2() int { return 1 }
 	tests := run.Find(&testFinder, node, filename, codeBytes)
 	fmt.Println(tests)
 
-	if tests == nil { t.Errorf("tests cant be nil this case") }
-	if len(tests) != len(expectedTest) {
-		t.Errorf("tests must be same size %d %d", len(tests), len(expectedTest))
-	}
+	assert.NotNil(t, tests, "tests can't be nil in this case")
+	assert.Equal(t, len(tests), len(expectedTest), "tests must be same size %d %d", len(tests), len(expectedTest))
 
 	for line, expected := range expectedTest {
 		actual, found := tests[line]
-		if !found {
-			t.Errorf("Expected test on line %d, but not found", line)
-			continue
-		}
-
-		if actual != expected {
-			t.Errorf("Expected test on line %d to be %v, but got %v", line, expected, actual)
-		}
+		assert.Equal(t, found, true, "expected test on line %d, but not found", line)
+		assert.Equal(t, actual, expected, "expected test on line %d to be %v, but got %v", line, expected, actual)
 	}
 }
-

@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"testing"
 	"time"
+	assert "github.com/stretchr/testify/assert"
 )
 
 func TestGopls(t *testing.T) {
@@ -23,7 +24,7 @@ func TestGopls(t *testing.T) {
 	reader := textproto.NewReader(bufio.NewReader(stdout))
 
 	err := cmd.Start()
-	if err != nil { fmt.Println(err); return }
+	assert.NotEqual(t, err, nil, "error occured at start: %s", err)
 
 	initializeRequest := InitializeRequest{
 		ID: 0, JSONRPC: "2.0",
@@ -51,7 +52,7 @@ func TestGopls(t *testing.T) {
 
 		didOpenRequest := DidOpenRequest{
 			JSONRPC: "2.0", Method:	"textDocument/didOpen",
-			Params: DidOpenParams{
+			Params: DidOpenTextDocumentParams{
 				TextDocument: TextDocument{
 					LanguageID: "go", Text: string(filecontent),
 					URI: "file://" + file, Version:		1,

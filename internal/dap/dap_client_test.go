@@ -14,6 +14,7 @@ import (
 	// "path"
 	// "strings"
 	"testing"
+	assert "github.com/stretchr/testify/assert"
 )
 
 
@@ -24,21 +25,16 @@ func TestDapClientStart(t *testing.T) {
 	started := dap.Start("dlv", "dap")
 	defer dap.Stop()
 
-	if !started { t.Errorf("Error, dap not started") }
-
-	if dap.cmd == nil { t.Errorf("Error, cmd is nil") }
+	assert.Equal(t, started, true, "error, dap not started")
+	assert.Equal(t, dap.cmd, nil, "error, cmd is nil")
 
 	pid := dap.cmd.Process.Pid
-	fmt.Println("dap pid is", pid)
 
 	process, err := os.FindProcess(pid)
-	if err != nil { t.Errorf("Error finding cmd with id %d: %s\n", process.Pid, err) }
 
-	if dap.IsStopped { t.Errorf("Expected lsp not to be stopped") }
+	assert.Equal(t, err, nil, "error finding cmd with id %d: %s", process.Pid, err)
+	assert.NotEqual(t, dap.IsStopped, true, "expected lsp not to be stopped")
 }
-
-
-
 
 func TestDapClientInitialize(t *testing.T) {
 	os.Chdir("../..")
@@ -57,9 +53,7 @@ func TestDapClientInitialize(t *testing.T) {
 	currentDir, _ := os.Getwd()
 	dap.Init(currentDir)
 
-	if dap.IsReady == false {
-		t.Errorf("Expected lsp to be ready, got false")
-	}
+	assert.Equal(t, dap.IsReady, true, "expected lsp to be ready, got false")
 }
 
 func TestDapClientLaunch(t *testing.T) {
@@ -76,10 +70,7 @@ func TestDapClientLaunch(t *testing.T) {
 	dap.Init(currentDir)
 
 	launchResult := dap.Launch("./cmd/test/main.go")
-	
-	if launchResult == false {
-		t.Errorf("Expected launchResult to be true, got false")
-	}
+	assert.Equal(t, launchResult, true, "expected launchResult to be true, got false")
 }
 
 func TestDapClientBreakpoint(t *testing.T) {
@@ -97,16 +88,10 @@ func TestDapClientBreakpoint(t *testing.T) {
 	dap.Launch("./cmd/test/main.go")
 	
 	setBreakpointResult := dap.SetBreakpoint("/Users/max/apps/go/edgo/cmd/test/main.go", 9)
-	
-	if setBreakpointResult == false {
-		t.Errorf("Expected setBreakpointResult to be true, got false")
-	}
+	assert.Equal(t, setBreakpointResult, true, "expected setBreakpointResult to be true, got false")
 
 	setBreakpointResult2 := dap.SetBreakpoint("/Users/max/apps/go/edgo/cmd/test/main.go", 10)
-
-	if setBreakpointResult2 == false {
-		t.Errorf("Expected setBreakpointResult to be true, got false")
-	}
+	assert.Equal(t, setBreakpointResult2, true, "expected setBreakpointResult2 to be true, got false")
 }
 
 func TestDapClientContinue(t *testing.T) {
@@ -123,13 +108,11 @@ func TestDapClientContinue(t *testing.T) {
 	dap.Init(currentDir)
 	dap.Launch("./cmd/test/main.go")
 	dap.SetBreakpoint("/Users/max/apps/go/edgo/cmd/test/main.go", 9)
-	
+
 	threadId := 1
+
 	continueResult := dap.Continue(threadId)
-	
-	if continueResult == false {
-		t.Errorf("Expected setBreakpointResult to be true, got false")
-	}
+	assert.Equal(t, continueResult, true, "expected continueResult to be true, got false")
 }
 
 func TestDapClientContinueWithEvents(t *testing.T) {
@@ -167,8 +150,8 @@ func TestDapClientContinueWithEvents(t *testing.T) {
 	time.Sleep(time.Second)
 	dap.Continue(threadId)
 	time.Sleep(time.Second)
-
 }
+
 func TestDapClientDisconnect(t *testing.T) {
 	os.Chdir("../..")
 	currentDir, _ := os.Getwd()
@@ -206,7 +189,6 @@ func TestDapClientDisconnect(t *testing.T) {
 	time.Sleep(time.Second)
 
 	dap.Disconnect()
-
 }
 
 func TestDapClientContinueWithEventsRwice(t *testing.T) {
@@ -273,7 +255,6 @@ func TestDapClientContinueWithEventsRwice(t *testing.T) {
 	time.Sleep(time.Second)
 	dap.Continue(threadId)
 	time.Sleep(time.Second)
-
 }
 
 func TestDp(t *testing.T) {
@@ -284,7 +265,6 @@ func TestDp(t *testing.T) {
 	ctx, _ := signal.NotifyContext(context.Background(), os.Kill)
 	cmd := exec.CommandContext(ctx, split[0], split[1:]...)
 	cmd.Env = append(os.Environ())
-
 
 	go func() {
 		err := cmd.Run()
@@ -303,7 +283,6 @@ func TestDp(t *testing.T) {
 	}()
 
 	time.Sleep(time.Second*10)
-
 }
 
 func TestDapClientStartPython(t *testing.T) {
@@ -373,5 +352,4 @@ func TestDapClientStartPython(t *testing.T) {
 	fmt.Println("variablesResponse", variablesResponse)
 
 	time.Sleep(time.Second*100000)
-
 }

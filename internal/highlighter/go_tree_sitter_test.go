@@ -2,10 +2,10 @@ package highlighter
 
 import (
 	"context"
-	"fmt"
 	sitter "github.com/smacker/go-tree-sitter"
 	"github.com/smacker/go-tree-sitter/javascript"
 	"testing"
+	assert "github.com/stretchr/testify/assert"
 )
 
 func TestTreeSitterQueries(t *testing.T) {
@@ -111,7 +111,11 @@ function hello() {
 		for _, c := range m.Captures {
 			name := q.CaptureNameForId(c.Index)
 			content := c.Node.Content(code)
-			fmt.Println(c.Node.StartPoint(), c.Node.EndPoint(), name, c.Node.Type(), content)
+			assert.NotNil(t, c.Node.StartPoint(), "node startpoint is nil")
+			assert.NotNil(t, c.Node.EndPoint(), "node endpoint is nil")
+			assert.NotNil(t, name, "name is nil")
+			assert.NotNil(t, c.Node.Type(), "node type is nil")
+			assert.NotNil(t, content, "content is nil")
 		}
 	}
 }

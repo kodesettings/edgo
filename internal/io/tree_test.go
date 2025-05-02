@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"testing"
+	assert "github.com/stretchr/testify/assert"
 )
 
 func TestProcessDirectory(t *testing.T) {
@@ -17,16 +18,12 @@ func TestProcessDirectory(t *testing.T) {
 
 	// Recursively process the directory
 	fileInfo, err := ReadDirTree(dir, "", true,0)
-	if err != nil {
-		fmt.Println("Failed to process directory:", err)
-		return
-	}
+	assert.NotNil(t, err, "failed to process directory: %s", err)
 
 	// Print the result
 	//fmt.Printf("%+v\n", fileInfo)
 
 	PrintTree(fileInfo, 0)
-
 }
 
 func TestTreeSize(t *testing.T) {
@@ -34,6 +31,7 @@ func TestTreeSize(t *testing.T) {
 	tree, _ := ReadDirTree(dir,"", true,0)
 	size := TreeSize(tree, 0)
 	fmt.Println("size", size)
+	assert.Equal(t, size > 0, true, "size is zero")
 }
 
 func TestGetSelected(t *testing.T) {
@@ -41,4 +39,6 @@ func TestGetSelected(t *testing.T) {
 	tree, _ := ReadDirTree(dir, "", true,0)
 	found, fi := GetSelected(tree, 13)
 	fmt.Println("selected", found, fi)
+	assert.NotNil(t, found, "foudn is nil")
+	assert.NotNil(t, fi, "fi is nil")
 }

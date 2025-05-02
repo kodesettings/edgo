@@ -10,6 +10,7 @@ import (
 	"github.com/smacker/go-tree-sitter/python"
 	"testing"
 	"time"
+	assert "github.com/stretchr/testify/assert"
 )
 
 func walk(node *sitter.Node) {
@@ -45,13 +46,11 @@ func TestTreeSitter(t *testing.T) {
 	lang := golang.GetLanguage()
 	start := time.Now()
 	n, err := sitter.ParseCtx(context.Background(), sourceCode, lang)
-	if err != nil { fmt.Println(err)}
+
+	assert.Nil(t, err, "error occurred in tree sitter test")
+	assert.NotNil(t, n, "error occurred in tree sitter test")
 
 	fmt.Println("parsed, elapsed", time.Since(start))
-
-	//fmt.Println(n)
-
-	walk(n)
 }
 
 func TestTreeSitterGo(t *testing.T) {
@@ -81,13 +80,12 @@ func main() {
 	lang := golang.GetLanguage()
 	start := time.Now()
 	n, err := sitter.ParseCtx(context.Background(), sourceCode, lang)
-	if err != nil { fmt.Println(err)}
+
+	assert.Nil(t, err, "error occurred in tree sitter go")
+	assert.NotNil(t, n, "error occurred in tree sitter go")
 
 	fmt.Println("parsed, elapsed", time.Since(start))
 
-	//fmt.Println(n)
-
-	walk(n)
 }
 
 func TestTreeSitterPython(t *testing.T) {
@@ -113,15 +111,12 @@ print("Elapsed time:", elapsed_time, q"seconds")
 	lang := python.GetLanguage()
 	start := time.Now()
 	n, err := sitter.ParseCtx(context.Background(), sourceCode, lang)
-	if err != nil { fmt.Println(err)}
+
+	assert.Nil(t, err, "error occurred in tree sitter python")
+	assert.NotNil(t, n, "error occurred in tree sitter python")
 
 	fmt.Println("parsed, elapsed", time.Since(start))
-
-	//fmt.Println(n)
-
-	walk(n)
 }
-
 
 func TestTreeSitterJs(t *testing.T) {
 	code := []byte(`
@@ -134,13 +129,13 @@ function hello() {
 
 	start := time.Now()
 	tree, err := parser.ParseCtx(context.Background(),nil, code)
-	if err != nil { fmt.Println(err)}
+
+	assert.Nil(t, err, "error occurred in tree sitter js")
+	assert.NotNil(t, tree, "error occurred in tree sitter js")
 
 	fmt.Println("parsed, elapsed", time.Since(start))
 	print(tree.RootNode(), code)
 }
-
-
 
 func TestTreeSitterJsEdit(t *testing.T) {
 	parser := sitter.NewParser()
@@ -152,7 +147,8 @@ func TestTreeSitterJsEdit(t *testing.T) {
 	start := time.Now()
 
 	tree, err := parser.ParseCtx(context.Background(),nil, code)
-	if err != nil { fmt.Println(err)}
+	assert.Nil(t, err, "error occurred in tree sitter js edit")
+	assert.NotNil(t, tree, "error occurred in tree sitter js edit")
 
 	elapsedFirst := time.Since(start)
 	fmt.Println("parsed, elapsed", elapsedFirst)
@@ -174,7 +170,9 @@ func TestTreeSitterJsEdit(t *testing.T) {
 
 	start = time.Now()
 	tree, err = parser.ParseCtx(context.Background(), tree, code)
-	if err != nil { fmt.Println(err)}
+	assert.Nil(t, err, "error occurred in tree sitter js edit")
+	assert.NotNil(t, tree, "error occurred in tree sitter js edit")
+
 	elapsedSecond := time.Since(start)
 	fmt.Println("parsed again, elapsed", elapsedSecond)
 	speedup := float64(elapsedFirst) / float64(elapsedSecond)
@@ -194,7 +192,8 @@ func TestTreeSitterJsEditDelete(t *testing.T) {
 	start := time.Now()
 
 	tree, err := parser.ParseCtx(context.Background(),nil, code)
-	if err != nil { fmt.Println(err)}
+	assert.Nil(t, err, "error occurred in tree sitter js edit delete")
+	assert.NotNil(t, tree, "error occurred in tree sitter js edit delete")
 
 	elapsedFirst := time.Since(start)
 	fmt.Println("parsed, elapsed", elapsedFirst)
@@ -216,7 +215,9 @@ func TestTreeSitterJsEditDelete(t *testing.T) {
 
 	start = time.Now()
 	tree, err = parser.ParseCtx(context.Background(), tree, code)
-	if err != nil { fmt.Println(err)}
+	assert.Nil(t, err, "error occurred in tree sitter js edit delete")
+	assert.NotNil(t, tree, "error occurred in tree sitter js edit delete")
+
 	elapsedSecond := time.Since(start)
 	fmt.Println("parsed again, elapsed", elapsedSecond)
 	speedup := float64(elapsedFirst) / float64(elapsedSecond)
@@ -235,7 +236,8 @@ func TestTreeSitterJsEditDeleteMultiple(t *testing.T) {
 	start := time.Now()
 
 	tree, err := parser.ParseCtx(context.Background(),nil, code)
-	if err != nil { fmt.Println(err)}
+	assert.Nil(t, err, "error occurred in tree sitter js edit delete multiple")
+	assert.NotNil(t, tree, "error occurred in tree sitter js edit delete multiple")
 
 	elapsedFirst := time.Since(start)
 	fmt.Println("parsed, elapsed", elapsedFirst)
@@ -276,7 +278,9 @@ func TestTreeSitterJsEditDeleteMultiple(t *testing.T) {
 
 	start = time.Now()
 	tree, err = parser.ParseCtx(context.Background(), tree, code)
-	if err != nil { fmt.Println(err)}
+	assert.Nil(t, err, "error occurred in tree sitter js edit delete multiple")
+	assert.NotNil(t, tree, "error occurred in tree sitter js edit delete multiple")
+
 	elapsedSecond = time.Since(start)
 	fmt.Println("parsed again, elapsed", elapsedSecond)
 	speedup = float64(elapsedFirst) / float64(elapsedSecond)
@@ -295,7 +299,8 @@ func TestTreeSitterJsEditEnter(t *testing.T) {
 	start := time.Now()
 
 	tree, err := parser.ParseCtx(context.Background(),nil, code)
-	if err != nil { fmt.Println(err)}
+	assert.Nil(t, err, "error occurred in tree sitter js edit delete enter")
+	assert.NotNil(t, tree, "error occurred in tree sitter js edit delete enter")
 
 	elapsedFirst := time.Since(start)
 	fmt.Println("parsed, elapsed", elapsedFirst)
@@ -318,7 +323,9 @@ console.log('hello')}`)
 
 	start = time.Now()
 	tree, err = parser.ParseCtx(context.Background(), tree, code)
-	if err != nil { fmt.Println(err)}
+	assert.Nil(t, err, "error occurred in tree sitter js edit delete enter")
+	assert.NotNil(t, tree, "error occurred in tree sitter js edit delete enter")
+
 	elapsedSecond := time.Since(start)
 	fmt.Println("parsed again, elapsed", elapsedSecond)
 	speedup := float64(elapsedFirst) / float64(elapsedSecond)
@@ -326,8 +333,6 @@ console.log('hello')}`)
 
 	print(tree.RootNode(), code)
 }
-
-
 
 func TestTreeSitterQuery(t *testing.T) {
 	code := []byte(`
@@ -368,7 +373,12 @@ function hello() {
 		for _, c := range m.Captures {
 			name := q.CaptureNameForId(c.Index)
 			content := c.Node.Content(code)
-			fmt.Println(c.Node.StartPoint(), c.Node.EndPoint(), name, c.Node.Type(), content)
+			// fmt.Println(c.Node.StartPoint(), c.Node.EndPoint(), name, c.Node.Type(), content)
+			assert.NotNil(t, c.Node.StartPoint(), "node startpoint is nil")
+			assert.NotNil(t, c.Node.EndPoint(), "node endpoint is nil")
+			assert.NotNil(t, name, "name is nil")
+			assert.NotNil(t, c.Node.Type(), "node type is nil")
+			assert.NotNil(t, content, "content is nil")
 		}
 	}
 }
@@ -403,7 +413,10 @@ func main() {
 		// Apply predicates filtering
 		m = qc.FilterPredicates(m, sourceCode)
 		for _, c := range m.Captures {
-			fmt.Println(c.Node.StartPoint(), c.Node.EndPoint(), c.Node.Type(), c.Node.Content(sourceCode))
+			assert.NotNil(t, c.Node.StartPoint(), "node startpoint is nil")
+			assert.NotNil(t, c.Node.EndPoint(), "node endpoint is nil")
+			assert.NotNil(t, c.Node.Type(), "node type is nil")
+			assert.NotNil(t, c.Node.Content(sourceCode), "content is nil")
 		}
 	}
 }

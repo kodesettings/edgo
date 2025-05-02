@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	assert "github.com/stretchr/testify/assert"
 )
 
 
@@ -32,11 +33,7 @@ func TestGit(t *testing.T) {
 	removed.Print()
 }
 
-
-
-
 func TestGit2(t *testing.T) {
-
 	str1 := `
     Line 1
 	Line 2
@@ -61,9 +58,7 @@ func TestGit2(t *testing.T) {
 }
 
 func TestGit22(t *testing.T) {
-
 	str1 := `Line 1`
-
 	str2 := `Line 2`
 
 	added, removed := Diff(str1, str2)
@@ -135,13 +130,11 @@ func TestGit4(t *testing.T) {
 }
 
 func TestGit5(t *testing.T) {
-
 	fname := "internal/utils/utils.go"
 
 	fileContent, _ := GetLastCommitFileContent(fname)
 	bytes, _ := os.ReadFile(fname)
 	newFileContent := string(bytes)
-
 
 	//const (
 	//	text1 = "Lorem ipsum dolor."
@@ -149,8 +142,6 @@ func TestGit5(t *testing.T) {
 	//)
 
 	dmp := diffmatchpatch.New()
-
 	diffs := dmp.DiffMain(fileContent, newFileContent, false)
-
 	fmt.Println(dmp.DiffPrettyText(diffs))
 }

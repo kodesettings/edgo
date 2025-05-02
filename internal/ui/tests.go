@@ -10,8 +10,6 @@ import (
 	"os"
 )
 
-
-
 func (e *Editor) FindTests() {
 	clear(e.Tests)
 
@@ -30,7 +28,6 @@ func (e *Editor) FindTests() {
 	rootNode := e.treeSitterHighlighter.GetTree().RootNode()
 	e.Tests = e.Test.Find(&e.TestFinder, rootNode, e.AbsoluteFilePath, codeBytes)
 }
-
 
 func (e *Editor) RunTest(test TestData) {
 	if e.Test == nil { return }
@@ -78,5 +75,4 @@ func (e *Editor) RunTest(test TestData) {
 			}
 		}
 	}()
-
 }

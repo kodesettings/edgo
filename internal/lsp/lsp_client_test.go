@@ -7,6 +7,7 @@ import (
 	"path"
 	"strings"
 	"testing"
+	assert "github.com/stretchr/testify/assert"
 )
 
 func TestLspClientStart(t *testing.T) {
@@ -14,29 +15,15 @@ func TestLspClientStart(t *testing.T) {
 	started := lsp.Start("gopls")
 	defer lsp.Stop()
 
-	if !started {
-		t.Errorf("Error, lsp not started")
-		return
-	}
-
-	if lsp.Cmd == nil {
-		t.Errorf("Error, Cmd is nil")
-		return
-	}
+	assert.Equal(t, started, true, "lsp not started")
+	assert.NotNil(t, lsp.Cmd, "cmd is nil")
 
 	pid := lsp.Cmd.Process.Pid
 	fmt.Println("lsp pid is", pid)
 
 	process, err := os.FindProcess(pid)
-	if err != nil {
-		t.Errorf("Error finding Cmd with id %d: %s\n", process.Pid, err)
-		return
-	}
-
-	if lsp.isStopped {
-		t.Errorf("Expected lsp not to be stopped")
-		return
-	}
+	assert.Nil(t, err, "error finding Cmd with id %d: %s\n", process.Pid, err)
+	assert.NotEqual(t, lsp.isStopped, true, "expected lsp not to be stopped")
 }
 
 func TestLspClientStop(t *testing.T) {
@@ -46,13 +33,9 @@ func TestLspClientStop(t *testing.T) {
 	pid := lsp.Cmd.Process.Pid
 	fmt.Println("lsp pid is", pid)
 
-	//time.Sleep(10*time.Second)
 	lsp.Stop()
-	//time.Sleep(10*time.Second)
 
-	if lsp.isStopped == false {
-		t.Errorf("Expected lsp to be stopped, got false")
-	}
+	assert.Equal(t, lsp.isStopped, true, "expected lsp to be stopped, got false")
 }
 
 func TestLspClientInitialize(t *testing.T) {
@@ -65,9 +48,7 @@ func TestLspClientInitialize(t *testing.T) {
 	currentDir, _ := os.Getwd()
 	lsp.Init(currentDir)
 
-	if lsp.IsReady == false {
-		t.Errorf("Expected lsp to be ready, got false")
-	}
+	assert.Equal(t, lsp.IsReady, true, "expected lsp to be ready, got false")
 }
 
 func TestLspClientHover(t *testing.T) {
@@ -86,14 +67,13 @@ func TestLspClientHover(t *testing.T) {
 	lsp.DidOpen(file, &stringtext)
 
 	response, err := lsp.Hover(file, 75-1, 7)
+	assert.Nil(t, err, "error occured")
 
 	fmt.Println(response, err)
 
 	expected := "func (*Logger).Start()"
 	got := response.Result.Contents.Value
-	if got != expected {
-		t.Errorf("Expected lsp hover result to be %s, got something else %s", expected, got)
-	}
+	assert.Equal(t, got, expected, "expected lsp hover result to be %s, got something else %s", expected, got)
 }
 
 func TestLspClientCompletion(t *testing.T) {
@@ -112,13 +92,13 @@ func TestLspClientCompletion(t *testing.T) {
 	lsp.DidOpen(file, &stringtext)
 
 	response, err := lsp.Completion(file, 100-1, 8)
+	assert.Nil(t, err, "error occured")
 
 	fmt.Println(response, err)
 
 	expected := "Start"
-	if len(response.Result.Items) != 1 && response.Result.Items[0].Label != expected {
-		t.Errorf("Expected lsp Completion result to be %s, got something else", expected)
-	}
+	assert.Equal(t, len(response.Result.Items), 1, "items must be 1")
+	assert.Equal(t, response.Result.Items[0].Label, expected, "expeccted lsp completion result to be %s", expected)
 }
 
 func TestLspClientDefinition(t *testing.T) {
@@ -137,13 +117,15 @@ func TestLspClientDefinition(t *testing.T) {
 	lsp.DidOpen(file, &stringtext)
 
 	response, err := lsp.Definition(file, 124-1, 8)
+	assert.Nil(t, err, "error occured")
 
 	fmt.Println(response, err)
 
 	expectedSuffix := "logger/logger.go"
-	if len(response.Result) == 1 && !strings.Contains(response.Result[0].URI, expectedSuffix) {
-		t.Errorf("Expected lsp Definition result to be %s, got something else", expectedSuffix)
-	}
+	containsSuffix := strings.Contains(response.Result[0].URI, expectedSuffix)
+
+	assert.Equal(t, len(response.Result), 1, "items must be 1")
+	assert.Equal(t, containsSuffix, false, "expeccted lsp definition result to be %s", expectedSuffix)
 }
 
 func TestLspClientSignatureHelp(t *testing.T) {
@@ -162,13 +144,13 @@ func TestLspClientSignatureHelp(t *testing.T) {
 	lsp.DidOpen(file, &stringtext)
 
 	response, err := lsp.SignatureHelp(file, 156-1, 21)
+	assert.Nil(t, err, "error occured")
 
 	fmt.Println(response, err)
 
 	expected := "Join"
-	if len(response.Result.Signatures) != 1 && !strings.Contains(response.Result.Signatures[0].Label, expected) {
-		t.Errorf("Expected lsp Definition result to be %s, got something else", expected)
-	}
+	assert.Equal(t, len(response.Result.Signatures), 1, "items must be 1")
+	assert.Equal(t, response.Result.Signatures[0].Label, expected, "expeccted lsp definition result to be %s", expected)
 }
 
 func TestLspClientReferences(t *testing.T) {
@@ -187,6 +169,7 @@ func TestLspClientReferences(t *testing.T) {
 	lsp.DidOpen(file, &stringtext)
 
 	response, err := lsp.References(file, 175-1, 2)
+	assert.Nil(t, err, "error occured")
 
 	fmt.Println(response, err)
 	// todo fix, something wrong with base dir

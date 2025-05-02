@@ -9,7 +9,6 @@ import (
 	"time"
 )
 
-
 func TestFileWatcher(t *testing.T) {
 	tempDir := os.TempDir()
 	fmt.Println("Temporary directory:", tempDir)
@@ -43,7 +42,6 @@ func TestFileWatcher(t *testing.T) {
 		os.Remove(tempDir)
 	}
 }
-
 
 func TestDirWatcher(t *testing.T) {
 	tempDir := os.TempDir()

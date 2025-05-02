@@ -3,6 +3,7 @@ package process
 import (
 	"fmt"
 	"testing"
+	assert "github.com/stretchr/testify/assert"
 )
 
 func TestTerminalStart(t *testing.T) {
@@ -15,9 +16,7 @@ func TestTerminalStart(t *testing.T) {
 
 	// Example: Execute "ls" command on the terminal
 	err = terminal.ExecuteCommand("ls")
-	if err != nil {
-		fmt.Println("Error:", err)
-	}
+	assert.Nil(t, err, "error received in terminal start: %s", err)
 
 	// Access all output lines
 	fmt.Println("Output Lines:")

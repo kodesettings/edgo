@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"testing"
+	assert "github.com/stretchr/testify/assert"
 )
 
 func TestReadConfig(t *testing.T) {
@@ -18,11 +19,6 @@ func TestReadConfig(t *testing.T) {
 
 	golang, ok := conf.Langs["go"]
 
-	if !ok {
-		t.Errorf("Go lang go not found")
-	}
-
-	if golang.Lsp != "gopls" {
-		t.Errorf("Go lang lsp should be gopls")
-	}
+	assert.Equal(t, ok, true, "Go lang go not found")
+	assert.Equal(t, golang.Lsp, "gopls", "Go lang lsp should be gopls")
 }

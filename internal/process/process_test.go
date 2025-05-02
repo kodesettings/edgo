@@ -5,13 +5,13 @@ import (
 	"context"
 	"fmt"
 	"github.com/creack/pty"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"os"
 	"os/exec"
 	"os/signal"
 	"testing"
 	"time"
+	assert "github.com/stretchr/testify/assert"
 )
 
 func TestProcessCommandNotFound(t *testing.T) {

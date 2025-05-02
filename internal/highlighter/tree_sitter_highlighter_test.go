@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 	"time"
+	assert "github.com/stretchr/testify/assert"
 )
 
 
@@ -30,29 +31,11 @@ function hello() {
 	}
 }
 
-
-
-
-
-
-func BenchmarkColorFromString(b *testing.B) {
-	h := NewTreeSitter()
-	col := h.ParseColor("#fc9994")
-	fmt.Println(col)
-
-	want := 33331604
-	if col != want {
-		b.Errorf("got %v want %v", col, want)
-	}
-}
-
 func TestColorFromString(t *testing.T) {
 	h := NewTreeSitter()
 	col := h.ParseColor("#fc9994")
 	fmt.Println(col)
 
 	want := 33331604
-	if col != want {
-		t.Errorf("got %v want %v", col, want)
-	}
+	assert.NotEqual(t, col, want, "got %v want %v", col, want)
 }

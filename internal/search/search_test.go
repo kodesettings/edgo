@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"testing"
 	"time"
+	assert "github.com/stretchr/testify/assert"
 )
 
 func TestSearch(t *testing.T) {
@@ -62,10 +63,9 @@ func TestSearch(t *testing.T) {
 
 	for _, tc := range testCases {
 		results := Search(text, tc.pattern)
-		if !reflect.DeepEqual(results, tc.expected) {
-			t.Errorf("Search did not return the expected results for pattern '%s'. Expected: %v, Got: %v",
-				tc.pattern, tc.expected, results)
-		}
+		assert.Equal(t, reflect.DeepEqual(results, tc.expected), true, 
+			"Search did not return the expected results for pattern '%s'. Expected: %v, Got: %v",
+			tc.pattern, tc.expected, results)
 	}
 }
 
@@ -121,7 +121,6 @@ func TestSearchOnDirParallel2(t *testing.T) {
 	}
 }
 
-
 func TestLineCount(t *testing.T) {
 	start := time.Now()
 	lc, emptylc := LineCountOnFile("search_test.go")
@@ -131,7 +130,6 @@ func TestLineCount(t *testing.T) {
 	fmt.Println("Found", lc, "lines")
 	fmt.Println("Found empty", emptylc, "lines")
 }
-
 
 func TestLineCountOnDirParallel(t *testing.T) {
 	fmt.Println("cpu", runtime.NumCPU())
@@ -145,11 +143,6 @@ func TestLineCountOnDirParallel(t *testing.T) {
 	fmt.Println("total rows processed", totalRowsProcessed)
 
 	fmt.Println("done, elapsed", elapsed.String())
-	//fmt.Println("Found", len(results), "results")
-	//
-	//for _, result := range results {
-	//	fmt.Println(result)
-	//}
 
 	langCount := LangCount(results)
 	for _, result := range langCount {

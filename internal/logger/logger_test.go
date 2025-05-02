@@ -7,9 +7,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+	assert "github.com/stretchr/testify/assert"
 )
-
-
 
 func TestLoggerInfo(t *testing.T) {
 	err := os.Setenv("EDGO_LOG", "edgo.log")
@@ -29,9 +28,6 @@ func TestLoggerInfo(t *testing.T) {
 	lines := strings.Split(content, "\n")
 	lines = slices.Delete(lines, len(lines)-1, len(lines))
 
-	if len(lines) != 3 {
-		t.Errorf("Expected %d, got %d", 3, len(lines))
-	}
-
+	assert.Equal(t, lines, 3, "Expected %d, got %d", 3, len(lines))
 	os.Remove("edgo.log")
 }
