@@ -32,14 +32,16 @@ func (e *Editor) ReadFile(fileToRead string) string {
 	return code
 }
 
-func (e *Editor) UpdateLsp(isOpen bool, text string, position...int) {
+func (e *Editor) UpdateLsp(isOpen bool, text string, pos ...int) {
 	if e.Lang == "" { return } // language not detected
 	lsp := e.lsp2lang[e.Lang]
 
 	if !lsp.IsReady { return } // lsp is not connected
 
+	var version int = 2 // TODO: add version number incrementing
+
 	if !isOpen {
-		go lsp.DidChange(e.AbsoluteFilePath, position[0], position[1], position[2], position[3], &text);
+		go lsp.DidChange(e.AbsoluteFilePath, pos[1], pos[0], pos[3], pos[2], &text, version);
 	} else {
 		go lsp.DidOpen(e.AbsoluteFilePath, &text);
 	}

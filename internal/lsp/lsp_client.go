@@ -304,7 +304,7 @@ func (this *LspClient) DidOpen(file string, text *string) {
 	this.send(didOpenRequest)
 }
 
-func (this *LspClient) DidChange(file string, spc int, spl int, epc int, epl int, text *string) {
+func (this *LspClient) DidChange(file string, spc int, spl int, epc int, epl int, text *string, version int) {
 	didChangeRequest := DidChangeRequest{
 		JSONRPC: "2.0",  Method:  "textDocument/didChange",
 		Params: DidChangeTextDocumentParams{
@@ -317,7 +317,7 @@ func (this *LspClient) DidChange(file string, spc int, spl int, epc int, epl int
 			}},
 			TextDocument: VersionedTextDocumentIdentifier{
 				URI:        "file://" + file,
-				Version:    1,
+				Version:    version,
 			},
 		},
 	}
