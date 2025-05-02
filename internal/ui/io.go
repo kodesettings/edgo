@@ -28,19 +28,20 @@ func (e *Editor) ReadFile(fileToRead string) string {
 	} else {
 		code = e.BuildContent(fileToRead, 1000000)
 	}
+
 	return code
 }
 
-func (e *Editor) UpdateLsp() {
-	if e.Lang != "" {
-		lsp := e.lsp2lang[e.Lang]
-		if lsp.IsReady {
-			code := ConvertContentToString(e.Content)
-			go lsp.DidOpen(e.AbsoluteFilePath, &code) // todo remove it in future
-			//go lsp.didChange(AbsoluteFilePath)
-			//go lsp.didSave(AbsoluteFilePath)
-		}
+func (e *Editor) UpdateLsp(isOpen bool, text string, position...int) {
+	if e.Lang == "" { return } // language not detected
+	lsp := e.lsp2lang[e.Lang]
 
+	if !lsp.IsReady { return } // lsp is not connected
+
+	if !isOpen {
+		go lsp.DidChange(e.AbsoluteFilePath, position[0], position[1], position[2], position[3], &text);
+	} else {
+		go lsp.DidOpen(e.AbsoluteFilePath, &text);
 	}
 }
 
@@ -78,7 +79,7 @@ func (e *Editor) WriteFile(saveFile bool) {
 	e.IsContentChanged = false
 	e.FileWatcher.UpdateStats()
 update:
-	go e.UpdateLsp()
+	e.UpdateLsp(true, ConvertContentToString(e.Content), e.Row, e.Col, e.Row, e.Col)
 }
 
 func (e *Editor) BuildContent(filename string, limit int) string {

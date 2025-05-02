@@ -304,21 +304,26 @@ func (this *LspClient) DidOpen(file string, text *string) {
 	this.send(didOpenRequest)
 }
 
-func (this *LspClient) DidClose(file string) {
-	request := DidOpenRequest{
-		JSONRPC: "2.0",  Method:  "textDocument/didClose",
-		Params: DidOpenParams{
+func (this *LspClient) DidChange(file string, spc int, spl int, epc int, epl int, text *string) {
+	didChangeRequest := DidChangeRequest{
+		JSONRPC: "2.0",  Method:  "textDocument/didChange",
+		Params: DidChangeParams{
+			ContentChanges: []ContentChange{{
+				Range: ChangeRange{
+					Start: Character{ Line: spl, Character: spc},
+					End: Character{ Line: epl, Character: epc},
+				},
+				Text: *text,
+			}},
 			TextDocument: TextDocument{
-				LanguageID: this.Lang,
 				URI:        "file://" + file,
 				Version:    1,
 			},
 		},
 	}
 
-	this.send(request)
+	this.send(didChangeRequest)
 }
-
 
 func (this *LspClient) Hover(file string, line int, character int) (HoverResponse, error) {
 	this.id++
@@ -433,7 +438,7 @@ func (this *LspClient) PrepareRename(file string, line int, character int) (Prep
 	id := this.id
 
 	request := PrepareRenameRequest {
-		ID: id, Jsonrpc: "2.0", Method:  "textDocument/prepareRename",
+		ID: id, JSONRPC: "2.0", Method:  "textDocument/prepareRename",
 		Params: Params{
 			TextDocument: TextDocument { URI:  "file://" + file },
 			Position: Position { Line: line, Character: character },
@@ -454,7 +459,7 @@ func (this *LspClient) Rename(file string, newname string, line int, character i
 	id := this.id
 
 	request := RenameRequest{
-		ID: id,  Jsonrpc: "2.0", Method:  "textDocument/rename",
+		ID: id,  JSONRPC: "2.0", Method:  "textDocument/rename",
 		Params: RenameParams {
 			NewName: newname,
 			Position: Position { Line: line, Character: character },
@@ -476,7 +481,7 @@ func (this *LspClient) CodeAction(file string, spc int, spl int, epc int, epl in
 	id := this.id
 
 	request := CodeActionRequest {
-		ID: id,  Jsonrpc: "2.0", Method: "textDocument/codeAction",
+		ID: id,  JSONRPC: "2.0", Method: "textDocument/codeAction",
 		Params: CodeActionParams {
 			TextDocument: TextDocument { URI:  "file://" + file },
 			Context: Context{ Only: []string{"refactor"}, TriggerKind: 1 },
@@ -501,7 +506,7 @@ func (this *LspClient) Command(command Command) (CommandResponse, error) {
 	id := this.id
 
 	request := CommandRequest {
-		ID: id,  Jsonrpc: "2.0", Method: "workspace/executeCommand",
+		ID: id, JSONRPC: "2.0", Method: "workspace/executeCommand",
 		Params: command,
 	}
 
@@ -518,7 +523,7 @@ func (this *LspClient) Command(command Command) (CommandResponse, error) {
 
 func (this *LspClient) ApplyEdit(key int) {
 	request := ApplyEditRequest {
-		ID: key,  Jsonrpc: "2.0",
+		ID: key,  JSONRPC: "2.0",
 		Result:  Applied { true } ,
 	}
 	this.send(request)

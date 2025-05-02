@@ -193,9 +193,9 @@ func (e *Editor) OnEnter() {
 	e.OnCursorChanged()
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
 	e.Update = true
+	e.UpdateLsp(false, contentToString, e.Row, e.Col, e.Row, e.Col)
 	e.IsContentChanged = true
 	e.FindTests()
-	e.UpdateLsp()
 }
 
 func (e *Editor) OnDelete() {
@@ -209,6 +209,7 @@ func (e *Editor) OnDelete() {
 		e.Col--
 		e.DeleteCharacter(e.Row, e.Col)
 		e.OnCursorChanged()
+		e.UpdateLsp(false, "", e.Row, e.Col, e.Row, e.Col + 1)
 	} else if e.Row > 0 { // delete line
 		e.Undo = append(e.Undo, EditOperation{{DeleteLine, ' ', e.Row -1, len(e.Content[e.Row-1])}})
 		left := e.Content[e.Row][e.Col:]
@@ -221,6 +222,7 @@ func (e *Editor) OnDelete() {
 		code := ConvertContentToString(e.Content)
 		e.treeSitterHighlighter.RemoveCharEdit(&code, e.Row, e.Col, '\n')
 		e.OnCursorChanged()
+		e.UpdateLsp(false, "", e.Row, e.Col, e.Row - 1, e.Col)
 	}
 
 	e.Focus()
@@ -228,7 +230,6 @@ func (e *Editor) OnDelete() {
 	e.Update = true
 	e.IsContentChanged = true
 	e.FindTests()
-	e.UpdateLsp()
 }
 
 func (e *Editor) OnTab() {
@@ -241,6 +242,7 @@ func (e *Editor) OnTab() {
 		e.InsertCharacter(e.Row, e.Col, ch)
 		e.Col++
 		e.OnCursorChanged()
+		e.UpdateLsp(false, string(e.Content[e.Col]), e.Row, e.Col, e.Row, e.Col)
 	} else  {
 		var ops = EditOperation{}
 		e.Selection.Ssx = 0
@@ -253,13 +255,13 @@ func (e *Editor) OnTab() {
 		e.Selection.Sex = e.Col
 		e.Undo = append(e.Undo, ops)
 		e.UpdateColors()
+		e.UpdateLsp(false, string(e.Content[e.Col]), e.Row, e.Col, e.Row, e.Col)
 	}
 
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
 	e.Update = true
 	e.IsContentChanged = true
 	e.FindTests()
-	e.UpdateLsp()
 }
 
 func (e *Editor) OnBackTab() {
@@ -285,12 +287,11 @@ func (e *Editor) OnBackTab() {
 		e.UpdateColors()
 	}
 
-
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
 	e.Update = true
+	e.UpdateLsp(false, string(e.Content[e.Col]), e.Row, e.Col, e.Row, e.Col)
 	e.IsContentChanged = true
 	e.FindTests()
-	e.UpdateLsp()
 }
 
 func (e *Editor) AddChar(ch rune) {
@@ -306,14 +307,14 @@ func (e *Editor) AddChar(ch rune) {
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
 
 	e.Update = true
+	e.UpdateLsp(false, string(ch), e.Row, e.Col - 1, e.Row, e.Col)
 	e.IsContentChanged = true
 	e.FindTests()
-	e.UpdateLsp()
 }
 
 func (e *Editor) InsertCharacter(line, pos int, ch rune) {
 	e.Content[line] = InsertTo(e.Content[line], pos, ch)
-	//if lsp.isReady { go lsp.didChange(AbsoluteFilePath, Line, pos, Line, pos, string(ch)) }
+	e.UpdateLsp(false, string(ch), line, pos, line, pos)
 	e.Undo = append(e.Undo, EditOperation{{Insert, ch, e.Row, e.Col}})
 
 	code := ConvertContentToString(e.Content)
@@ -377,6 +378,7 @@ func (e *Editor) DeleteCharacter(line, pos int) {
 	})
 
 	e.Content[line] = Remove(e.Content[line], pos)
+	e.UpdateLsp(false, string(ch), line, pos, line, pos)
 
 	code := ConvertContentToString(e.Content)
 	e.treeSitterHighlighter.RemoveCharEdit(&code, line, pos, ch)
@@ -405,7 +407,6 @@ func (e *Editor) OnSwapLinesUp() {
 	e.Update = true
 	e.IsContentChanged = true
 	e.FindTests()
-	e.UpdateLsp()
 }
 
 func (e *Editor) OnSwapLinesDown() {
@@ -432,7 +433,6 @@ func (e *Editor) OnSwapLinesDown() {
 	e.Update = true
 	e.IsContentChanged = true
 	e.FindTests()
-	e.UpdateLsp()
 }
 
 func (e *Editor) OnCopy() {
@@ -529,8 +529,8 @@ func (e *Editor) Cut(isCopySelected bool) {
 
 		e.UpdateColors()
 		e.Update = true
+		e.UpdateLsp(false, ConvertContentToString(e.Content), e.Row, e.Col, e.Row, e.Col)
 		e.IsContentChanged = true
-		e.UpdateLsp()
 		e.UpdateNeeded() // optimize
 
 	} else { // cut selection
@@ -550,6 +550,7 @@ func (e *Editor) Cut(isCopySelected bool) {
 			xd := indices[0]
 			yd := indices[1]
 			e.Col, e.Row = xd, yd
+			e.UpdateLsp(false, ConvertContentToString(e.Content), indices[0], indices[1], xd, yd)
 
 			if len(e.Content[yd]) > 0 {
 				// Delete the character at index (x, j)
@@ -588,7 +589,6 @@ func (e *Editor) Cut(isCopySelected bool) {
 		e.Selection.CleanSelection()
 		e.Update = true
 		e.IsContentChanged = true
-		e.UpdateLsp()
 		e.UpdateNeeded() // optimize
 	}
 
@@ -619,7 +619,6 @@ func (e *Editor) Duplicate() {
 		e.Update = true
 		e.IsContentChanged = true
 		e.FindTests()
-		e.UpdateLsp()
 	} else {
 		selection := e.Selection.GetSelectionString(e.Content)
 		if len(selection) == 0 { return }
@@ -722,6 +721,7 @@ func (e *Editor) OnUndo() {
 	}
 
 	e.UpdateColors()
+	e.UpdateLsp(false, ConvertContentToString(e.Content), e.Row, e.Col, e.Row, e.Col)
 	e.Redo = append(e.Redo, lastOperation)
 	e.UpdateNeeded()
 }
@@ -760,6 +760,7 @@ func (e *Editor) OnRedo() {
 	}
 
 	e.UpdateColors()
+	e.UpdateLsp(false, ConvertContentToString(e.Content), e.Row, e.Col, e.Row, e.Col)
 	e.Undo = append(e.Undo, lastRedoOperation)
 	e.UpdateNeeded()
 }
@@ -812,7 +813,6 @@ func (e *Editor) OnCommentLine() {
 		e.OnDown(false)
 		e.Update = true
 		e.IsContentChanged = true
-		e.UpdateLsp()
 		return
 	}
 
@@ -831,12 +831,13 @@ func (e *Editor) OnCommentLine() {
 		ops = append(ops, Operation{Insert, ch, e.Row, from})
 	}
 
+	e.UpdateLsp(false, string(e.Content[e.Row]), e.Row, e.Col, e.Row, e.Col)
+
 	e.Undo = append(e.Undo, ops)
 	if e.Col < 0 { e.Col = 0 }
 	e.OnDown(false)
 	e.Update = true
 	e.IsContentChanged = true
-	e.UpdateLsp()
 }
 
 func (e *Editor) HandleSmartMove(char rune) {
@@ -890,7 +891,6 @@ func (e *Editor) HandleSmartMoveDown() {
 	e.Undo = append(e.Undo, ops)
 	e.Update = true
 	e.IsContentChanged = true
-	e.UpdateLsp()
 }
 
 func (e *Editor) HandleSmartMoveUp() {
@@ -917,7 +917,6 @@ func (e *Editor) HandleSmartMoveUp() {
 	e.Undo = append(e.Undo, ops)
 	e.Update = true
 	e.IsContentChanged = true
-	e.UpdateLsp()
 }
 
 func (e *Editor) MaybeAddPair(ch rune) {

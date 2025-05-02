@@ -640,6 +640,9 @@ func (e *Editor) OpenFile(fname string) error {
 	e.Selection = Selection{-1,-1,-1,-1,false }
 	e.SearchResults = []SearchResult{}
 
+	// Opening file for LSP
+	e.UpdateLsp(true, ConvertContentToString(e.Content), e.Row, e.Col, e.Row, e.Col)
+
 	e.FileWatcher.UpdateFile(e.AbsoluteFilePath)
 	e.FileWatcher.UpdateStats()
 

@@ -460,10 +460,9 @@ func (e *Editor) completionApply(completion CompletionResponse, selected int) {
 	// add newText
 	for _, char := range newText { e.InsertCharacter(e.Row, e.Col, char); e.Col++ }
 	e.UpdateColors()
-
+	e.UpdateLsp(false, ConvertContentToString(e.Content), e.Row, e.Col, e.Row, e.Col)
 	e.Update = true
 	e.IsContentChanged = true
-	e.UpdateLsp()
 }
 
 func (e *Editor) OnRename() {
@@ -559,8 +558,6 @@ func (e *Editor) applyRename(renameResponse RenameResponse) {
 
 				e.UpdateColors()
 			}
-
-			e.UpdateLsp()
 		}
 	}
 

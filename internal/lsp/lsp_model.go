@@ -8,6 +8,7 @@ type ClientInfo struct {
 	Name    string `json:"name,omitempty"`
 	Version string `json:"version,omitempty"`
 }
+
 type WorkspaceFolder struct {
 	Name string `json:"name"`
 	URI  string `json:"uri"`
@@ -72,11 +73,13 @@ type InitializedRequest struct {
 	Method  string      `json:"method"`
 	Params  interface{} `json:"params,omitempty"`
 }
+
 type ShutdownRequest struct {
 	ID      int    `json:"id,omitempty"`
 	JSONRPC string      `json:"jsonrpc"`
 	Method  string      `json:"method"`
 }
+
 type ExitRequest struct {
 	JSONRPC string      `json:"jsonrpc"`
 	Method  string      `json:"method"`
@@ -103,8 +106,6 @@ type TextDocumentContentChangeEvent struct {
 	Text string `json:"text"`
 }
 
-
-
 type CompletionResponse struct {
 	JSONRPC string            `json:"jsonrpc"`
 	Result  CompletionResult  `json:"result"`
@@ -128,7 +129,6 @@ func unmarshal[T any](source []byte) (T, error) {
 }
 
 func (m *CompletionResponse) UnmarshalJSON(b []byte) error {
-
 	type TempCompletionResponse CompletionResponse
 	temp := &TempCompletionResponse{}
 
@@ -184,7 +184,6 @@ type PositionResponse struct {
 	Character float64 `json:"character"`
 }
 
-
 type Contents struct {
 	Kind  string `json:"kind"`
 	Value string `json:"value"`
@@ -200,7 +199,6 @@ type HoverResponse struct {
 	Result  HoverResult `json:"result"`
 	ID      int         `json:"id"`
 }
-
 
 type Parameter struct {
 	Label string `json:"label"`
@@ -221,7 +219,6 @@ type SignatureHelpResponse struct {
 	Result  SignatureHelpResult `json:"result"`
 	ID      int    `json:"id"`
 }
-
 
 type Capabilities struct {
 	CapabilitiesTextDocument CapabilitiesTextDocument `json:"textDocument"`
@@ -299,7 +296,6 @@ var capabilities = Capabilities{
 	},
 }
 
-
 type LspSettings struct {
 	Langs []map[string]string `yaml:"langs"`
 }
@@ -324,11 +320,10 @@ type DiagnosticParams struct {
 }
 
 type DiagnosticResponse struct {
-	Jsonrpc string `json:"jsonrpc"`
+	JSONRPC string `json:"jsonrpc"`
 	Method  string `json:"method"`
 	Params  DiagnosticParams `json:"params"`
 }
-
 
 type DefinitionRequest struct {
 	ID      int    `json:"id"`
@@ -342,7 +337,6 @@ type DefinitionParams struct {
 	Position     Position     `json:"position,omitempty"`
 }
 
-
 type DefinitionResult struct {
 	URI   string `json:"uri"`
 	Range Range  `json:"range"`
@@ -353,6 +347,7 @@ type DefinitionResponse struct {
 	Result  []DefinitionResult `json:"result"`
 	ID      int      `json:"id"`
 }
+
 type DefinitionResponse2 struct {
 	JSONRPC string           `json:"jsonrpc"`
 	Result  DefinitionResult `json:"result"`
@@ -383,7 +378,6 @@ func (m *DefinitionResponse) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-
 type Character struct {
 	Character int `json:"character"`
 	Line      int `json:"line"`
@@ -397,7 +391,6 @@ type ChangeRange struct {
 type ContentChange struct {
 	Range ChangeRange  `json:"range"`
 	Text  string `json:"text"`
-	RangeLength int   `json:"rangeLength"`
 }
 
 type DidChangeParams struct {
@@ -406,7 +399,7 @@ type DidChangeParams struct {
 }
 
 type DidChangeRequest struct {
-	Jsonrpc string `json:"jsonrpc"`
+	JSONRPC string `json:"jsonrpc"`
 	Method  string `json:"method"`
 	Params  DidChangeParams `json:"params"`
 }
@@ -416,7 +409,7 @@ type DidSaveParams struct {
 }
 
 type DidSaveRequest struct {
-	Jsonrpc string `json:"jsonrpc"`
+	JSONRPC string `json:"jsonrpc"`
 	Method  string `json:"method"`
 	Params  DidSaveParams `json:"params"`
 }
@@ -437,25 +430,21 @@ type Span struct {
 	End   Position `json:"end"`
 }
 
-
-
 type PrepareRenameRequest struct {
 	ID int `json:"id"`
-	Jsonrpc string `json:"jsonrpc"`
+	JSONRPC string `json:"jsonrpc"`
 	Method  string `json:"method"`
 	Params  Params `json:"params"`
 }
 
-
 type PrepareRenameResponse struct {
 	ID int `json:"id"`
-	Jsonrpc string `json:"jsonrpc"`
+	JSONRPC string `json:"jsonrpc"`
 	Result  struct {
 		Range Range `json:"range"`
 		Placeholder string `json:"placeholder"`
 	} `json:"result"`
 }
-
 
 type RenameParams struct {
 	NewName string `json:"newName"`
@@ -465,13 +454,13 @@ type RenameParams struct {
 
 type RenameRequest struct {
 	ID int `json:"id"`
-	Jsonrpc string `json:"jsonrpc"`
+	JSONRPC string `json:"jsonrpc"`
 	Method  string `json:"method"`
 	Params  RenameParams `json:"params"`
 }
 
 type RenameResponse struct {
-	Jsonrpc string        `json:"jsonrpc"`
+	JSONRPC string        `json:"jsonrpc"`
 	Result  ChangesResult `json:"result"`
 	ID      int           `json:"id"`
 }
@@ -505,13 +494,13 @@ type CodeActionParams struct {
 
 type CodeActionRequest struct {
 	ID int `json:"id"`
-	Jsonrpc string `json:"jsonrpc"`
+	JSONRPC string `json:"jsonrpc"`
 	Method  string `json:"method"`
 	Params  CodeActionParams `json:"params"`
 }
 
 type CodeActionResponse struct {
-	Jsonrpc string  `json:"jsonrpc"`
+	JSONRPC string  `json:"jsonrpc"`
 	Result  []CodeActionResult `json:"result"`
 	ID      int     `json:"id"`
 }
@@ -537,7 +526,7 @@ type Argument struct {
 
 type CommandRequest struct {
 	ID int `json:"id"`
-	Jsonrpc string `json:"jsonrpc"`
+	JSONRPC string `json:"jsonrpc"`
 	Method  string `json:"method"`
 	Params  Command `json:"params"`
 }
@@ -545,7 +534,7 @@ type CommandRequest struct {
 
 //type CommandResponse struct {
 //	ID      int    `json:"id"`
-//	Jsonrpc string `json:"jsonrpc"`
+//	JSONRPC string `json:"jsonrpc"`
 //	Method  string `json:"method"`
 //	Params  EditParams `json:"params"`
 //}
@@ -567,7 +556,7 @@ type DocChange struct {
 }
 
 type CommandResponse struct {
-	Jsonrpc string `json:"jsonrpc"`
+	JSONRPC string `json:"jsonrpc"`
 	Method  string `json:"method"`
 	Params  struct {
 		Edit struct {
@@ -577,16 +566,16 @@ type CommandResponse struct {
 	ID int `json:"id"`
 }
 
-
 type Applied struct {
 	Applied bool  `json:"applied"`
 }
+
 type ApplyWorkspaceEditParams struct {
 	Applied Applied  `json:"edit"`
 }
 
 type ApplyEditRequest struct {
 	ID int `json:"id"`
-	Jsonrpc string `json:"jsonrpc"`
+	JSONRPC string `json:"jsonrpc"`
 	Result  Applied `json:"result"`
 }
