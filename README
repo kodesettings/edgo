@@ -22,7 +22,7 @@ Usage
 Configuration
 
     Please check the manual page in your console for all the key bindings and for how to
-    altering the editor.
+    alter the color schemas or LSP configuration of the editor.
 
     Themes are supported via the configuration file and the theme sources can be found
     in internal/highlighter/themes directory for now.
@@ -30,7 +30,7 @@ Configuration
 The LSP Support
 
     Following lsp features are supported: completion, hover, signature help, definition,
-    references, rename, method extraction and diagnostic informations.
+    references, rename, method extraction and diagnostic information.
 
 Syntax highlighting
 
