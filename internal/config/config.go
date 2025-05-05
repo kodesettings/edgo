@@ -5,7 +5,6 @@ import (
 	"os"
 )
 
-
 type Lang struct {
 	Name     string `yaml:"name,omitempty"`
 	Lsp      string `yaml:"lsp,omitempty"`

@@ -1,7 +1,7 @@
 package utils
 
 import (
-	. "edgo/internal/highlighter"
+	. "github.com/vipmax/edgo/internal/highlighter"
 	"fmt"
 	"testing"
 	assert "github.com/stretchr/testify/assert"

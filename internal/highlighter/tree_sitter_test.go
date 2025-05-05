@@ -2,7 +2,7 @@ package highlighter
 
 import (
 	"context"
-	"edgo/internal/utils"
+	"github.com/vipmax/edgo/internal/utils"
 	"fmt"
 	sitter "github.com/smacker/go-tree-sitter"
 	"github.com/smacker/go-tree-sitter/golang"

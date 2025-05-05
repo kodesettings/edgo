@@ -1,7 +1,7 @@
 package git
 
 import (
-	. "edgo/internal/utils"
+	. "github.com/vipmax/edgo/internal/utils"
 	"fmt"
 	gogit "github.com/go-git/go-git/v5"
 	"github.com/sergi/go-diff/diffmatchpatch"

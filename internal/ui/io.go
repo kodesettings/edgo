@@ -2,7 +2,7 @@ package ui
 
 import (
 	"bufio"
-	. "edgo/internal/utils"
+	. "github.com/vipmax/edgo/internal/utils"
 	"fmt"
 	"os"
 	"sort"

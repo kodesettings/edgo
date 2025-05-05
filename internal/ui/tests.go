@@ -1,10 +1,10 @@
 package ui
 
 import (
-	. "edgo/internal/highlighter"
-	"edgo/internal/process"
-	. "edgo/internal/tests"
-	"edgo/internal/utils"
+	. "github.com/vipmax/edgo/internal/highlighter"
+	"github.com/vipmax/edgo/internal/process"
+	. "github.com/vipmax/edgo/internal/tests"
+	"github.com/vipmax/edgo/internal/utils"
 	"github.com/gdamore/tcell"
 	sitter "github.com/smacker/go-tree-sitter"
 	"os"

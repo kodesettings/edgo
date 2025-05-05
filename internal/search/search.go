@@ -2,9 +2,9 @@ package search
 
 import (
 	"bufio"
-	"edgo/internal/highlighter"
-	. "edgo/internal/logger"
-	"edgo/internal/utils"
+	"github.com/vipmax/edgo/internal/highlighter"
+	. "github.com/vipmax/edgo/internal/logger"
+	"github.com/vipmax/edgo/internal/utils"
 	"os"
 	"path/filepath"
 	"runtime"

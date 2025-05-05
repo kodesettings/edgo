@@ -11,7 +11,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
 	"github.com/acarl005/stripansi"
 )
 

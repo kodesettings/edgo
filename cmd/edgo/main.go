@@ -1,10 +1,10 @@
 package main
 
 import (
-	. "edgo/internal/config"
-	. "edgo/internal/highlighter"
-	. "edgo/internal/logger"
-	. "edgo/internal/ui"
+	. "github.com/vipmax/edgo/internal/config"
+	. "github.com/vipmax/edgo/internal/highlighter"
+	. "github.com/vipmax/edgo/internal/logger"
+	. "github.com/vipmax/edgo/internal/ui"
 	"fmt"
 	"runtime"
 )

@@ -1,4 +1,4 @@
-module edgo
+module github.com/vipmax/edgo
 
 go 1.21
 

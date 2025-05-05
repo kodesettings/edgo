@@ -1,12 +1,12 @@
 package ui
 
 import (
-	. "edgo/internal/highlighter"
-	. "edgo/internal/io"
-	. "edgo/internal/lsp"
-	. "edgo/internal/operations"
-	"edgo/internal/search"
-	. "edgo/internal/utils"
+	. "github.com/vipmax/edgo/internal/highlighter"
+	. "github.com/vipmax/edgo/internal/io"
+	. "github.com/vipmax/edgo/internal/lsp"
+	. "github.com/vipmax/edgo/internal/operations"
+	"github.com/vipmax/edgo/internal/search"
+	. "github.com/vipmax/edgo/internal/utils"
 	"fmt"
 	. "github.com/gdamore/tcell"
 	"sort"

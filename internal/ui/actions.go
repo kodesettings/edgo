@@ -1,13 +1,12 @@
 package ui
 
 import (
-	"edgo/internal/highlighter"
-	. "edgo/internal/operations"
-	. "edgo/internal/utils"
+	"github.com/vipmax/edgo/internal/highlighter"
+	. "github.com/vipmax/edgo/internal/operations"
+	. "github.com/vipmax/edgo/internal/utils"
 	"github.com/atotto/clipboard"
 	"strings"
 )
-
 
 func (e *Editor) OnDown(isPaging bool) {
 	e.Update = false

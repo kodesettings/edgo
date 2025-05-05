@@ -1,7 +1,7 @@
 package lsp
 
 import (
-	. "edgo/internal/logger"
+	. "github.com/vipmax/edgo/internal/logger"
 	"fmt"
 	"os"
 	"path"

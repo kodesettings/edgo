@@ -1,6 +1,7 @@
 package selection
 
-import . "edgo/internal/utils"
+import . "github.com/vipmax/edgo/internal/utils"
+
 type Selection struct {
 	Ssx        int  // selection Start x
 	Ssy        int  // selection Start y

@@ -9,7 +9,6 @@ import (
 	"time"
 )
 
-
 type FileWatcher struct {
 	filePath  string
 	lastStats os.FileInfo

@@ -1,10 +1,9 @@
 package ui
 
 import (
-	dap "edgo/internal/dap"
-	. "edgo/internal/logger"
-	. "edgo/internal/utils"
-	//"encoding/json"
+	dap "github.com/vipmax/edgo/internal/dap"
+	. "github.com/vipmax/edgo/internal/logger"
+	. "github.com/vipmax/edgo/internal/utils"
 	"fmt"
 	. "github.com/gdamore/tcell"
 	"github.com/goccy/go-json"

@@ -2,9 +2,9 @@ package io
 
 import (
 	"cmp"
-	. "edgo/internal/logger"
-	. "edgo/internal/search"
-	. "edgo/internal/utils"
+	. "github.com/vipmax/edgo/internal/logger"
+	. "github.com/vipmax/edgo/internal/search"
+	. "github.com/vipmax/edgo/internal/utils"
 	"fmt"
 	"os"
 	"path/filepath"

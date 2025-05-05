@@ -1,8 +1,8 @@
 package highlighter
 
 import (
-	. "edgo/internal/logger"
-	. "edgo/internal/themes"
+	. "github.com/vipmax/edgo/internal/logger"
+	. "github.com/vipmax/edgo/internal/themes"
 	"github.com/alecthomas/chroma"
 	"github.com/alecthomas/chroma/lexers"
 	"github.com/alecthomas/chroma/styles"

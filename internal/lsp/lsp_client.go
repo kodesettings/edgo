@@ -3,7 +3,7 @@ package lsp
 import (
 	"bufio"
 	"context"
-	. "edgo/internal/logger"
+	. "github.com/vipmax/edgo/internal/logger"
 	"fmt"
 	"github.com/goccy/go-json"
 	"io"

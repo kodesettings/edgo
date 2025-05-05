@@ -2,7 +2,7 @@ package highlighter
 
 import (
 	"context"
-	. "edgo/internal/highlighter/langs"
+	. "github.com/vipmax/edgo/internal/highlighter/langs"
 	"fmt"
 	"github.com/gdamore/tcell"
 	sitter "github.com/smacker/go-tree-sitter"

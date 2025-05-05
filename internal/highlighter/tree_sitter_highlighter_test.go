@@ -1,7 +1,7 @@
 package highlighter
 
 import (
-	. "edgo/internal/utils"
+	. "github.com/vipmax/edgo/internal/utils"
 	"fmt"
 	"testing"
 	"time"
