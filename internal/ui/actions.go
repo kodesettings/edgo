@@ -681,7 +681,7 @@ func (e *Editor) OnCursorBack() {
 }
 
 func (e *Editor) OnUndo() {
-	if len(e.Undo) == 0 { return }
+	if len(e.Undo) == 0 { e.UpdateLsp(true, ConvertContentToString(e.Content)); return }
 
 	lastOperation := e.Undo[len(e.Undo)-1]
 	e.Undo = e.Undo[:len(e.Undo)-1]
@@ -716,8 +716,9 @@ func (e *Editor) OnUndo() {
 			e.UpdateLsp(false, ConvertContentToString(e.Content))
 		} else if o.Action == MoveCursor {
 			e.Row = o.Line; e.Col = o.Column
+		} else {
+			e.OnCursorChanged()
 		}
-		e.OnCursorChanged()
 	}
 
 	e.UpdateColors()

@@ -40,9 +40,10 @@ func (e *Editor) UpdateLsp(isOpen bool, text string) {
 
 	if !isOpen {
 		e.lspver[e.AbsoluteFilePath]++
-		version := e.lspver[e.AbsoluteFilePath]
+		version := e.lspver[e.AbsoluteFilePath] // incrementing sequence number
 		go lsp.DidChange(e.AbsoluteFilePath, &text, version);
 	} else {
+		e.lspver[e.AbsoluteFilePath] = 1 // reseting sequence number
 		go lsp.DidOpen(e.AbsoluteFilePath, &text);
 	}
 }
