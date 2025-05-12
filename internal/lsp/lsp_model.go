@@ -62,6 +62,16 @@ type DidOpenRequest struct {
 	Params  DidOpenTextDocumentParams `json:"params"`
 }
 
+type DidCloseTextDocumentParams struct {
+	TextDocument TextDocumentIdentifier `json:"textDocument"`
+}
+
+type DidCloseRequest struct {
+	JSONRPC string                     `json:"jsonrpc"`
+	Method  string                     `json:"method"`
+	Params  DidCloseTextDocumentParams `json:"params"`
+}
+
 type InitializedRequest struct {
 	JSONRPC string      `json:"jsonrpc"`
 	Method  string      `json:"method"`
@@ -95,6 +105,10 @@ type DidChangeRequest struct {
 	JSONRPC string                      `json:"jsonrpc"`
 	Method  string                      `json:"method"`
 	Params  DidChangeTextDocumentParams `json:"params"`
+}
+
+type TextDocumentIdentifier struct {
+	URI     string `json:"uri"`
 }
 
 type VersionedTextDocumentIdentifier struct {

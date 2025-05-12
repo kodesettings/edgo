@@ -303,15 +303,15 @@ func (this *LspClient) DidOpen(file string, text *string) {
 	this.send(didOpenRequest)
 }
 
-func (this *LspClient) DidChange(file string, spc int, spl int, epc int, epl int, text *string, version int) {
+func (this *LspClient) DidChange(file string, text *string, version int) {
 	didChangeRequest := DidChangeRequest{
 		JSONRPC: "2.0",  Method:  "textDocument/didChange",
 		Params: DidChangeTextDocumentParams{
 			ContentChanges: []TextDocumentContentChangeEvent{{
-				Range: Range{
-					Start: Position{ Line: spl, Character: spc},
-					End: Position{ Line: epl, Character: epc},
-				},
+//				Range: Range{
+//					Start: Position{ Line: spl, Character: spc},
+//					End: Position{ Line: epl, Character: epc},
+//				},
 				Text: *text,
 			}},
 			TextDocument: VersionedTextDocumentIdentifier{
@@ -322,6 +322,19 @@ func (this *LspClient) DidChange(file string, spc int, spl int, epc int, epl int
 	}
 
 	this.send(didChangeRequest)
+}
+
+func (this *LspClient) DidClose(file string) {
+	didCloseRequest := DidCloseRequest{
+		JSONRPC: "2.0",  Method:  "textDocument/didClose",
+		Params: DidCloseTextDocumentParams{
+			TextDocument: TextDocumentIdentifier{
+				URI:        "file://" + file,
+			},
+		},
+	}
+
+	this.send(didCloseRequest)
 }
 
 func (this *LspClient) Hover(file string, line int, character int) (HoverResponse, error) {

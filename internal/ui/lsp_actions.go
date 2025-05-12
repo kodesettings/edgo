@@ -460,7 +460,7 @@ func (e *Editor) completionApply(completion CompletionResponse, selected int) {
 	// add newText
 	for _, char := range newText { e.InsertCharacter(e.Row, e.Col, char); e.Col++ }
 	e.UpdateColors()
-	e.UpdateLsp(false, newText, e.Row, from, e.Row, end)
+	e.UpdateLsp(false, ConvertContentToString(e.Content))
 	e.Update = true
 	e.IsContentChanged = true
 }

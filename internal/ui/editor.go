@@ -108,6 +108,7 @@ type Editor struct {
 	ProcessPanelSearchResultIndex int
 
 	lsp2lang map[string]*LspClient
+	lspver map[string]int // version number sequencing
 
 	Dap       dap.DapClient
 	DebugInfo DebugInfo
@@ -641,7 +642,7 @@ func (e *Editor) OpenFile(fname string) error {
 	e.SearchResults = []SearchResult{}
 
 	// Opening file for LSP
-	e.UpdateLsp(true, ConvertContentToString(e.Content), e.Row, e.Col, e.Row, e.Col)
+	e.UpdateLsp(true, ConvertContentToString(e.Content))
 
 	e.FileWatcher.UpdateFile(e.AbsoluteFilePath)
 	e.FileWatcher.UpdateStats()

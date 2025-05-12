@@ -192,7 +192,7 @@ func (e *Editor) OnEnter() {
 	e.OnCursorChanged()
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
 	e.Update = true
-	e.UpdateLsp(false, string(e.Content[e.Row]), e.Row, e.Col, e.Row + 1, e.Col)
+	e.UpdateLsp(false, ConvertContentToString(e.Content))
 	e.IsContentChanged = true
 	e.FindTests()
 }
@@ -208,7 +208,7 @@ func (e *Editor) OnDelete() {
 		e.Col--
 		e.DeleteCharacter(e.Row, e.Col)
 		e.OnCursorChanged()
-		e.UpdateLsp(false, "", e.Row, e.Col - 1, e.Row, e.Col)
+		e.UpdateLsp(false, ConvertContentToString(e.Content))
 	} else if e.Row > 0 { // delete line
 		e.Undo = append(e.Undo, EditOperation{{DeleteLine, ' ', e.Row -1, len(e.Content[e.Row-1])}})
 		left := e.Content[e.Row][e.Col:]
@@ -221,7 +221,7 @@ func (e *Editor) OnDelete() {
 		code := ConvertContentToString(e.Content)
 		e.treeSitterHighlighter.RemoveCharEdit(&code, e.Row, e.Col, '\n')
 		e.OnCursorChanged()
-		e.UpdateLsp(false, "", e.Row - 1, e.Col, e.Row, e.Col)
+		e.UpdateLsp(false, ConvertContentToString(e.Content))
 	}
 
 	e.Focus()
@@ -241,7 +241,7 @@ func (e *Editor) OnTab() {
 		e.InsertCharacter(e.Row, e.Col, ch)
 		e.Col++
 		e.OnCursorChanged()
-		e.UpdateLsp(false, string(e.Content[e.Row]), e.Row, e.Col, e.Row, e.Col)
+		e.UpdateLsp(false, ConvertContentToString(e.Content))
 	} else  {
 		var ops = EditOperation{}
 		e.Selection.Ssx = 0
@@ -254,7 +254,7 @@ func (e *Editor) OnTab() {
 		e.Selection.Sex = e.Col
 		e.Undo = append(e.Undo, ops)
 		e.UpdateColors()
-		e.UpdateLsp(false, string(e.Content[e.Row]), e.Row, e.Col, e.Row, e.Col)
+		e.UpdateLsp(false, ConvertContentToString(e.Content))
 	}
 
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
@@ -288,7 +288,7 @@ func (e *Editor) OnBackTab() {
 
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
 	e.Update = true
-	e.UpdateLsp(false, string(e.Content[e.Row]), e.Row, e.Col, e.Row, e.Col)
+	e.UpdateLsp(false, ConvertContentToString(e.Content))
 	e.IsContentChanged = true
 	e.FindTests()
 }
@@ -306,14 +306,14 @@ func (e *Editor) AddChar(ch rune) {
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
 
 	e.Update = true
-	e.UpdateLsp(false, "", e.Row, e.Col, e.Row, e.Col)
+	e.UpdateLsp(false, ConvertContentToString(e.Content))
 	e.IsContentChanged = true
 	e.FindTests()
 }
 
 func (e *Editor) InsertCharacter(line, pos int, ch rune) {
 	e.Content[line] = InsertTo(e.Content[line], pos, ch)
-	e.UpdateLsp(false, "", e.Row, e.Col, e.Row, e.Col)
+	e.UpdateLsp(false, ConvertContentToString(e.Content))
 	e.Undo = append(e.Undo, EditOperation{{Insert, ch, e.Row, e.Col}})
 
 	code := ConvertContentToString(e.Content)
@@ -377,7 +377,7 @@ func (e *Editor) DeleteCharacter(line, pos int) {
 	})
 
 	e.Content[line] = Remove(e.Content[line], pos)
-	e.UpdateLsp(false, "", e.Row, e.Col - 1, e.Row, e.Col)
+	e.UpdateLsp(false, ConvertContentToString(e.Content))
 
 	code := ConvertContentToString(e.Content)
 	e.treeSitterHighlighter.RemoveCharEdit(&code, line, pos, ch)
@@ -528,7 +528,7 @@ func (e *Editor) Cut(isCopySelected bool) {
 
 		e.UpdateColors()
 		e.Update = true
-		e.UpdateLsp(false, "", e.Row, e.Col, e.Row, e.Col)
+		e.UpdateLsp(false, ConvertContentToString(e.Content))
 		e.IsContentChanged = true
 		e.UpdateNeeded() // optimize
 
@@ -549,7 +549,7 @@ func (e *Editor) Cut(isCopySelected bool) {
 			xd := indices[0]
 			yd := indices[1]
 			e.Col, e.Row = xd, yd
-			e.UpdateLsp(false, "", e.Row, e.Col, e.Row, e.Col)
+			e.UpdateLsp(false, ConvertContentToString(e.Content))
 
 			if len(e.Content[yd]) > 0 {
 				// Delete the character at index (x, j)
@@ -693,17 +693,17 @@ func (e *Editor) OnUndo() {
 		if o.Action == Insert {
 			e.Row = o.Line; e.Col = o.Column
 			e.Content[e.Row] = append(e.Content[e.Row][:e.Col], e.Content[e.Row][e.Col+1:]...)
-			e.UpdateLsp(false, "", o.Line, o.Column, e.Row, e.Col)
+			e.UpdateLsp(false, ConvertContentToString(e.Content))
 		} else if o.Action == Delete {
 			e.Row = o.Line; e.Col = o.Column
 			e.Content[e.Row] = InsertTo(e.Content[e.Row], e.Col, o.Char)
-			e.UpdateLsp(false, string(e.Content[e.Row]), e.Row, e.Col, e.Row, e.Col)
+			e.UpdateLsp(false, ConvertContentToString(e.Content))
 		} else if o.Action == Enter {
 			// Merge lines
 			e.Content[o.Line] = append(e.Content[o.Line], e.Content[o.Line+1]...)
 			e.Content = append(e.Content[:o.Line+1], e.Content[o.Line+2:]...)
 			e.Row = o.Line; e.Col = o.Column
-			e.UpdateLsp(false, ConvertContentToString(e.Content), o.Line, o.Column, e.Row, e.Col)
+			e.UpdateLsp(false, ConvertContentToString(e.Content))
 		} else if o.Action == DeleteLine {
 			// Insert enter
 			e.Row = o.Line; e.Col = o.Column
@@ -713,7 +713,7 @@ func (e *Editor) OnUndo() {
 			e.Row++; e.Col = 0
 			newline := append([]rune{}, after...)
 			e.Content = InsertTo(e.Content, e.Row, newline)
-			e.UpdateLsp(false, string(after), o.Line, o.Column, e.Row, e.Col)
+			e.UpdateLsp(false, ConvertContentToString(e.Content))
 		} else if o.Action == MoveCursor {
 			e.Row = o.Line; e.Col = o.Column
 		}
@@ -737,11 +737,11 @@ func (e *Editor) OnRedo() {
 			e.Row = o.Line; e.Col = o.Column
 			e.Content[e.Row] = InsertTo(e.Content[e.Row], e.Col, o.Char)
 			e.Col++
-			e.UpdateLsp(false, string(e.Content[e.Row]), o.Line, o.Column, e.Row, e.Col)
+			e.UpdateLsp(false, ConvertContentToString(e.Content))
 		} else if o.Action == Delete {
 			e.Row = o.Line; e.Col = o.Column
 			e.Content[e.Row] = append(e.Content[e.Row][:e.Col], e.Content[e.Row][e.Col+1:]...)
-			e.UpdateLsp(false, "", o.Line, o.Column, e.Row, e.Col)
+			e.UpdateLsp(false, ConvertContentToString(e.Content))
 		} else if o.Action == Enter {
 			e.Row = o.Line; e.Col = o.Column
 			after := e.Content[e.Row][e.Col:]
@@ -750,13 +750,13 @@ func (e *Editor) OnRedo() {
 			e.Row++; e.Col = 0
 			newline := append([]rune{}, after...)
 			e.Content = InsertTo(e.Content, e.Row, newline)
-			e.UpdateLsp(false, string(after), o.Line, o.Column, e.Row, e.Col)
+			e.UpdateLsp(false, ConvertContentToString(e.Content))
 		} else if o.Action == DeleteLine {
 			// Merge lines
 			e.Content[o.Line] = append(e.Content[o.Line], e.Content[o.Line+1]...)
 			e.Content = append(e.Content[:o.Line+1], e.Content[o.Line+2:]...)
 			e.Row = o.Line; e.Col = o.Column
-			e.UpdateLsp(false, ConvertContentToString(e.Content), o.Line, o.Column, e.Row, e.Col)
+			e.UpdateLsp(false, ConvertContentToString(e.Content))
 		} else if o.Action == MoveCursor {
 			e.Row = o.Line; e.Col = o.Column
 		}
@@ -833,13 +833,11 @@ func (e *Editor) OnCommentLine() {
 		ops = append(ops, Operation{Insert, ch, e.Row, from})
 	}
 
-	// TODO: fix this
-	e.UpdateLsp(false, string(e.Content[e.Row]), e.Row, e.Col, e.Row, e.Col)
-
 	e.Undo = append(e.Undo, ops)
 	if e.Col < 0 { e.Col = 0 }
 	e.OnDown(false)
 	e.Update = true
+	e.UpdateLsp(false, ConvertContentToString(e.Content))
 	e.IsContentChanged = true
 }
 
