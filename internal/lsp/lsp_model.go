@@ -124,13 +124,13 @@ type TextDocumentContentChangeEvent struct {
 type CompletionResponse struct {
 	JSONRPC string            `json:"jsonrpc"`
 	Result  CompletionResult  `json:"result"`
-	ID      float64           `json:"id"`
+	ID      int               `json:"id"`
 }
 
 type CompletionResponse2 struct {
 	JSONRPC string            `json:"jsonrpc"`
 	Items   []CompletionItem  `json:"result"`
-	ID      float64           `json:"id"`
+	ID      int               `json:"id"`
 }
 
 func unmarshal[T any](source []byte) (T, error) {
@@ -172,13 +172,13 @@ type CompletionResult struct {
 
 type CompletionItem struct {
 	Label            string        `json:"label"`
-	Kind             float64       `json:"kind"`
+	Kind             int           `json:"kind"`
 	Detail           string        `json:"detail"`
 	Preselect        bool          `json:"preselect"`
 	SortText         string        `json:"sortText"`
 	InsertText       string        `json:"insertText"`
 	FilterText       string        `json:"filterText"`
-	InsertTextFormat float64       `json:"insertTextFormat"`
+	InsertTextFormat int           `json:"insertTextFormat"`
 	TextEdit         TextEdit      `json:"textEdit"`
 }
 
