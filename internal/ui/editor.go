@@ -679,6 +679,7 @@ func (e *Editor) Init() {
 	e.FileSelectedIndex = -1
 	e.CursorHistory = []CursorMove{}
 	e.lsp2lang = map[string]*LspClient{}
+	e.lspver = map[string]int{}
 	e.DebugInfo = DebugInfo{}
 
 	e.treeSitterHighlighter = NewTreeSitter()

@@ -39,7 +39,8 @@ func (e *Editor) UpdateLsp(isOpen bool, text string) {
 	if !lsp.IsReady { return } // lsp is not connected
 
 	if !isOpen {
-		version := e.lspver[e.AbsoluteFilePath] + 1
+		e.lspver[e.AbsoluteFilePath]++
+		version := e.lspver[e.AbsoluteFilePath]
 		go lsp.DidChange(e.AbsoluteFilePath, &text, version);
 	} else {
 		go lsp.DidOpen(e.AbsoluteFilePath, &text);
