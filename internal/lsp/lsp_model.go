@@ -34,9 +34,9 @@ type InitializeRequest struct {
 }
 
 type Context struct {
-	IncludeDeclaration bool `json:"includeDeclaration,omitempty"`
-	Only        []string `json:"only,omitempty"`
-	TriggerKind int `json:"triggerKind,omitempty"`
+	IncludeDeclaration bool     `json:"includeDeclaration,omitempty"`
+	Only               []string `json:"only,omitempty"`
+	TriggerKind        int      `json:"triggerKind,omitempty"`
 }
 
 type Params struct {
@@ -117,7 +117,7 @@ type VersionedTextDocumentIdentifier struct {
 }
 
 type TextDocumentContentChangeEvent struct {
-	Range Range  `json:"range"`
+//	Range Range  `json:"range"`
 	Text  string `json:"text"`
 }
 
@@ -230,9 +230,9 @@ type SignatureHelpResult struct {
 }
 
 type SignatureHelpResponse struct {
-	JSONRPC string `json:"jsonrpc"`
+	JSONRPC string              `json:"jsonrpc"`
 	Result  SignatureHelpResult `json:"result"`
-	ID      int    `json:"id"`
+	ID      int                 `json:"id"`
 }
 
 type Capabilities struct {
@@ -335,15 +335,15 @@ type DiagnosticParams struct {
 }
 
 type DiagnosticResponse struct {
-	JSONRPC string `json:"jsonrpc"`
-	Method  string `json:"method"`
+	JSONRPC string           `json:"jsonrpc"`
+	Method  string           `json:"method"`
 	Params  DiagnosticParams `json:"params"`
 }
 
 type DefinitionRequest struct {
-	ID      int    `json:"id"`
-	JSONRPC string `json:"jsonrpc"`
-	Method  string `json:"method"`
+	ID      int              `json:"id"`
+	JSONRPC string           `json:"jsonrpc"`
+	Method  string           `json:"method"`
 	Params  DefinitionParams `json:"params"`
 }
 
@@ -358,9 +358,9 @@ type DefinitionResult struct {
 }
 
 type DefinitionResponse struct {
-	JSONRPC string   `json:"jsonrpc"`
+	JSONRPC string             `json:"jsonrpc"`
 	Result  []DefinitionResult `json:"result"`
-	ID      int      `json:"id"`
+	ID      int                `json:"id"`
 }
 
 type DefinitionResponse2 struct {
@@ -408,15 +408,15 @@ type DidSaveParams struct {
 }
 
 type DidSaveRequest struct {
-	JSONRPC string `json:"jsonrpc"`
-	Method  string `json:"method"`
+	JSONRPC string        `json:"jsonrpc"`
+	Method  string        `json:"method"`
 	Params  DidSaveParams `json:"params"`
 }
 
 type ReferencesResponse struct {
-	JSONRPC string  `json:"jsonrpc"`
+	JSONRPC string            `json:"jsonrpc"`
 	Result  []ReferencesRange `json:"result"`
-	ID      int     `json:"id"`
+	ID      int               `json:"id"`
 }
 
 type ReferencesRange struct {
@@ -430,7 +430,7 @@ type Span struct {
 }
 
 type PrepareRenameRequest struct {
-	ID int `json:"id"`
+	ID int         `json:"id"`
 	JSONRPC string `json:"jsonrpc"`
 	Method  string `json:"method"`
 	Params  Params `json:"params"`
@@ -446,16 +446,16 @@ type PrepareRenameResponse struct {
 }
 
 type RenameParams struct {
-	NewName string `json:"newName"`
-	Position Position `json:"position"`
+	NewName string            `json:"newName"`
+	Position Position         `json:"position"`
 	TextDocument TextDocument `json:"textDocument"`
 }
 
 type RenameRequest struct {
-	ID int `json:"id"`
-	JSONRPC string `json:"jsonrpc"`
-	Method  string `json:"method"`
-	Params  RenameParams `json:"params"`
+	ID int                `json:"id"`
+	JSONRPC string        `json:"jsonrpc"`
+	Method  string        `json:"method"`
+	Params  RenameParams  `json:"params"`
 }
 
 type RenameResponse struct {
@@ -470,15 +470,13 @@ type ChangesResult struct {
 
 type DocumentChange struct {
 	TextDocument TextDocument `json:"textDocument"`
-	Edits        []Edit        `json:"edits"`
+	Edits        []Edit       `json:"edits"`
 }
-
 
 type Edit struct {
 	Range   Range  `json:"range"`
 	NewText string `json:"newText"`
 }
-
 
 type RequestRange struct {
 	Start Position `json:"start"`
@@ -487,28 +485,28 @@ type RequestRange struct {
 
 type CodeActionParams struct {
 	TextDocument TextDocument `json:"textDocument"`
-	Range        RequestRange        `json:"range"`
+	Range        RequestRange `json:"range"`
 	Context      Context      `json:"context"`
 }
 
 type CodeActionRequest struct {
-	ID int `json:"id"`
-	JSONRPC string `json:"jsonrpc"`
-	Method  string `json:"method"`
+	ID int                   `json:"id"`
+	JSONRPC string           `json:"jsonrpc"`
+	Method  string           `json:"method"`
 	Params  CodeActionParams `json:"params"`
 }
 
 type CodeActionResponse struct {
-	JSONRPC string  `json:"jsonrpc"`
+	JSONRPC string             `json:"jsonrpc"`
 	Result  []CodeActionResult `json:"result"`
-	ID      int     `json:"id"`
+	ID      int                `json:"id"`
 }
 
 type CodeActionResult struct {
-	Title   string  `json:"title"`
-	Kind    string  `json:"kind"`
+	Title   string   `json:"title"`
+	Kind    string   `json:"kind"`
 	Edit    struct{} `json:"edit"`
-	Command Command `json:"command"`
+	Command Command  `json:"command"`
 }
 
 type Command struct {
@@ -524,45 +522,26 @@ type Argument struct {
 }
 
 type CommandRequest struct {
-	ID int `json:"id"`
-	JSONRPC string `json:"jsonrpc"`
-	Method  string `json:"method"`
-	Params  Command `json:"params"`
+	ID int           `json:"id"`
+	JSONRPC string   `json:"jsonrpc"`
+	Method  string   `json:"method"`
+	Params  Command  `json:"params"`
 }
 
-
-//type CommandResponse struct {
-//	ID      int    `json:"id"`
-//	JSONRPC string `json:"jsonrpc"`
-//	Method  string `json:"method"`
-//	Params  EditParams `json:"params"`
-//}
-//
-//type EditParams struct {
-//	Edit DocumentEdit `json:"edit"`
-//}
-//
-//type DocumentEdit struct {
-//	DocumentChanges ChangesResult `json:"documentChanges"`
-//}
-
-type DocChange struct {
-	TextDocument struct {
-		Version int    `json:"version"`
-		URI     string `json:"uri"`
-	} `json:"textDocument"`
-	Edits []Edit `json:"edits"`
-}
 
 type CommandResponse struct {
-	JSONRPC string `json:"jsonrpc"`
-	Method  string `json:"method"`
-	Params  struct {
-		Edit struct {
-			DocumentChanges []DocChange `json:"documentChanges"`
-		} `json:"edit"`
-	} `json:"params"`
-	ID int `json:"id"`
+	ID      int        `json:"id"`
+	JSONRPC string     `json:"jsonrpc"`
+	Method  string     `json:"method"`
+	Params  EditParams `json:"params"`
+}
+
+type EditParams struct {
+	Edit DocumentEdit `json:"edit"`
+}
+
+type DocumentEdit struct {
+	DocumentChanges ChangesResult `json:"documentChanges"`
 }
 
 type Applied struct {
@@ -574,7 +553,7 @@ type ApplyWorkspaceEditParams struct {
 }
 
 type ApplyEditRequest struct {
-	ID int `json:"id"`
-	JSONRPC string `json:"jsonrpc"`
+	ID int          `json:"id"`
+	JSONRPC string  `json:"jsonrpc"`
 	Result  Applied `json:"result"`
 }

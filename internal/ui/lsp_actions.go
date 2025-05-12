@@ -580,9 +580,9 @@ func (e *Editor) OnCodeAction() {
 
 	commandResponse, err := Lsp.Command(codeAction.Result[0].Command)
 	if err != nil { return }
-	if len(commandResponse.Params.Edit.DocumentChanges) == 0 { return }
+	if len(commandResponse.Params.Edit.DocumentChanges.DocumentChanges) == 0 { return }
 
-	e.handleEdits(commandResponse.Params.Edit.DocumentChanges[0].Edits)
+	e.handleEdits(commandResponse.Params.Edit.DocumentChanges.DocumentChanges[0].Edits)
 	Lsp.ApplyEdit(commandResponse.ID)
 }
 
