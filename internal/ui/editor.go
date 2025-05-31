@@ -1074,8 +1074,7 @@ func (e *Editor) InitLsp(lang string) {
 	currentDir, _ := os.Getwd()
 
 	lsp.Init(currentDir)
-	code := ConvertContentToString(e.Content)
-	lsp.DidOpen(e.AbsoluteFilePath, &code)
+	e.UpdateLsp(true, ConvertContentToString(e.Content))
 
 	//e.DrawEverything()
 	//
