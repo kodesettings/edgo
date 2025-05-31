@@ -13,6 +13,7 @@ var languages = map[string]Language{
 	"c":          &C{},
 	"c++":        &Cpp{},
 	"cpp":        &Cpp{},
+	"c#":         &Csharp{},
 	"csharp":     &Csharp{},
 	"html":       &Html{},
 	"kotlin":     &Kotlin{},

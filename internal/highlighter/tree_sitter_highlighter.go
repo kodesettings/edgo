@@ -118,6 +118,7 @@ func GetSitterLang(lang string) *sitter.Language {
 	case "c": return c.GetLanguage()
 	case "c++": return cpp.GetLanguage()
 	case "cpp": return cpp.GetLanguage()
+	case "c#": return csharp.GetLanguage()
 	case "csharp": return csharp.GetLanguage()
 	case "html": return html.GetLanguage()
 	case "kotlin": return kotlin.GetLanguage()
