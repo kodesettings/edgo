@@ -12,18 +12,14 @@ import (
 func TestTreeSitterHighlighterColors(t *testing.T) {
 	treeSitterHighlighter := NewTreeSitter()
 	treeSitterHighlighter.SetLang("go")
-	code := `
-function hello() {
-	console.log('hello') 
-}
-`
+
 	filecode, _ := ReadFileToString("../../internal/ui/editor.go")
-	code = filecode
+	code := filecode
 
 	treeSitterHighlighter.Parse(&code)
 
 	start := time.Now()
-	colors := treeSitterHighlighter.ColorRanges(1100, 11150, nil)
+	colors := treeSitterHighlighter.ColorRanges(1, 2, []byte(code))
 	fmt.Println("colorized, elapsed", time.Since(start).Nanoseconds())
 
 	for i, colorsLine := range colors {
@@ -37,5 +33,5 @@ func TestColorFromString(t *testing.T) {
 	fmt.Println(col)
 
 	want := 33331604
-	assert.NotEqual(t, col, want, "got %v want %v", col, want)
+	assert.Equal(t, col, want, "got %v want %v", col, want)
 }

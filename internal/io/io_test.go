@@ -11,11 +11,9 @@ import (
 
 func TestFileWatcher(t *testing.T) {
 	tempDir := os.TempDir()
-	fmt.Println("Temporary directory:", tempDir)
 	file := filepath.Join(tempDir, "example.txt")
 	os.Remove(file)
-	os.WriteFile(file, []byte((`Hello, world!`)), 0644)
-
+	os.WriteFile(file, []byte(("Hello, world!")), 0644)
 
 	fw := NewFileWatcher(100)
 	fw.UpdateFile(file)
@@ -23,15 +21,13 @@ func TestFileWatcher(t *testing.T) {
 
 	updateChan := make(chan struct{})
 	fw.StartWatch(func() {
-		fmt.Println("file content changed")
 		updateChan <- struct{}{}
 	})
 
 	go func() {
 		time.Sleep(100 * time.Millisecond)
-		os.WriteFile(file, []byte((`file content changed`)), 0644)
+		os.WriteFile(file, []byte(("file content changed")), 0644)
 	}()
-
 
 	select {
 	case <-time.After(time.Second * 1):
@@ -45,7 +41,6 @@ func TestFileWatcher(t *testing.T) {
 
 func TestDirWatcher(t *testing.T) {
 	tempDir := os.TempDir()
-	fmt.Println("Temporary directory:", tempDir)
 	file := filepath.Join(tempDir, "example.txt")
 
 	updateChan := make(chan struct{})
@@ -61,7 +56,7 @@ func TestDirWatcher(t *testing.T) {
 	})
 
 	go func() {
-		os.WriteFile(file, []byte((`Hello, world!`)), 0644)
+		os.WriteFile(file, []byte(("Hello, world!")), 0644)
 	}()
 
 	select {

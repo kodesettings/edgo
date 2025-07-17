@@ -1,7 +1,6 @@
 package lsp
 
 import (
-	. "github.com/vipmax/edgo/internal/logger"
 	"fmt"
 	"os"
 	"path"
@@ -19,7 +18,7 @@ func TestLspClientStart(t *testing.T) {
 	assert.NotNil(t, lsp.Cmd, "cmd is nil")
 
 	pid := lsp.Cmd.Process.Pid
-	fmt.Println("lsp pid is", pid)
+	assert.NotEqual(t, pid, 0, "lsp pid is zero")
 
 	process, err := os.FindProcess(pid)
 	assert.Nil(t, err, "error finding Cmd with id %d: %s\n", process.Pid, err)
@@ -31,7 +30,7 @@ func TestLspClientStop(t *testing.T) {
 	lsp.Start("gopls")
 
 	pid := lsp.Cmd.Process.Pid
-	fmt.Println("lsp pid is", pid)
+	assert.NotEqual(t, pid, 0, "lsp pid is zero")
 
 	lsp.Stop()
 
@@ -43,7 +42,7 @@ func TestLspClientInitialize(t *testing.T) {
 	lsp.Start("gopls")
 
 	pid := lsp.Cmd.Process.Pid
-	fmt.Println("lsp pid is", pid)
+	assert.NotEqual(t, pid, 0, "lsp pid is zero")
 
 	currentDir, _ := os.Getwd()
 	lsp.Init(currentDir)
@@ -52,16 +51,13 @@ func TestLspClientInitialize(t *testing.T) {
 }
 
 func TestLspClientHover(t *testing.T) {
-	err := os.Setenv("EDGO_LOG", "edgo.log")
-	Log.Start()
-
 	lsp := LspClient{Lang: "go"}
 	lsp.Start("gopls")
 
 	currentDir, _ := os.Getwd()
 	lsp.Init(currentDir)
 
-	file := path.Join(currentDir, "internal","lsp", "lsp_client_test.go")
+	file := path.Join(currentDir, "lsp_client_test.go")
 	text, _ := os.ReadFile(file)
 	stringtext := string(text)
 	lsp.DidOpen(file, &stringtext)
@@ -77,9 +73,6 @@ func TestLspClientHover(t *testing.T) {
 }
 
 func TestLspClientCompletion(t *testing.T) {
-	err := os.Setenv("EDGO_LOG", "edgo.log")
-	Log.Start()
-
 	lsp := LspClient{Lang: "go"}
 	lsp.Start("gopls")
 
@@ -98,13 +91,10 @@ func TestLspClientCompletion(t *testing.T) {
 
 	expected := "Start"
 	assert.Equal(t, len(response.Result.Items), 1, "items must be 1")
-	assert.Equal(t, response.Result.Items[0].Label, expected, "expeccted lsp completion result to be %s", expected)
+	assert.Equal(t, response.Result.Items[0].Label, expected, "expected lsp completion result to be %s", expected)
 }
 
 func TestLspClientDefinition(t *testing.T) {
-	err := os.Setenv("EDGO_LOG", "edgo.log")
-	Log.Start()
-
 	lsp := LspClient{Lang: "go"}
 	lsp.Start("gopls")
 
@@ -125,13 +115,10 @@ func TestLspClientDefinition(t *testing.T) {
 	containsSuffix := strings.Contains(response.Result[0].URI, expectedSuffix)
 
 	assert.Equal(t, len(response.Result), 1, "items must be 1")
-	assert.Equal(t, containsSuffix, false, "expeccted lsp definition result to be %s", expectedSuffix)
+	assert.Equal(t, containsSuffix, false, "expected lsp definition result to be %s", expectedSuffix)
 }
 
 func TestLspClientSignatureHelp(t *testing.T) {
-	err := os.Setenv("EDGO_LOG", "edgo.log")
-	Log.Start()
-
 	lsp := LspClient{Lang: "go"}
 	lsp.Start("gopls")
 
@@ -150,13 +137,10 @@ func TestLspClientSignatureHelp(t *testing.T) {
 
 	expected := "Join"
 	assert.Equal(t, len(response.Result.Signatures), 1, "items must be 1")
-	assert.Equal(t, response.Result.Signatures[0].Label, expected, "expeccted lsp definition result to be %s", expected)
+	assert.Equal(t, response.Result.Signatures[0].Label, expected, "expected lsp definition result to be %s", expected)
 }
 
 func TestLspClientReferences(t *testing.T) {
-	err := os.Setenv("EDGO_LOG", "edgo.log")
-	Log.Start()
-
 	lsp := LspClient{Lang: "go"}
 	lsp.Start("gopls")
 

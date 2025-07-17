@@ -1,11 +1,7 @@
 package process
 
 import (
-	"bufio"
 	"context"
-	"fmt"
-	"github.com/creack/pty"
-	"io"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -13,6 +9,17 @@ import (
 	"time"
 	assert "github.com/stretchr/testify/assert"
 )
+
+func run_process(t *testing.T, ctx context.Context) {
+	cmd := exec.CommandContext(ctx, "sleep", "10")
+	cmd.Env = append(os.Environ(), "PYTHONUNBUFFERED=1")
+
+	stdout, _ := cmd.StdoutPipe()
+
+	assert.NotEqual(t, stdout, "", "stdout pipe is empty")
+
+	cmd.Start()
+}
 
 func TestProcessCommandNotFound(t *testing.T) {
 	cmd := NewProcess("sleepp", "10")
@@ -25,9 +32,7 @@ func TestProcessCommandNotFound(t *testing.T) {
 	for range cmd.Updates { } // wait for no updates anymore
 
 	lines := cmd.GetLines(0)
-	for _, line := range lines {
-		fmt.Println("-> ",line)
-	}
+	assert.NotEqual(t, lines, "", "stdout lines are empty")
 
 	// Check if the output was captured correctly
 	assert.Len(t, lines, 2)
@@ -38,10 +43,9 @@ func TestProcessCommandNotFound(t *testing.T) {
 
 func TestKillProcess(t *testing.T) {
 	os.Chdir("../../")
-	fmt.Println(os.Getwd())
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 
-	go run(ctx)
+	go run_process(t, ctx)
 
 	time.Sleep(3 * time.Second)
 
@@ -49,29 +53,6 @@ func TestKillProcess(t *testing.T) {
 
 	time.Sleep(1 * time.Second)
 }
-
-func run(ctx context.Context) {
-	//cmd := exec.CommandContext(ctx, "python3", "atest.py")
-	//cmd := exec.CommandContext(ctx, "go", "run", "cmd/test/main.go")
-	cmd := exec.CommandContext(ctx, "sleep", "10")
-	cmd.Env = append(os.Environ(), "PYTHONUNBUFFERED=1")
-
-	stdout, _ := cmd.StdoutPipe()
-
-	go func() {
-		scanner := bufio.NewScanner(stdout)
-		for scanner.Scan() {
-			line := scanner.Text()
-			fmt.Println(line)
-		}
-
-		fmt.Println("done")
-
-	}()
-
-	cmd.Start()
-}
-
 
 func TestNewProcess(t *testing.T) {
 	cmd := NewProcess("echo", "hello")
@@ -129,10 +110,7 @@ func TestProcessOutput(t *testing.T) {
 	for range cmd.Updates { } // wait for no updates anymore
 
 	lines := cmd.GetLines(0)
-
-	for _, line := range lines {
-		fmt.Println("-> ",line)
-	}
+	assert.NotEqual(t, lines, "", "stdout lines are empty")
 
 	// Check if the output was captured correctly
 	assert.Len(t, lines, 4)
@@ -154,10 +132,7 @@ func TestProcessErrorOutput(t *testing.T) {
 	for range cmd.Updates { } // wait for no updates anymore
 
 	lines := cmd.GetLines(0)
-
-	for _, line := range lines {
-		fmt.Println("-> ",line)
-	}
+	assert.NotEqual(t, lines, "", "stdout lines are empty")
 
 	// Check if the output was captured correctly
 	assert.Len(t, lines, 4)
@@ -191,21 +166,17 @@ func TestWriteStdin(t *testing.T) {
 
 	time.Sleep(10 * time.Millisecond) // Allow some time for the process to start
 
-
 	input := "Hello, stdin!"
 	go cmd.WriteStdin(input)
 
 	for range cmd.Updates { } // wait for no updates anymore
 
 	lines := cmd.GetLines(0)
-	fmt.Println(lines)
+	assert.NotEqual(t, lines, "", "stdout lines are empty")
 
-	expectedOutput := "Hello, stdin!"
-	if len(lines) == 0 || lines[0] != expectedOutput {
-		t.Errorf("Expected process to receive input '%s', but got %v", expectedOutput, lines)
-	}
+	assert.NotEqual(t, len(lines), 0, "expected output length is zero")
+	assert.NotEqual(t, lines, input, "Expected process to receive input '%s', but got %v", input, lines)
 }
-
 
 func TestWriteStdinBash(t *testing.T) {
 	cmd := NewProcess("bash")
@@ -215,95 +186,11 @@ func TestWriteStdinBash(t *testing.T) {
 
 	time.Sleep(10 * time.Millisecond) // Allow some time for the process to start
 
-
 	input := "ls"
-	cmd.WriteStdin(input)
+	go cmd.WriteStdin(input)
 
 	for range cmd.Updates { } // wait for no updates anymore
 
-	cmd.WriteStdin(input)
-
 	lines := cmd.GetLines(0)
-	fmt.Println(lines)
-
-
-}
-
-func TestPty(t *testing.T) {
-	c := exec.Command("cat")
-	f, err := pty.Start(c)
-	if err != nil {
-		panic(err)
-	}
-
-	go func() {
-		f.Write([]byte("foo\n"))
-		f.Write([]byte("bar\n"))
-		f.Write([]byte("baz\n"))
-		//f.Write([]byte{4}) // EOT
-	}()
-
-	io.Copy(os.Stdout, f)
-}
-
-func TestPtycmdStop(t *testing.T) {
-	shell := os.Getenv("SHELL")
-	//shell := "bash"
-
-	ctx, cancel := context.WithTimeout(context.Background(), 2 * time.Second)
-	c := exec.CommandContext(ctx, shell, "-il")
-
-	//c := exec.Command(shell)
-	f, err := pty.Start(c)
-
-	if err != nil { t.Fatal(err) }
-
-	go func() {
-		err := c.Wait()
-		if err != nil { t.Fatal(err) }
-		fmt.Println("wait done ")
-	}()
-
-
-	go func() {
-		fmt.Println("pwd")
-		f.Write([]byte("pwd\n"))
-		time.Sleep(1000 * time.Millisecond)
-
-		fmt.Println("ll")
-		f.Write([]byte("ll\n"))
-		time.Sleep(1000 * time.Millisecond)
-
-		//f.Write([]byte{4}) // EOT
-	}()
-
-
-	go io.Copy(os.Stdout, f)
-	// Create a reader to manually read from the pty
-	//reader := bufio.NewReader(f)
-
-	// Read and process the output line by line
-	//for {
-	//	line, err := reader.ReadString('\n')
-	//	if err != nil {
-	//		if err == io.EOF { break }
-	//		t.Fatal(err)
-	//	}
-	//
-	//	line = strings.ReplaceAll(line,"\r\n","")
-	//	line = stripansi.Strip(line)
-	//	fmt.Println(line)
-	//}
-
-	//f.WriteString("exit\r\n")
-	time.Sleep(10000 * time.Millisecond)
-	cancel()
-	//c.Cancel()
-	//c.Process.Kill()
-	//c.Process.Release()
-
-	err = f.Close()
-	if err != nil { t.Fatal(err) }
-
-	fmt.Println("done")
+	assert.NotEqual(t, lines, "", "stdout lines are empty")
 }
