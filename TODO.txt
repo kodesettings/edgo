@@ -1,2 +1,15 @@
-- fixing all unit test cases
-- adding more unit tests for full test coverage
+== TODO LIST, DEVELOPMENT TASKLIST, BUGFIXES
+======================================================================================
+
+== Fixing all unit test cases
+  - failing test cases are: dap, git, io, lsp
+  - do we need dap and git support?
+  - why lsp is timing out after didOpen in test case?
+
+== Adding more unit tests for full test coverage
+  - covering all editor methods with test cases for safety
+
+== Fixing internal/highlighter/tree_sitter_highlighter.go
+  - upon opening big files process is crashing at function ColorRanges() at line 235,
+    beginning with variable queryCursor := sitter.NewQueryCursor()
+
