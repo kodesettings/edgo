@@ -35,8 +35,7 @@ The LSP Support
 Syntax highlighting
 
     Following languages are currently supported:
-    bash, c/c++, c#, go, html, java, javascript, kotlin, lua, python, rust, scala, toml,
-    typescript and yaml files.
+    bash, c/c++, go, html, css, java, javascript, typescript, python and rust
 
     Install your language server for interaction with the edgo text editor.
 

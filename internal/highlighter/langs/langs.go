@@ -6,28 +6,22 @@ type Language interface {
 
 var languages = map[string]Language{
 	"javascript": &Javascript{},
-	"typescript": &Typescript{},
+	"typescript": &Javascript{},
 	"python":     &Python{},
 	"rust":       &Rust{},
 	"go":         &Go{},
 	"c":          &C{},
 	"c++":        &Cpp{},
 	"cpp":        &Cpp{},
-	"c#":         &Csharp{},
-	"csharp":     &Csharp{},
+	"css":        &Css{},
 	"html":       &Html{},
-	"kotlin":     &Kotlin{},
-	"scala":      &Scala{},
-	"yaml":       &Yaml{},
 	"java":       &Java{},
 	"bash":       &Bash{},
-	"toml":       &Toml{},
-	"lua":        &Lua{},
 }
 
 func MatchQueryLang(lang string) string {
 	if l, exists := languages[lang]; exists {
 		return l.Query()
 	}
-	return languages["toml"].Query()
+	return ""
 }
