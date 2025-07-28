@@ -41,7 +41,7 @@ func (this *RunQueryFinder) Find(root *Node, filename string, code []byte) map[i
 			node := capture.Node;
 			nodename := this.Query.CaptureNames()[capture.Index]
 			content := node.Utf8Text(code)
-			isTestFound := nodename == "test-name"
+			isTestFound := nodename == "main-name"
 			if isTestFound {
 				line := int(node.StartPosition().Row)
 				results[line] = RunData{

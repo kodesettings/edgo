@@ -2,7 +2,7 @@
 ======================================================================================
 
 == Fixing all unit test cases
-  - failing test cases are: dap, git, io, lsp
+  - failing test cases are: dap, git, io, lsp (for golang only, due to gopls timeout)
   - do we need dap and git support?
   - why lsp is timing out after didOpen in test case?
 

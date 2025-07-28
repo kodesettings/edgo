@@ -72,11 +72,11 @@ describe("math tests", () => {
 	tests := javascriptTest.Find(&testFinder, tree.RootNode(), "test.js", []byte(sourceCode))
 
 	assert.NotNil(t, tests, "tests can't be nil in this case")
-	assert.Equal(t, len(tests), len(expectedTest), "tests must be same size %d %d", len(tests), len(expectedTest))
+	assert.Equal(t, len(expectedTest), len(tests), "tests must be same size")
 
 	for line, expected := range expectedTest {
 		actual, found := tests[line]
-		assert.Equal(t, found, true, "expected test on line %d, but not found", line)
-		assert.Equal(t, actual, expected, "expected test on line %d to be %v, but got %v", line, expected, actual)
+		assert.Equal(t, true, found, "expected test on line %d, but not found", line)
+		assert.Equal(t, expected, actual, "expected test on line %d to be %v, but got %v", line, expected, actual)
 	}
 }
