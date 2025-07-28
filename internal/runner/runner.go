@@ -1,7 +1,7 @@
 package runner
 
 import (
-	. "github.com/smacker/go-tree-sitter"
+	. "github.com/tree-sitter/go-tree-sitter"
 )
 
 type Run interface {
@@ -19,7 +19,6 @@ func GetRunnerByLang(lang string, filepath string) Run {
 	return nil
 }
 
-
 type RunData struct {
 	Name string
 	Filename string
@@ -31,25 +30,20 @@ type RunQueryFinder struct {
 	Lang  string
 }
 
-
 func (this *RunQueryFinder) Find(root *Node, filename string, code []byte) map[int]RunData {
 	results := make(map[int]RunData)
 
-	qc := NewQueryCursor()
-	qc.Exec(this.Query, root)
+	queryCursor := NewQueryCursor()
+	matches := queryCursor.Matches(this.Query, root, code)
 
-	for {
-		m, ok := qc.NextMatch()
-		if !ok { break }
-		m = qc.FilterPredicates(m, code)
-
-		for i := range m.Captures {
-			c := m.Captures[i]; node := c.Node;
-			nodename := this.Query.CaptureNameForId(c.Index)
-			content := node.Content(code)
-			isTestFound := nodename == "main-name"
+	for match := matches.Next(); match != nil; match = matches.Next() {
+		for _, capture := range match.Captures {
+			node := capture.Node;
+			nodename := this.Query.CaptureNames()[capture.Index]
+			content := node.Utf8Text(code)
+			isTestFound := nodename == "test-name"
 			if isTestFound {
-				line := int(node.StartPoint().Row)
+				line := int(node.StartPosition().Row)
 				results[line] = RunData{
 					Name: content,
 					Filename: filename,

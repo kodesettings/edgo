@@ -2,17 +2,16 @@ package tests
 
 import (
 	"context"
-	"fmt"
-	. "github.com/smacker/go-tree-sitter"
-	"github.com/smacker/go-tree-sitter/java"
 	"testing"
+	sitter "github.com/tree-sitter/go-tree-sitter"
+	java "github.com/tree-sitter/tree-sitter-java/bindings/go"
 	assert "github.com/stretchr/testify/assert"
 )
 
 func TestJavaFindTest(t *testing.T) {
-	lang := "javascript"
+	lang := "java"
 
-	code := `
+	sourceCode := `
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import calc.Calculator;
@@ -43,19 +42,20 @@ class MyFirstJUnitJupiterTests {
 
 	}
 
-	codeBytes := []byte(code)
+	javaTest := JavaTest{}
+	query := javaTest.TestQuery()
 
-	test := JavaTest{}
-	query := test.TestQuery()
-
-	language := java.GetLanguage()
-	q, _ := NewQuery([]byte(query), language)
+	language := sitter.NewLanguage(java.Language())
+	q, _ := sitter.NewQuery(language, query)
 
 	testFinder := TestFinder{TestQuery: q, Lang: lang}
-	node, _ := ParseCtx(context.Background(), codeBytes, language)
 
-	tests := test.Find(&testFinder, node, "test.java", codeBytes)
-	fmt.Println(tests)
+	parser := sitter.NewParser()
+	defer parser.Close()
+	parser.SetLanguage(language)
+
+	tree := parser.ParseCtx(context.Background(), []byte(sourceCode), nil)
+	tests := javaTest.Find(&testFinder, tree.RootNode(), "test.java", []byte(sourceCode))
 
 	assert.NotNil(t, tests, "tests can't be nil in this case")
 	assert.Equal(t, len(tests), len(expectedTest), "tests must be same size %d %d", len(tests), len(expectedTest))

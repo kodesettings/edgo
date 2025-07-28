@@ -6,7 +6,7 @@ import (
 	. "github.com/vipmax/edgo/internal/tests"
 	"github.com/vipmax/edgo/internal/utils"
 	"github.com/gdamore/tcell"
-	sitter "github.com/smacker/go-tree-sitter"
+	sitter "github.com/tree-sitter/go-tree-sitter"
 	"os"
 )
 
@@ -19,7 +19,7 @@ func (e *Editor) FindTests() {
 		e.Test = GetTestByLang(e.Lang, e.AbsoluteFilePath)
 		if e.Test == nil { return }
 		queryStr := e.Test.TestQuery()
-		q, _ := sitter.NewQuery([]byte(queryStr), e.treeSitterHighlighter.GetLang())
+		q, _ := sitter.NewQuery(e.treeSitterHighlighter.GetLang(), queryStr)
 		e.TestFinder.TestQuery = q
 	}
 

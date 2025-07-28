@@ -10,6 +10,8 @@
   - covering all editor methods with test cases for safety
 
 == Fixing internal/highlighter/tree_sitter_highlighter.go
-  - upon opening big files process is crashing at function ColorRanges() at line 235,
-    beginning with variable queryCursor := sitter.NewQueryCursor()
+  - upon opening big files process is crashing at function ColorRanges() when executing a query
 
+++ transitioned from github.com/smacker/go-tree-sitter to github.com/tree-sitter/go-tree-sitter
+  - this was due to the lower level API that is supported natively by the tree sitter dev team
+  

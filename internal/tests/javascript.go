@@ -1,7 +1,7 @@
 package tests
 
 import (
-	. "github.com/smacker/go-tree-sitter"
+	. "github.com/tree-sitter/go-tree-sitter"
 	"strings"
 )
 

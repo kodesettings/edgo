@@ -2,17 +2,16 @@ package tests
 
 import (
 	"context"
-	"fmt"
-	. "github.com/smacker/go-tree-sitter"
-	"github.com/smacker/go-tree-sitter/javascript"
 	"testing"
+	sitter "github.com/tree-sitter/go-tree-sitter"
+	javascript "github.com/tree-sitter/tree-sitter-javascript/bindings/go"
 	assert "github.com/stretchr/testify/assert"
 )
 
 func TestJavascriptFindTest(t *testing.T) {
 	lang := "javascript"
 
-	code := `
+	sourceCode := `
 function sum(a, b) {
     return a + b;
 }
@@ -57,19 +56,20 @@ describe("math tests", () => {
 		},
 	}
 
-	codeBytes := []byte(code)
+	javascriptTest := JavascriptTest{}
+	query := javascriptTest.TestQuery()
 
-	test := JavascriptTest{}
-	query := test.TestQuery()
-
-	language := javascript.GetLanguage()
-	q, _ := NewQuery([]byte(query), language)
+	language := sitter.NewLanguage(javascript.Language())
+	q, _ := sitter.NewQuery(language, query)
 
 	testFinder := TestFinder{TestQuery: q, Lang: lang}
-	node, _ := ParseCtx(context.Background(), codeBytes, language)
 
-	tests := test.Find(&testFinder, node, "test.js", codeBytes)
-	fmt.Println(tests)
+	parser := sitter.NewParser()
+	defer parser.Close()
+	parser.SetLanguage(language)
+
+	tree := parser.ParseCtx(context.Background(), []byte(sourceCode), nil)
+	tests := javascriptTest.Find(&testFinder, tree.RootNode(), "test.js", []byte(sourceCode))
 
 	assert.NotNil(t, tests, "tests can't be nil in this case")
 	assert.Equal(t, len(tests), len(expectedTest), "tests must be same size %d %d", len(tests), len(expectedTest))

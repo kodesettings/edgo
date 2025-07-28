@@ -1,7 +1,7 @@
 package tests
 
 import (
-	. "github.com/smacker/go-tree-sitter"
+	. "github.com/tree-sitter/go-tree-sitter"
 	"strings"
 )
 
@@ -26,20 +26,17 @@ type TestFinder struct {
 func (this *TestFinder) Find(root *Node, filename string, code []byte) map[int]TestData {
 	tests := make(map[int]TestData)
 
-	qc := NewQueryCursor()
-	qc.Exec(this.TestQuery, root)
+	queryCursor := NewQueryCursor()
+	matches := queryCursor.Matches(this.TestQuery, root, code)
 
-	for {
-		m, ok := qc.NextMatch()
-		if !ok { break }
-		m = qc.FilterPredicates(m, code)
-		for i := range m.Captures {
-			c := m.Captures[i]; node := c.Node;
-			nodename := this.TestQuery.CaptureNameForId(c.Index)
-			content := node.Content(code)
+	for match := matches.Next(); match != nil; match = matches.Next() {
+		for _, capture := range match.Captures {
+			node := capture.Node;
+			nodename := this.TestQuery.CaptureNames()[capture.Index]
+			content := node.Utf8Text(code)
 			isTestFound := nodename == "test-name"
 			if isTestFound {
-				line := int(node.StartPoint().Row)
+				line := int(node.StartPosition().Row)
 				tests[line] = TestData{
 					Name: content,
 					Filename: filename,

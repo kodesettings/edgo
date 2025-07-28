@@ -1,6 +1,8 @@
 module github.com/vipmax/edgo
 
-go 1.21
+go 1.23
+
+toolchain go1.23.11
 
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
@@ -14,8 +16,17 @@ require (
 	github.com/pmezard/go-difflib v1.0.0
 	github.com/rjeczalik/notify v0.9.3
 	github.com/sergi/go-diff v1.1.0
-	github.com/smacker/go-tree-sitter v0.0.0-20240827094217-dd81d9e9be82
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
+	github.com/tree-sitter/go-tree-sitter v0.25.0
+	github.com/tree-sitter/tree-sitter-bash v0.25.0
+	github.com/tree-sitter/tree-sitter-c v0.24.1
+	github.com/tree-sitter/tree-sitter-cpp v0.23.4
+	github.com/tree-sitter/tree-sitter-go v0.23.4
+	github.com/tree-sitter/tree-sitter-html v0.23.2
+	github.com/tree-sitter/tree-sitter-java v0.23.5
+	github.com/tree-sitter/tree-sitter-javascript v0.23.1
+	github.com/tree-sitter/tree-sitter-python v0.23.6
+	github.com/tree-sitter/tree-sitter-rust v0.24.0
 	gopkg.in/yaml.v2 v2.2.8
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -37,10 +48,12 @@ require (
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
+	github.com/mattn/go-pointer v0.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/skeema/knownhosts v1.1.1 // indirect
+	github.com/tree-sitter/tree-sitter-css v0.23.2 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/crypto v0.9.0 // indirect
 	golang.org/x/net v0.10.0 // indirect

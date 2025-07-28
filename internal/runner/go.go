@@ -2,7 +2,7 @@ package runner
 
 import (
 	"fmt"
-	. "github.com/smacker/go-tree-sitter"
+	. "github.com/tree-sitter/go-tree-sitter"
 	"strings"
 )
 

@@ -2,18 +2,17 @@ package runner
 
 import (
 	"context"
-	"fmt"
-	. "github.com/smacker/go-tree-sitter"
-	"github.com/smacker/go-tree-sitter/golang"
 	"testing"
+	sitter "github.com/tree-sitter/go-tree-sitter"
+	golang "github.com/tree-sitter/tree-sitter-go/bindings/go"
 	assert "github.com/stretchr/testify/assert"
 )
 
 func TestGoFindTest(t *testing.T) {
-	filename := "main.go"
+	fileName := "main.go"
 	lang := "go"
 
-	code := `
+	sourceCode := `
 package main
 
 import (
@@ -37,24 +36,26 @@ func main2() int { return 1 }
 	expectedTest := map[int]RunData{
 		8: {
 			Name:     "main",
-			Filename: filename,
+			Filename: fileName,
 			Line:     8,
 		},
 	}
 
-	codeBytes := []byte(code)
-
 	run := GoRun{}
 	query := run.Query()
 
-	language := golang.GetLanguage()
-	q, _ := NewQuery([]byte(query), language)
+	language := sitter.NewLanguage(golang.Language())
+	q, _ := sitter.NewQuery(language, query)
 
 	testFinder := RunQueryFinder{Query: q, Lang: lang}
-	node, _ := ParseCtx(context.Background(), codeBytes, language)
 
-	tests := run.Find(&testFinder, node, filename, codeBytes)
-	fmt.Println(tests)
+	parser := sitter.NewParser()
+	defer parser.Close()
+	parser.SetLanguage(language)
+
+	tree := parser.ParseCtx(context.Background(), []byte(sourceCode), nil)
+
+	tests := run.Find(&testFinder, tree.RootNode(), fileName, []byte(sourceCode))
 
 	assert.NotNil(t, tests, "tests can't be nil in this case")
 	assert.Equal(t, len(tests), len(expectedTest), "tests must be same size %d %d", len(tests), len(expectedTest))

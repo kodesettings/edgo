@@ -3,25 +3,18 @@ package highlighter
 import (
 	"context"
 	. "github.com/vipmax/edgo/internal/highlighter/langs"
-	"fmt"
 	"github.com/gdamore/tcell"
-	sitter "github.com/smacker/go-tree-sitter"
-	"github.com/smacker/go-tree-sitter/bash"
-	"github.com/smacker/go-tree-sitter/c"
-	"github.com/smacker/go-tree-sitter/cpp"
-	"github.com/smacker/go-tree-sitter/csharp"
-	"github.com/smacker/go-tree-sitter/golang"
-	"github.com/smacker/go-tree-sitter/html"
-	"github.com/smacker/go-tree-sitter/java"
-	"github.com/smacker/go-tree-sitter/javascript"
-	"github.com/smacker/go-tree-sitter/lua"
-	"github.com/smacker/go-tree-sitter/kotlin"
-	"github.com/smacker/go-tree-sitter/scala"
-	"github.com/smacker/go-tree-sitter/python"
-	"github.com/smacker/go-tree-sitter/rust"
-	"github.com/smacker/go-tree-sitter/typescript/typescript"
-	"github.com/smacker/go-tree-sitter/toml"
-	"github.com/smacker/go-tree-sitter/yaml"
+	sitter "github.com/tree-sitter/go-tree-sitter"
+	bash "github.com/tree-sitter/tree-sitter-bash/bindings/go"
+	c "github.com/tree-sitter/tree-sitter-c/bindings/go"
+	cpp "github.com/tree-sitter/tree-sitter-cpp/bindings/go"
+	golang "github.com/tree-sitter/tree-sitter-go/bindings/go"
+	html "github.com/tree-sitter/tree-sitter-html/bindings/go"
+	css "github.com/tree-sitter/tree-sitter-css/bindings/go"
+	java "github.com/tree-sitter/tree-sitter-java/bindings/go"
+	javascript "github.com/tree-sitter/tree-sitter-javascript/bindings/go"
+	python "github.com/tree-sitter/tree-sitter-python/bindings/go"
+	rust "github.com/tree-sitter/tree-sitter-rust/bindings/go"
 	. "gopkg.in/yaml.v2"
 	"log"
 	"os"
@@ -110,25 +103,19 @@ func (h *TreeSitterHighlighter) SetTheme(themePath string) {
 
 func GetSitterLang(lang string) *sitter.Language {
 	switch lang {
-	case "javascript": return javascript.GetLanguage()
-	case "typescript": return typescript.GetLanguage()
-	case "python": return python.GetLanguage()
-	case "rust": return rust.GetLanguage()
-	case "go": return golang.GetLanguage()
-	case "c": return c.GetLanguage()
-	case "c++": return cpp.GetLanguage()
-	case "cpp": return cpp.GetLanguage()
-	case "c#": return csharp.GetLanguage()
-	case "csharp": return csharp.GetLanguage()
-	case "html": return html.GetLanguage()
-	case "kotlin": return kotlin.GetLanguage()
-	case "scala": return scala.GetLanguage()
-	case "yaml": return yaml.GetLanguage()
-	case "java":return java.GetLanguage()
-	case "bash": return bash.GetLanguage()
-	case "toml": return toml.GetLanguage()
-	case "lua": return lua.GetLanguage()
-	default: return toml.GetLanguage() // default toml works on all file types
+	case "bash": return sitter.NewLanguage(bash.Language())
+	case "c": return sitter.NewLanguage(c.Language())
+	case "c++": return sitter.NewLanguage(cpp.Language())
+	case "cpp": return sitter.NewLanguage(cpp.Language())
+	case "go": return sitter.NewLanguage(golang.Language())
+	case "html": return sitter.NewLanguage(html.Language())
+	case "css": return sitter.NewLanguage(css.Language())
+	case "java":return sitter.NewLanguage(java.Language())
+	case "javascript": return sitter.NewLanguage(javascript.Language())
+	case "typescript": return sitter.NewLanguage(javascript.Language())
+	case "python": return sitter.NewLanguage(python.Language())
+	case "rust": return sitter.NewLanguage(rust.Language())
+	default: return sitter.NewLanguage(css.Language()) // default css works on all file types
 	}
 }
 
@@ -139,11 +126,10 @@ func (h *TreeSitterHighlighter) SetLang(lang string) {
 	h.parser.SetLanguage(h.language)
 
 	queryLang := MatchQueryLang(h.lang)
-	q, err := sitter.NewQuery([]byte(queryLang), h.language)
+	q, err := sitter.NewQuery(h.language, queryLang)
 	if err!= nil { panic(err) }
 	h.query = q
 }
-
 
 func (h *TreeSitterHighlighter) matchExpression(expression string, fullexpression string) int {
 	if value, ok := h.colorsMap[fullexpression]; ok { return  h.ParseColor(value) }
@@ -151,44 +137,46 @@ func (h *TreeSitterHighlighter) matchExpression(expression string, fullexpressio
 	return -1
 }
 
-
 /*
-	comment for sitter.EditInput
-	The StartIndex, OldEndIndex, and NewEndIndex parameters indicate the range of bytes you're modifying
-	The StartPoint, OldEndPoint, and NewEndPoint parameters indicate the range of positions (line, column) affected by the edit.
+	comment for sitter.InputEdit
+	The StartByte, OldEndByte, and NewEndByte parameters indicate the range of bytes you're modifying
+	The StartPosition, OldEndPosition, and NewEndPosition parameters indicate the range of positions (line, column) affected by the edit.
 */
 
 func (h *TreeSitterHighlighter) AddCharEdit(code *string, row int, col int, ch rune) {
 	StartIndex := GetStartIndex(code, row, col)
-	runeLen := uint32(utf8.RuneLen(ch))
+	runeLen := uint(utf8.RuneLen(ch))
 
-	editInput := sitter.EditInput{
-		StartIndex: StartIndex, OldEndIndex: StartIndex,
-		NewEndIndex: StartIndex + runeLen,
-		StartPoint:  sitter.Point{Row: 0, Column: 0},
-		OldEndPoint: sitter.Point{Row: 0, Column: 0},
-		NewEndPoint: sitter.Point{Row: 0, Column: 0},
+	editInput := sitter.InputEdit{
+		StartByte: StartIndex,
+		OldEndByte: StartIndex,
+		NewEndByte: StartIndex + runeLen,
+		StartPosition:  sitter.Point{Row: 0, Column: 0},
+		OldEndPosition: sitter.Point{Row: 0, Column: 0},
+		NewEndPosition: sitter.Point{Row: 0, Column: 0},
 	}
-	h.tree.Edit(editInput)
+	h.tree.Edit(&editInput)
 	h.Parse(code)
 }
 
 func (h *TreeSitterHighlighter) RemoveCharEdit(code *string, row int, col int, ch rune) {
 	StartIndex := GetStartIndex(code, row, col)
-	Row := uint32(row); Column := uint32(col)
-	runeLen := uint32(utf8.RuneLen(ch))
+	Row := uint(row); Column := uint(col)
+	runeLen := uint(utf8.RuneLen(ch))
 
-	editInput := sitter.EditInput{
-		StartIndex: StartIndex, OldEndIndex: StartIndex + runeLen, NewEndIndex: StartIndex,
-		StartPoint:  sitter.Point{Row: Row, Column: Column},
-		OldEndPoint: sitter.Point{Row: Row, Column: Column + runeLen},
-		NewEndPoint: sitter.Point{Row: Row, Column: Column},
+	editInput := sitter.InputEdit{
+		StartByte: StartIndex,
+		OldEndByte: StartIndex + runeLen,
+		NewEndByte: StartIndex,
+		StartPosition:  sitter.Point{Row: Row, Column: Column},
+		OldEndPosition: sitter.Point{Row: Row, Column: Column + runeLen},
+		NewEndPosition: sitter.Point{Row: Row, Column: Column},
 	}
-	h.tree.Edit(editInput)
+	h.tree.Edit(&editInput)
 	h.Parse(code)
 }
 
-func GetStartIndex(code *string, row int, col int) uint32 {
+func GetStartIndex(code *string, row int, col int) uint {
 	r, c, startIndex := 0, 0, 0
 	for _, char := range *code {
 		runeLen := utf8.RuneLen(char)
@@ -205,59 +193,49 @@ func GetStartIndex(code *string, row int, col int) uint32 {
 			c++
 		}
 	}
-	return uint32(startIndex)
+	return uint(startIndex)
 }
-
 
 func Use(vals ...interface{}) { }
 
-
-
 func (h *TreeSitterHighlighter) Parse(code *string) {
-	tree, err := h.parser.ParseCtx(context.Background(), h.tree, []byte(*code))
-	if err != nil { fmt.Println(err) }
+	tree := h.parser.ParseCtx(context.Background(), []byte(*code), h.tree)
 	h.tree = tree
 }
 
 func (h *TreeSitterHighlighter) ReParse(code *string) {
-	tree, err := h.parser.ParseCtx(context.Background(), nil, []byte(*code))
-	if err != nil { fmt.Println(err) }
+	tree := h.parser.ParseCtx(context.Background(), []byte(*code), nil)
 	h.tree = tree
 }
 
 func (h *TreeSitterHighlighter) ReParseBytes(codeBytes []byte) {
-	tree, err := h.parser.ParseCtx(context.Background(), nil, codeBytes)
-	if err != nil { fmt.Println(err) }
+	tree := h.parser.ParseCtx(context.Background(), codeBytes, nil)
 	h.tree = tree
 }
-
 
 func (h *TreeSitterHighlighter) ColorRanges(from, to int, codeBytes []byte) []ColoredByteRange {
 
 	queryCursor := sitter.NewQueryCursor()
-	queryCursor.Exec(h.query, h.tree.RootNode())
+	matches := queryCursor.Matches(h.query, h.tree.RootNode(), codeBytes)
 	queryCursor.SetPointRange(
-		sitter.Point{Row: uint32(from), Column: 0},
-		sitter.Point{Row: uint32(to), Column: 0},
+		sitter.Point{Row: uint(from), Column: 0},
+		sitter.Point{Row: uint(to), Column: 0},
 	)
 
 	colors := make([]ColoredByteRange, 0)
 
-	for {
-		m, ok := queryCursor.NextMatch()
-		if !ok { break }
-		m = queryCursor.FilterPredicates(m, codeBytes)
-		for _, c := range m.Captures {
-			name := h.query.CaptureNameForId(c.Index)
+	for match := matches.Next(); match != nil; match = matches.Next() {
+		for _, capture := range match.Captures {
+			name := h.query.CaptureNames()[capture.Index]
 			split := strings.Split(name, ".")
 			color := h.matchExpression(split[0], name)
 
-			contentstr := string(codeBytes[c.Node.StartByte():c.Node.EndByte()]); Use(contentstr) // for debug
+			contentstr := string(codeBytes[capture.Node.StartByte():capture.Node.EndByte()]); Use(contentstr) // for debug
 
 			if !strings.Contains(name, "injection") {
 				colors = append(colors, ColoredByteRange{
-					StartByte: int(c.Node.StartByte()),
-					EndByte:   int(c.Node.EndByte()),
+					StartByte: int(capture.Node.StartByte()),
+					EndByte:   int(capture.Node.EndByte()),
 					Color:     color,
 				})
 			} else {
@@ -272,19 +250,19 @@ func (h *TreeSitterHighlighter) ColorRanges(from, to int, codeBytes []byte) []Co
 					h.injectionLangs[injLang] = injectionHighlighter
 				}
 
-				contentInjection := codeBytes[c.Node.StartByte():c.Node.EndByte()]
+				contentInjection := codeBytes[capture.Node.StartByte():capture.Node.EndByte()]
 				injectionHighlighter.ReParseBytes(contentInjection)
 
-				injectionLength := int(c.Node.EndPoint().Row) - int(c.Node.StartPoint().Row)
+				injectionLength := int(capture.Node.EndPosition().Row) - int(capture.Node.StartPosition().Row)
 				Use(injectionLength)
 
-				fromInj := from - int(c.Node.StartPoint().Row)
+				fromInj := from - int(capture.Node.StartPosition().Row)
 				if fromInj < 0 { fromInj = 0 }
-				toInj := to - int(c.Node.EndPoint().Row)
+				toInj := to - int(capture.Node.EndPosition().Row)
 				if toInj < to { toInj = to }
 				colorsInjection := injectionHighlighter.ColorRanges(fromInj, toInj, contentInjection)
 
-				startByte := int(c.Node.StartByte())
+				startByte := int(capture.Node.StartByte())
 				for _, colorsInj := range colorsInjection {
 					colorsInj.StartByte += startByte
 					colorsInj.EndByte += startByte
@@ -296,7 +274,6 @@ func (h *TreeSitterHighlighter) ColorRanges(from, to int, codeBytes []byte) []Co
 	return colors
 }
 
-
 type ColoredByteRange struct {
 	StartByte int
 	EndByte   int
@@ -306,13 +283,14 @@ type ColoredByteRange struct {
 func (h *TreeSitterHighlighter) GetTree() *sitter.Tree {
 	return h.tree
 }
+
 func (h *TreeSitterHighlighter) GetLang() *sitter.Language {
 	return h.language
 }
+
 func (h *TreeSitterHighlighter) GetLangStr() string {
 	return h.lang
 }
-
 
 type NodeRange struct {
 	Ssy int
@@ -320,8 +298,6 @@ type NodeRange struct {
 	Sey int
 	Sex int
 }
-
-
 
 type Path struct {
 	Atx int
@@ -333,11 +309,13 @@ type Path struct {
 func (p *Path) CurrentNode() NodeRange {
 	return p.Nodes[p.Current]
 }
+
 func (p *Path) Next() NodeRange {
 	p.Current += 1
 	if p.Current >= len(p.Nodes) { p.Current = len(p.Nodes) - 1 }
 	return p.Nodes[p.Current]
 }
+
 func (p *Path) Prev() NodeRange {
 	p.Current -= 1
 	if p.Current < 0 {
@@ -352,17 +330,17 @@ func (h *TreeSitterHighlighter) GetNodePathAt(StartPointRow int, StartPointColum
 
 	rootNode := h.tree.RootNode()
 	node := rootNode.NamedDescendantForPointRange(
-		sitter.Point{Row: uint32(StartPointRow), Column: uint32(StartPointColumn)},
-		sitter.Point{Row: uint32(EndPointRow), Column: uint32(EndPointColumn)},
+		sitter.Point{Row: uint(StartPointRow), Column: uint(StartPointColumn)},
+		sitter.Point{Row: uint(EndPointRow), Column: uint(EndPointColumn)},
 	)
 
 	path := Path{Aty: StartPointRow, Atx: StartPointColumn}
 
 	for node != nil {
-		r := NodeRange{int(node.StartPoint().Row),
-			int(node.StartPoint().Column),
-			int(node.EndPoint().Row),
-			int(node.EndPoint().Column),
+		r := NodeRange{int(node.StartPosition().Row),
+			int(node.StartPosition().Column),
+			int(node.EndPosition().Row),
+			int(node.EndPosition().Column),
 		}
 		path.Nodes = append(path.Nodes, r)
 		node = node.Parent()
@@ -375,13 +353,13 @@ func (h *TreeSitterHighlighter) GetNodeAt(StartPointRow int, StartPointColumn in
 	EndPointRow int, EndPointColumn int) (string, NodeRange) {
 	rootNode := h.tree.RootNode()
 	node := rootNode.NamedDescendantForPointRange(
-		sitter.Point{Row: uint32(StartPointRow), Column: uint32(StartPointColumn)},
-		sitter.Point{Row: uint32(EndPointRow), Column: uint32(EndPointColumn)},
+		sitter.Point{Row: uint(StartPointRow), Column: uint(StartPointColumn)},
+		sitter.Point{Row: uint(EndPointRow), Column: uint(EndPointColumn)},
 	)
 
-	return node.Type(), NodeRange{int(node.StartPoint().Row),
-		int(node.StartPoint().Column),
-		int(node.EndPoint().Row),
-		int(node.EndPoint().Column),
+	return node.Kind(), NodeRange{int(node.StartPosition().Row),
+		int(node.StartPosition().Column),
+		int(node.EndPosition().Row),
+		int(node.EndPosition().Column),
 	}
 }

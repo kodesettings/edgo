@@ -2,17 +2,16 @@ package tests
 
 import (
 	"context"
-	"fmt"
-	. "github.com/smacker/go-tree-sitter"
-	"github.com/smacker/go-tree-sitter/python"
 	"testing"
+	sitter "github.com/tree-sitter/go-tree-sitter"
+	python "github.com/tree-sitter/tree-sitter-python/bindings/go"
 	assert "github.com/stretchr/testify/assert"
 )
 
 func TestPythonFindTest(t *testing.T) {
 	lang := "python"
 
-	code := `import pytest
+	sourceCode := `import pytest
 from random import randint
 
 class TestYo:
@@ -44,19 +43,20 @@ class TestYo:
 		},
 	}
 
-	codeBytes := []byte(code)
-
 	pythonTest := PythonTest{}
 	query := pythonTest.TestQuery()
 
-	language := python.GetLanguage()
-	q, _ := NewQuery([]byte(query), language)
+	language := sitter.NewLanguage(python.Language())
+	q, _ := sitter.NewQuery(language, query)
 
 	testFinder := TestFinder{TestQuery: q, Lang: lang}
-	node, _ := ParseCtx(context.Background(), codeBytes, language)
 
-	tests := pythonTest.Find(&testFinder, node, "test_yo.py", codeBytes)
-	fmt.Println(tests)
+	parser := sitter.NewParser()
+	defer parser.Close()
+	parser.SetLanguage(language)
+
+	tree := parser.ParseCtx(context.Background(), []byte(sourceCode), nil)
+	tests := pythonTest.Find(&testFinder, tree.RootNode(), "test_yo.py", []byte(sourceCode))
 
 	assert.NotNil(t, tests, "tests can't be nil in this case")
 	assert.Equal(t, len(tests), len(expectedTest), "tests must be same size %d %d", len(tests), len(expectedTest))
