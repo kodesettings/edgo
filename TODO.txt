@@ -1,6 +1,8 @@
 == TODO LIST, DEVELOPMENT TASKLIST, BUGFIXES
 ======================================================================================
 
+AVAILABLE ISSUES:
+
 == Fixing all unit test cases
   - failing test cases are: dap, git, io, lsp (for golang only, due to gopls timeout)
   - do we need dap and git support?
@@ -9,8 +11,10 @@
 == Adding more unit tests for full test coverage
   - covering all editor methods with test cases for safety
 
-== Fixing internal/highlighter/tree_sitter_highlighter.go
-  - upon opening big files process is crashing at function ColorRanges() when executing a query
+SOLVED ISSUES:
+
+++ fixed crashing of process upon opening big files at function ColorRanges() that was caused
+   by spawning lsp processes with incorrect async theads and timing in lsp_client.go Start()
 
 ++ transitioned from github.com/smacker/go-tree-sitter to github.com/tree-sitter/go-tree-sitter
   - this was due to the lower level API that is supported natively by the tree sitter dev team

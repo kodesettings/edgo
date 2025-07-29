@@ -60,35 +60,18 @@ func (l *LspClient) Start(cmd string, args ...string) bool {
 	if err != nil { Log.Info(err.Error()); return false }
 	l.stdout = stdout
 
-	errorsChannel := make(chan error)
-
 	// starting lsp Cmd async
-	go func() {
-		startError := l.Cmd.Run()
-		if startError != nil { errorsChannel <- startError }
-		close(errorsChannel)
-	}()
-
-	// wait for start
-	var end = false
-	for !end {
-		select {
-		case startError := <- errorsChannel:
-			if startError != nil {
-				Log.Error("error starting lsp " + startError.Error())
-				l.isStopped = true
-				return false
-			}
-
-		case <-time.After(time.Duration(100) * time.Millisecond):
-			Log.Info("lsp started success", cmd, strings.Join(args," "))
-			end = true
-		}
+	startError := l.Cmd.Start()
+	if startError != nil {
+		Log.Error("error starting lsp " + startError.Error())
+		l.isStopped = true
+		return false
+	} else {
+		time.Sleep(time.Duration(1000) * time.Millisecond)
+		Log.Info("lsp started success", cmd, strings.Join(args," "))
 	}
 
-	//l.reader = textproto.NewReader(bufio.NewReader(stdout))
 	l.reader = bufio.NewReader(stdout)
-
 	l.message2chan = make(map[int]chan string)
 	l.completionMessages = make(chan string)
 	l.referencesMessages = make(chan string)
