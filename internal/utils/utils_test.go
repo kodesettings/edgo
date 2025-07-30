@@ -16,11 +16,11 @@ func TestFormat(t *testing.T) {
 func TestDetectGoLang(t *testing.T) {
 	language := DetectLang("highlighter_test.go")
 	fmt.Println(language)
-	assert.Equal(t, language, "go", "language must be go, got %s", language)
+	assert.Equal(t, "go", language, "language must be go, got %s", language)
 }
 
 func TestDetectPythonLang(t *testing.T) {
 	language := DetectLang("test.py")
 	fmt.Println(language)
-	assert.Equal(t, language, "python", "language must be python, got %s", language)
+	assert.Equal(t, "python", language, "language must be python, got %s", language)
 }

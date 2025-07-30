@@ -52,18 +52,18 @@ func TestGetStyle(t *testing.T) {
 
 func TestGetColor(t *testing.T) {
 	col := ColorFromString("#fc9994")
-	assert.Equal(t, col, 33331604, "color does not match")
+	assert.Equal(t, 33331604, col, "color does not match")
 }
 
 func TestLangDetect(t *testing.T) {
 	file := "highlighter_test.go"
 	lang := DetectLang(file)
-	assert.Equal(t, lang, "go", "output must be go")
+	assert.Equal(t, "go", lang, "output must be go")
 }
 
 func TestLangDetect2(t *testing.T) {
 	file := "highlighter_test.go"
 	lang, safe := enry.GetLanguageByExtension(file)
-	assert.Equal(t, lang, "Go", "lang must be Go")
-	assert.Equal(t, safe, true, "save must be true")
+	assert.Equal(t, "Go", lang, "lang must be Go")
+	assert.Equal(t, true, safe, "save must be true")
 }

@@ -31,7 +31,7 @@ func TestTreeSize(t *testing.T) {
 	tree, _ := ReadDirTree(dir,"", true,0)
 	size := TreeSize(tree, 0)
 	fmt.Println("size", size)
-	assert.Equal(t, size > 0, true, "size is zero")
+	assert.Equal(t, true, size > 0, "size is zero")
 }
 
 func TestGetSelected(t *testing.T) {

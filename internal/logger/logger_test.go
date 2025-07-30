@@ -28,6 +28,6 @@ func TestLoggerInfo(t *testing.T) {
 	lines := strings.Split(content, "\n")
 	lines = slices.Delete(lines, len(lines)-1, len(lines))
 
-	assert.Equal(t, len(lines), 3, "Expected %d, got %d", 3, len(lines))
+	assert.Equal(t, 3, len(lines), "Expected %d, got %d", 3, len(lines))
 	os.Remove("edgo.log")
 }

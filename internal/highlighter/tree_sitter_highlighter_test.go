@@ -33,5 +33,5 @@ func TestColorFromString(t *testing.T) {
 	fmt.Println(col)
 
 	want := 33331604
-	assert.Equal(t, col, want, "got %v want %v", col, want)
+	assert.Equal(t, want, col, "got %v want %v", want, col)
 }

@@ -25,14 +25,14 @@ func TestDapClientStart(t *testing.T) {
 	started := dap.Start("dlv", "dap")
 	defer dap.Stop()
 
-	assert.Equal(t, started, true, "error, dap not started")
-	assert.Equal(t, dap.cmd, nil, "error, cmd is nil")
+	assert.Equal(t, true, started, "error, dap not started")
+	assert.NotNil(t, dap.cmd, "error, cmd is nil")
 
 	pid := dap.cmd.Process.Pid
 
 	process, err := os.FindProcess(pid)
 
-	assert.Equal(t, err, nil, "error finding cmd with id %d: %s", process.Pid, err)
+	assert.Nil(t, err, "error finding cmd with id %d: %s", process.Pid, err)
 	assert.NotEqual(t, dap.IsStopped, true, "expected lsp not to be stopped")
 }
 
@@ -53,7 +53,7 @@ func TestDapClientInitialize(t *testing.T) {
 	currentDir, _ := os.Getwd()
 	dap.Init(currentDir)
 
-	assert.Equal(t, dap.IsReady, true, "expected lsp to be ready, got false")
+	assert.Equal(t, true, dap.IsReady, "expected lsp to be ready, got false")
 }
 
 func TestDapClientLaunch(t *testing.T) {
@@ -70,7 +70,7 @@ func TestDapClientLaunch(t *testing.T) {
 	dap.Init(currentDir)
 
 	launchResult := dap.Launch("./cmd/test/main.go")
-	assert.Equal(t, launchResult, true, "expected launchResult to be true, got false")
+	assert.Equal(t, true, launchResult, "expected launchResult to be true, got false")
 }
 
 func TestDapClientBreakpoint(t *testing.T) {
@@ -88,10 +88,10 @@ func TestDapClientBreakpoint(t *testing.T) {
 	dap.Launch("./cmd/test/main.go")
 	
 	setBreakpointResult := dap.SetBreakpoint("/Users/max/apps/go/edgo/cmd/test/main.go", 9)
-	assert.Equal(t, setBreakpointResult, true, "expected setBreakpointResult to be true, got false")
+	assert.Equal(t, true, setBreakpointResult, "expected setBreakpointResult to be true, got false")
 
 	setBreakpointResult2 := dap.SetBreakpoint("/Users/max/apps/go/edgo/cmd/test/main.go", 10)
-	assert.Equal(t, setBreakpointResult2, true, "expected setBreakpointResult2 to be true, got false")
+	assert.Equal(t, true, setBreakpointResult2, "expected setBreakpointResult2 to be true, got false")
 }
 
 func TestDapClientContinue(t *testing.T) {
@@ -112,7 +112,7 @@ func TestDapClientContinue(t *testing.T) {
 	threadId := 1
 
 	continueResult := dap.Continue(threadId)
-	assert.Equal(t, continueResult, true, "expected continueResult to be true, got false")
+	assert.Equal(t, true, continueResult, "expected continueResult to be true, got false")
 }
 
 func TestDapClientContinueWithEvents(t *testing.T) {

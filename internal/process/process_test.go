@@ -36,9 +36,9 @@ func TestProcessCommandNotFound(t *testing.T) {
 
 	// Check if the output was captured correctly
 	assert.Len(t, lines, 2)
-	assert.Equal(t, lines[0], "sleepp 10")
+	assert.Equal(t, "sleepp 10", lines[0])
 	assert.Contains(t, lines[1], "executable file not found in $PATH")
-	assert.Equal(t, cmd.IsStopped(), true)
+	assert.Equal(t, true, cmd.IsStopped())
 }
 
 func TestKillProcess(t *testing.T) {
@@ -116,9 +116,9 @@ func TestProcessOutput(t *testing.T) {
 	assert.Len(t, lines, 4)
 	assert.Contains(t, lines[0], "echo hello")
 	assert.Contains(t, lines[1], "hello")
-	assert.Equal(t, lines[2], "")
+	assert.Equal(t, "", lines[2])
 	assert.Contains(t, lines[3], "finished with exit code 0")
-	assert.Equal(t, cmd.IsStopped(), true)
+	assert.Equal(t, true, cmd.IsStopped())
 }
 
 func TestProcessErrorOutput(t *testing.T) {
@@ -138,9 +138,9 @@ func TestProcessErrorOutput(t *testing.T) {
 	assert.Len(t, lines, 4)
 	assert.Contains(t, lines[0], "echo hello")
 	assert.Contains(t, lines[1], "hello")
-	assert.Equal(t, lines[2], "")
+	assert.Equal(t, "", lines[2])
 	assert.Contains(t, lines[3], "finished with exit code 0")
-	assert.Equal(t, cmd.IsStopped(), true)
+	assert.Equal(t, true, cmd.IsStopped())
 }
 
 func TestProcessStop(t *testing.T) {
@@ -150,12 +150,12 @@ func TestProcessStop(t *testing.T) {
 	cmd.Start() // Start the process
 	time.Sleep(10 * time.Millisecond)
 
-	assert.Equal(t, cmd.IsStopped(), false)
+	assert.Equal(t, false, cmd.IsStopped())
 
 	cmd.Stop() // Stop the process
 	time.Sleep(10 * time.Millisecond)
 
-	assert.Equal(t, cmd.IsStopped(), true)
+	assert.Equal(t, true, cmd.IsStopped())
 }
 
 func TestWriteStdin(t *testing.T) {

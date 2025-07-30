@@ -14,7 +14,7 @@ func TestLspClientStart(t *testing.T) {
 	started := lsp.Start("gopls")
 	defer lsp.Stop()
 
-	assert.Equal(t, started, true, "lsp not started")
+	assert.Equal(t, true, started, "lsp not started")
 	assert.NotNil(t, lsp.Cmd, "cmd is nil")
 
 	pid := lsp.Cmd.Process.Pid
@@ -34,7 +34,7 @@ func TestLspClientStop(t *testing.T) {
 
 	lsp.Stop()
 
-	assert.Equal(t, lsp.isStopped, true, "expected lsp to be stopped, got false")
+	assert.Equal(t, true, lsp.isStopped, "expected lsp to be stopped, got false")
 }
 
 func TestLspClientInitialize(t *testing.T) {
@@ -47,7 +47,7 @@ func TestLspClientInitialize(t *testing.T) {
 	currentDir, _ := os.Getwd()
 	lsp.Init(currentDir)
 
-	assert.Equal(t, lsp.IsReady, true, "expected lsp to be ready, got false")
+	assert.Equal(t, true, lsp.IsReady, "expected lsp to be ready, got false")
 }
 
 func TestLspClientHover(t *testing.T) {
@@ -69,7 +69,7 @@ func TestLspClientHover(t *testing.T) {
 
 	expected := "func (*Logger).Start()"
 	got := response.Result.Contents.Value
-	assert.Equal(t, got, expected, "expected lsp hover result to be %s, got something else %s", expected, got)
+	assert.Equal(t, expected, got, "expected lsp hover result to be %s, got something else %s", expected, got)
 }
 
 func TestLspClientCompletion(t *testing.T) {
@@ -90,8 +90,8 @@ func TestLspClientCompletion(t *testing.T) {
 	fmt.Println(response, err)
 
 	expected := "Start"
-	assert.Equal(t, len(response.Result.Items), 1, "items must be 1")
-	assert.Equal(t, response.Result.Items[0].Label, expected, "expected lsp completion result to be %s", expected)
+	assert.Equal(t, 1, len(response.Result.Items), "items must be 1")
+	assert.Equal(t, expected, response.Result.Items[0].Label, "expected lsp completion result to be %s", expected)
 }
 
 func TestLspClientDefinition(t *testing.T) {
@@ -114,8 +114,8 @@ func TestLspClientDefinition(t *testing.T) {
 	expectedSuffix := "logger/logger.go"
 	containsSuffix := strings.Contains(response.Result[0].URI, expectedSuffix)
 
-	assert.Equal(t, len(response.Result), 1, "items must be 1")
-	assert.Equal(t, containsSuffix, false, "expected lsp definition result to be %s", expectedSuffix)
+	assert.Equal(t, 1, len(response.Result), "items must be 1")
+	assert.Equal(t, false, containsSuffix, "expected lsp definition result to be %s", expectedSuffix)
 }
 
 func TestLspClientSignatureHelp(t *testing.T) {
@@ -136,8 +136,8 @@ func TestLspClientSignatureHelp(t *testing.T) {
 	fmt.Println(response, err)
 
 	expected := "Join"
-	assert.Equal(t, len(response.Result.Signatures), 1, "items must be 1")
-	assert.Equal(t, response.Result.Signatures[0].Label, expected, "expected lsp definition result to be %s", expected)
+	assert.Equal(t, 1, len(response.Result.Signatures), "items must be 1")
+	assert.Equal(t, expected, response.Result.Signatures[0].Label, "expected lsp definition result to be %s", expected)
 }
 
 func TestLspClientReferences(t *testing.T) {

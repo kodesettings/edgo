@@ -18,10 +18,11 @@ func TestNoSelection(t *testing.T) {
 	selection.Sex = 0
 	selection.Sey = 0
 	got := selection.GetSelectionString(Content)
-	want := ""
+	expected := ""
 
-	assert.Equal(t, got, want, "GetSelectionString() = %v, want %v", got, want)
+	assert.Equal(t, expected, got, "GetSelectionString() = %v, expected %v", got, expected)
 }
+
 func TestSingleCharacterSelection(t *testing.T) {
 	var Content = [][]rune{
 		[]rune("Hello, world!"),
@@ -35,9 +36,9 @@ func TestSingleCharacterSelection(t *testing.T) {
 	selection.Sex = 1
 	selection.Sey = 0
 	got := selection.GetSelectionString(Content)
-	want := "H"
+	expected := "H"
 
-	assert.Equal(t, got, want, "GetSelectionString() = %v, want %v", got, want)
+	assert.Equal(t, expected, got, "GetSelectionString() = %v, expected %v", got, expected)
 }
 
 func TestMultipleCharacterSelection(t *testing.T) {
@@ -53,9 +54,9 @@ func TestMultipleCharacterSelection(t *testing.T) {
 	selection.Sex = 5
 	selection.Sey = 0
 	got := selection.GetSelectionString(Content)
-	want := "Hello"
+	expected := "Hello"
 
-	assert.Equal(t, got, want, "GetSelectionString() = %v, want %v", got, want)
+	assert.Equal(t, expected, got, "GetSelectionString() = %v, expected %v", got, expected)
 }
 
 func TestMultipleLineSelection1(t *testing.T) {
@@ -71,9 +72,9 @@ func TestMultipleLineSelection1(t *testing.T) {
 	selection.Sex = 5
 	selection.Sey = 1
 	got := selection.GetSelectionString(Content)
-	want := "Hello, world!\nHow a"
+	expected := "Hello, world!\nHow a"
 
-	assert.Equal(t, got, want, "GetSelectionString() = %v, want %v", got, want)
+	assert.Equal(t, expected, got, "GetSelectionString() = %v, expected %v", got, expected)
 }
 
 func TestMultipleLineSelection2(t *testing.T) {
@@ -89,9 +90,9 @@ func TestMultipleLineSelection2(t *testing.T) {
 	selection.Sex = 11
 	selection.Sey = 1
 	got := selection.GetSelectionString(Content)
-	want := "Hello, world!\nHow are you"
+	expected := "Hello, world!\nHow are you"
 
-	assert.Equal(t, got, want, "GetSelectionString() = %v, want %v", got, want)
+	assert.Equal(t, expected, got, "GetSelectionString() = %v, expected %v", got, expected)
 }
 
 func TestMultipleLineSelection3(t *testing.T) {
@@ -107,7 +108,7 @@ func TestMultipleLineSelection3(t *testing.T) {
 	selection.Sex = 23
 	selection.Sey = 1
 	got := selection.GetSelectionString(Content)
-	want := " world!\nHow are you doing today"
+	expected := " world!\nHow are you doing today"
 
-	assert.Equal(t, got, want, "GetSelectionString() = %v, want %v", got, want)
+	assert.Equal(t, expected, got, "GetSelectionString() = %v, expected %v", got, expected)
 }

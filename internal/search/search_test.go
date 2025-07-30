@@ -63,7 +63,7 @@ func TestSearch(t *testing.T) {
 
 	for _, tc := range testCases {
 		results := Search(text, tc.pattern)
-		assert.Equal(t, reflect.DeepEqual(results, tc.expected), true, 
+		assert.Equal(t, true, reflect.DeepEqual(results, tc.expected), 
 			"Search did not return the expected results for pattern '%s'. Expected: %v, Got: %v",
 			tc.pattern, tc.expected, results)
 	}
