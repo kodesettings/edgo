@@ -176,6 +176,24 @@ func (h *TreeSitterHighlighter) RemoveCharEdit(code *string, row int, col int, c
 	h.Parse(code)
 }
 
+func (h *TreeSitterHighlighter) RemoveCharsEdit(code *string, row int, col int, nrow int, ncol int) {
+	StartIndex1 := GetStartIndex(code, row, col)
+	StartIndex2 := GetStartIndex(code, nrow, ncol)
+	Row1 := uint(row); Column1 := uint(col)
+	Row2 := uint(nrow); Column2 := uint(ncol)
+
+	editInput := sitter.InputEdit{
+		StartByte: StartIndex1,
+		OldEndByte: StartIndex2,
+		NewEndByte: StartIndex1,
+		StartPosition:  sitter.Point{Row: Row1, Column: Column1},
+		OldEndPosition: sitter.Point{Row: Row2, Column: Column2},
+		NewEndPosition: sitter.Point{Row: Row1, Column: Column1},
+	}
+	h.tree.Edit(&editInput)
+	h.Parse(code)
+}
+
 func GetStartIndex(code *string, row int, col int) uint {
 	r, c, startIndex := 0, 0, 0
 	for _, char := range *code {

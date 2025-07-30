@@ -454,6 +454,7 @@ func (e *Editor) OnSelectMoreAtCursor() {
 	e.Selection.Sex = node.Sex; e.Selection.Sey = node.Sey
 	e.Selection.IsSelected = true
 }
+
 func (e *Editor) OnSelectLessAtCursor() {
 	if e.TreePath == nil { return }
 	node := e.TreePath.Prev()
@@ -503,95 +504,69 @@ func (e *Editor) Cut(isCopySelected bool) {
 		e.Row, e.Col = 0, 0
 		return
 	}
+
 	var ops = EditOperation{}
 
-	if len(e.Selection.GetSelectionString(e.Content)) == 0 { // cut single Line
-		ops = append(ops, Operation{MoveCursor, ' ', e.Row, e.Col})
-
-		for i := len(e.Content[e.Row])-1; i >= 0; i-- {
-			ops = append(ops, Operation{Delete, e.Content[e.Row][i], e.Row, i})
-		}
-
-		if e.Row == 0 {
-			ops = append(ops, Operation{DeleteLine, '\n', 0, 0})
-			e.Col = 0
-		} else {
-			newc := 0
-			if e.Col > len(e.Content[e.Row-1]) { newc = len(e.Content[e.Row-1])} else { newc = e.Col
-			}
-			ops = append(ops, Operation{DeleteLine, '\n', e.Row -1, newc})
-			e.Col = newc
-		}
-
-		e.Content = Remove(e.Content, e.Row)
-		if e.Row > 0 { e.Row-- }
-
-		e.UpdateColors()
-		e.Update = true
-		e.UpdateLsp(false, ConvertContentToString(e.Content))
-		e.IsContentChanged = true
-		e.UpdateNeeded() // optimize
-
-	} else { // cut selection
-
-		if isCopySelected {
-			selectionString := e.Selection.GetSelectionString(e.Content)
-			clipboard.WriteAll(selectionString)
-		}
-
-		ops = append(ops, Operation{MoveCursor, ' ', e.Row, e.Col})
-
-		selectedIndices := e.Selection.GetSelectedIndices(e.Content)
-
-		// Sort selectedIndices in reverse order to delete characters from the end
-		for i := len(selectedIndices) - 1; i >= 0; i-- {
-			indices := selectedIndices[i]
-			xd := indices[0]
-			yd := indices[1]
-			e.Col, e.Row = xd, yd
-			e.UpdateLsp(false, ConvertContentToString(e.Content))
-
-			if len(e.Content[yd]) > 0 {
-				// Delete the character at index (x, j)
-				ch := e.Content[yd][xd]
-				ops = append(ops, Operation{Delete, ch, yd, xd})
-				e.Content[yd] = append(e.Content[yd][:xd], e.Content[yd][xd+1:]...)
-
-				code := ConvertContentToString(e.Content)
-				e.treeSitterHighlighter.RemoveCharEdit(&code, yd, xd, ch)
-			}
-
-			if len(e.Content[yd]) == 0 { // delete Line
-				if e.Row == 0 { ops = append(ops, Operation{DeleteLine, '\n', 0, 0}) } else {
-					ops = append(ops, Operation{DeleteLine, '\n', e.Row -1, len(e.Content[e.Row-1])})
-				}
-
-				e.Content = append(e.Content[:yd], e.Content[yd+1:]...)
-
-				code := ConvertContentToString(e.Content)
-				e.treeSitterHighlighter.RemoveCharEdit(&code, e.Col, e.Row, '\n')
-			}
-		}
-
-		if len(e.Content) == 0 {
-			e.Content = make([][]rune, 1)
-		}
-
-		if e.Row >= len(e.Content)  {
-			e.Row = len(e.Content) - 1
-			if e.Col >= len(e.Content[e.Row]) { e.Col = len(e.Content[e.Row]) - 1 }
-		}
-
-		if e.Row < 0 { e.Row = 0 }
-		if e.Col < 0 { e.Col = 0 }
-
-		e.Selection.CleanSelection()
-		e.Update = true
-		e.IsContentChanged = true
-		e.UpdateNeeded() // optimize
+	if isCopySelected {
+		selectionString := e.Selection.GetSelectionString(e.Content)
+		clipboard.WriteAll(selectionString)
 	}
 
+	ops = append(ops, Operation{MoveCursor, ' ', e.Row, e.Col})
+	selectedIndices := e.Selection.GetSelectedIndices(e.Content)
+
+	firstCol := e.Col
+	firstRow := e.Row
+
+	// Sort selectedIndices in reverse order to delete characters from the end
+	index := len(selectedIndices) - 1
+repeat:
+	indices := selectedIndices[index]
+	xd := indices[0]
+	yd := indices[1]
+	e.Col, e.Row = xd, yd
+
+	if len(e.Content[yd]) > 0 {
+		// Delete the character at index (x, j)
+		ch := e.Content[yd][xd]
+		ops = append(ops, Operation{Delete, ch, yd, xd})
+		e.Content[yd] = append(e.Content[yd][:xd], e.Content[yd][xd+1:]...)
+	}
+
+	if len(e.Content[yd]) == 0 { // delete Line
+		if e.Row == 0 {
+			ops = append(ops, Operation{DeleteLine, '\n', 0, 0})
+		} else {
+			ops = append(ops, Operation{DeleteLine, '\n', e.Row -1, len(e.Content[e.Row-1])})
+		}
+
+		e.Content = append(e.Content[:yd], e.Content[yd+1:]...)
+	}
+
+	if index > 0 { index--; goto repeat; }
+
+	code := ConvertContentToString(e.Content)
+	e.treeSitterHighlighter.RemoveCharsEdit(&code, firstCol, firstRow, e.Col, e.Row)
+
+	if len(e.Content) == 0 {
+		e.Content = make([][]rune, 1)
+	}
+
+	if e.Row >= len(e.Content)  {
+		e.Row = len(e.Content) - 1
+		if e.Col >= len(e.Content[e.Row]) { e.Col = len(e.Content[e.Row]) - 1 }
+	}
+
+	if e.Row < 0 { e.Row = 0 }
+	if e.Col < 0 { e.Col = 0 }
+
+	e.UpdateColors()
 	e.Undo = append(e.Undo, ops)
+	e.Selection.CleanSelection()
+	e.Update = true
+	e.UpdateLsp(false, ConvertContentToString(e.Content))
+	e.IsContentChanged = true
+	e.UpdateNeeded() // optimize
 }
 
 func (e *Editor) Duplicate() {
@@ -687,86 +662,86 @@ func (e *Editor) OnUndo() {
 	e.Undo = e.Undo[:len(e.Undo)-1]
 	e.Focus()
 
-	for i := len(lastOperation) - 1; i >= 0; i-- {
-		o := lastOperation[i]
+	index := len(lastOperation) - 1
+repeat:
+	o := lastOperation[index]
 
-		if o.Action == Insert {
-			e.Row = o.Line; e.Col = o.Column
-			e.Content[e.Row] = append(e.Content[e.Row][:e.Col], e.Content[e.Row][e.Col+1:]...)
-			e.UpdateLsp(false, ConvertContentToString(e.Content))
-		} else if o.Action == Delete {
-			e.Row = o.Line; e.Col = o.Column
-			e.Content[e.Row] = InsertTo(e.Content[e.Row], e.Col, o.Char)
-			e.UpdateLsp(false, ConvertContentToString(e.Content))
-		} else if o.Action == Enter {
-			// Merge lines
-			e.Content[o.Line] = append(e.Content[o.Line], e.Content[o.Line+1]...)
-			e.Content = append(e.Content[:o.Line+1], e.Content[o.Line+2:]...)
-			e.Row = o.Line; e.Col = o.Column
-			e.UpdateLsp(false, ConvertContentToString(e.Content))
-		} else if o.Action == DeleteLine {
-			// Insert enter
-			e.Row = o.Line; e.Col = o.Column
-			after := e.Content[e.Row][e.Col:]
-			before := e.Content[e.Row][:e.Col]
-			e.Content[e.Row] = before
-			e.Row++; e.Col = 0
-			newline := append([]rune{}, after...)
-			e.Content = InsertTo(e.Content, e.Row, newline)
-			e.UpdateLsp(false, ConvertContentToString(e.Content))
-		} else if o.Action == MoveCursor {
-			e.Row = o.Line; e.Col = o.Column
-		} else {
-			e.OnCursorChanged()
-		}
+	if o.Action == Insert {
+		e.Row = o.Line; e.Col = o.Column
+		e.Content[e.Row] = append(e.Content[e.Row][:e.Col], e.Content[e.Row][e.Col+1:]...)
+	} else if o.Action == Delete {
+		e.Row = o.Line; e.Col = o.Column
+		e.Content[e.Row] = InsertTo(e.Content[e.Row], e.Col, o.Char)
+	} else if o.Action == Enter {
+		// Merge lines
+		e.Content[o.Line] = append(e.Content[o.Line], e.Content[o.Line+1]...)
+		e.Content = append(e.Content[:o.Line+1], e.Content[o.Line+2:]...)
+		e.Row = o.Line; e.Col = o.Column
+	} else if o.Action == DeleteLine {
+		// Insert enter
+		e.Row = o.Line; e.Col = o.Column
+		after := e.Content[e.Row][e.Col:]
+		before := e.Content[e.Row][:e.Col]
+		e.Content[e.Row] = before
+		e.Row++; e.Col = 0
+		newline := append([]rune{}, after...)
+		e.Content = InsertTo(e.Content, e.Row, newline)
+	} else if o.Action == MoveCursor {
+		e.Row = o.Line; e.Col = o.Column
+	} else {
+		e.OnCursorChanged()
 	}
 
+	if index > 0 { index--; goto repeat; }
+
 	e.UpdateColors()
+	e.UpdateLsp(false, ConvertContentToString(e.Content))
 	e.Redo = append(e.Redo, lastOperation)
 	e.UpdateNeeded()
 }
+
 func (e *Editor) OnRedo() {
 	if len(e.Redo) == 0 { return }
 
 	lastRedoOperation := e.Redo[len(e.Redo)-1]
 	e.Redo = e.Redo[:len(e.Redo)-1]
 
-	for i := 0; i < len(lastRedoOperation); i++ {
-		o := lastRedoOperation[i]
+	index := 0
+repeat:
+	o := lastRedoOperation[index]
 
-		if o.Action == Insert {
-			e.Row = o.Line; e.Col = o.Column
-			e.Content[e.Row] = InsertTo(e.Content[e.Row], e.Col, o.Char)
-			e.Col++
-			e.UpdateLsp(false, ConvertContentToString(e.Content))
-		} else if o.Action == Delete {
-			e.Row = o.Line; e.Col = o.Column
-			e.Content[e.Row] = append(e.Content[e.Row][:e.Col], e.Content[e.Row][e.Col+1:]...)
-			e.UpdateLsp(false, ConvertContentToString(e.Content))
-		} else if o.Action == Enter {
-			e.Row = o.Line; e.Col = o.Column
-			after := e.Content[e.Row][e.Col:]
-			before := e.Content[e.Row][:e.Col]
-			e.Content[e.Row] = before
-			e.Row++; e.Col = 0
-			newline := append([]rune{}, after...)
-			e.Content = InsertTo(e.Content, e.Row, newline)
-			e.UpdateLsp(false, ConvertContentToString(e.Content))
-		} else if o.Action == DeleteLine {
-			// Merge lines
-			e.Content[o.Line] = append(e.Content[o.Line], e.Content[o.Line+1]...)
-			e.Content = append(e.Content[:o.Line+1], e.Content[o.Line+2:]...)
-			e.Row = o.Line; e.Col = o.Column
-			e.UpdateLsp(false, ConvertContentToString(e.Content))
-		} else if o.Action == MoveCursor {
-			e.Row = o.Line; e.Col = o.Column
-		}
+	if o.Action == Insert {
+		e.Row = o.Line; e.Col = o.Column
+		e.Content[e.Row] = InsertTo(e.Content[e.Row], e.Col, o.Char)
+		e.Col++
+	} else if o.Action == Delete {
+		e.Row = o.Line; e.Col = o.Column
+		e.Content[e.Row] = append(e.Content[e.Row][:e.Col], e.Content[e.Row][e.Col+1:]...)
+	} else if o.Action == Enter {
+		e.Row = o.Line; e.Col = o.Column
+		after := e.Content[e.Row][e.Col:]
+		before := e.Content[e.Row][:e.Col]
+		e.Content[e.Row] = before
+		e.Row++; e.Col = 0
+		newline := append([]rune{}, after...)
+		e.Content = InsertTo(e.Content, e.Row, newline)
+	} else if o.Action == DeleteLine {
+		// Merge lines
+		e.Content[o.Line] = append(e.Content[o.Line], e.Content[o.Line+1]...)
+		e.Content = append(e.Content[:o.Line+1], e.Content[o.Line+2:]...)
+		e.Row = o.Line; e.Col = o.Column
+	} else if o.Action == MoveCursor {
+		e.Row = o.Line; e.Col = o.Column
 	}
 
+	if index < len(lastRedoOperation) - 1 { index++; goto repeat; }
+
 	e.UpdateColors()
+	e.UpdateLsp(false, ConvertContentToString(e.Content))
 	e.Undo = append(e.Undo, lastRedoOperation)
 	e.UpdateNeeded()
 }
+
 func (e *Editor) OnCommentLine() {
 	e.Focus()
 
