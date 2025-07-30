@@ -340,13 +340,7 @@ func (e *Editor) InsertString(line, pos int, linestring string) {
 func (e *Editor) InsertLines(line, pos int, lines []string) {
 	var ops = EditOperation{}
 
-	//tabs := CountTabs(e.Content[e.Row], e.Col) // todo: spaces also can be
-	//if len(e.Content[e.Row]) > 0 { e.Row++ }
-	//ops = append(ops, Operation{Enter, '\n', e.Row, e.Col})
-
-
 	lines[0] = string(e.Content[e.Row][:e.Col]) + RemoveLeadingTabsSpaces(lines[0])
-
 
 	for _, linestr := range lines {
 		e.Col = 0
@@ -365,6 +359,7 @@ func (e *Editor) InsertLines(line, pos int, lines []string) {
 		}
 		e.Row++
 	}
+
 	e.Row--
 	e.Undo = append(e.Undo, ops)
 }
@@ -746,45 +741,45 @@ func (e *Editor) OnCommentLine() {
 	e.Focus()
 
 	found := false
+	index := 0
+repeat:
+	if len(e.Content[e.Row]) == 0 { return } // exit this function if useless
+	ch := e.Content[e.Row][index]
 
-	for i, ch := range e.Content[e.Row] {
-		if len(e.Content[e.Row]) == 0 { break }
+	if len(e.langConf.Comment) == 1 && ch == rune(e.langConf.Comment[0]) {
+		// found 1 char comment, uncomment
+		e.Col = index
+		e.Undo = append(e.Undo, EditOperation{
+			{MoveCursor, ch, e.Row, index+1},
+			{Delete, ch, e.Row, index},
+		})
+		e.Content[e.Row] = Remove(e.Content[e.Row], index)
 
-		if len(e.langConf.Comment) == 1 && ch == rune(e.langConf.Comment[0]) {
-			// found 1 char comment, uncomment
-			e.Col = i
-			e.Undo = append(e.Undo, EditOperation{
-				{MoveCursor, ch, e.Row, i+1},
-				{Delete, ch, e.Row, i},
-			})
-			e.Content[e.Row] = Remove(e.Content[e.Row], i)
+		code := ConvertContentToString(e.Content)
+		e.treeSitterHighlighter.RemoveCharEdit(&code, e.Row, index, ch)
 
-			code := ConvertContentToString(e.Content)
-			e.treeSitterHighlighter.RemoveCharEdit(&code, e.Row, i, ch)
+		found = true
+	} else if len(e.langConf.Comment) == 2 && ch == rune(e.langConf.Comment[0]) &&
+			e.Content[e.Row][index+1] == rune(e.langConf.Comment[1]) {
+		// found 2 char comment, uncomment
+		e.Col = index
+		e.Undo = append(e.Undo, EditOperation{
+			{MoveCursor, ch, e.Row, index+1},
+			{Delete, ch, e.Row, index},
+			{MoveCursor, e.Content[e.Row][index+1], e.Row, index+1},
+			{Delete, ch, e.Row, index},
+		})
+		e.Content[e.Row] = Remove(e.Content[e.Row], index)
+		e.Content[e.Row] = Remove(e.Content[e.Row], index)
 
-			found = true
-			break
-		}
-		if len(e.langConf.Comment) == 2 && ch == rune(e.langConf.Comment[0]) && e.Content[e.Row][i+1] == rune(e.langConf.Comment[1]) {
-			// found 2 char comment, uncomment
-			e.Col = i
-			e.Undo = append(e.Undo, EditOperation{
-				{MoveCursor, ch, e.Row, i+1},
-				{Delete, ch, e.Row, i},
-				{MoveCursor, e.Content[e.Row][i+1], e.Row, i+1},
-				{Delete, ch, e.Row, i},
-			})
-			e.Content[e.Row] = Remove(e.Content[e.Row], i)
-			e.Content[e.Row] = Remove(e.Content[e.Row], i)
+		code := ConvertContentToString(e.Content)
+		e.treeSitterHighlighter.RemoveCharEdit(&code, e.Row, index, ch)
+		e.treeSitterHighlighter.RemoveCharEdit(&code, e.Row, index, ch)
 
-			code := ConvertContentToString(e.Content)
-			e.treeSitterHighlighter.RemoveCharEdit(&code, e.Row, i, ch)
-			e.treeSitterHighlighter.RemoveCharEdit(&code, e.Row, i, ch)
-
-			found = true
-			break
-		}
+		found = true
 	}
+
+	if index < len(e.Content[e.Row]) - 1 { index++; goto repeat; }
 
 	if found {
 		if e.Col < 0 { e.Col = 0 }
