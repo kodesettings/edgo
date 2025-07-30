@@ -3,15 +3,17 @@
 
 AVAILABLE ISSUES:
 
-== Fixing all unit test cases
+== fixing all unit test cases
   - failing test cases are: dap, git, io, lsp (for golang only, due to gopls timeout)
   - do we need dap and git support?
   - why lsp is timing out after didOpen in test case?
 
-== Adding more unit tests for full test coverage
+== adding more unit tests for full test coverage
   - covering all editor methods with test cases for safety
 
 SOLVED ISSUES:
+
+++ speed up and optimization of cut, redo, undo operations
 
 ++ fixed crashing of process upon opening big files at function ColorRanges() that was caused
    by spawning lsp processes with incorrect async theads and timing in lsp_client.go Start()
