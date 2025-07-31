@@ -1,0 +1,673 @@
+package ui
+
+import (
+	. "github.com/vipmax/edgo/internal/highlighter"
+	. "github.com/vipmax/edgo/internal/io"
+	. "github.com/vipmax/edgo/internal/search"
+	. "github.com/vipmax/edgo/internal/utils"
+	"fmt"
+	. "github.com/gdamore/tcell"
+	"strings"
+	"time"
+	"unicode/utf8"
+)
+
+func (e *Editor) DrawEverything() {
+	 // Lock the mutex to ensure exclusive access to the method
+    e.mu.Lock()
+    defer e.mu.Unlock() // Ensure the mutex is unlocked when the method exits
+    
+	e.Screen.Clear()
+
+	// clean files panel and draw separator
+	if e.FilesPanelWidth != 0 {
+		for row := 0; row < e.ROWS; row++ {
+			for col := 0; col < e.FilesPanelWidth; col++ {
+				e.Screen.SetContent(col, row, ' ', nil, StyleDefault)
+			}
+			e.Screen.SetContent(e.FilesPanelWidth-2, row, '▕', nil, DimmedStyle)
+		}
+
+		var aty = 0
+		var fileindex = 0
+		e.DrawTree(e.Tree, 0, &fileindex, &aty)
+	}
+
+	if len(e.Content) == 0 { e.DrawLogo(); return }
+	//if e.Update == false { return }
+
+	countTabsTo := CountTabsTo(e.Content[e.Row], e.Col)
+	tabcor := countTabsTo * (e.langTabWidth - 1)
+
+	if e.Col < e.X { e.X = e.Col }
+	if e.Col + e.LINES_WIDTH + e.FilesPanelWidth + tabcor >= e.X + e.COLUMNS  {
+		e.X = e.Col - e.COLUMNS + 1 + e.LINES_WIDTH + e.FilesPanelWidth + tabcor
+	}
+
+	/*
+		1. Getting bytes ranges and colors from tree-sitter only for visible text
+		2. iterating over characters and increment bytesCounter
+		3. find range that matches bytesCounter
+		4. draw each cell (row,col, char, color)
+	*/
+
+	start := time.Now()
+	code := ConvertContentToString(e.Content)
+	//Log.Info("ConvertContentToString", time.Since(start).String())
+
+	//start = time.Now()
+	coloredByteRanges := e.treeSitterHighlighter.ColorRanges(e.Y, e.Y+e.TERMINAL_HEIGHT, []byte(code))
+	//Log.Info("ColorRanges", time.Since(start).String())
+
+	bytesCounter := 0
+
+	if e.Y > 0 { //  if scrolling needs to recalculate bytesCounter offset
+		newlineCount := 0
+		for _, c := range code {
+			bytesCounter += utf8.RuneLen(c)
+			if c == '\n' { newlineCount++ }
+			if newlineCount == e.Y { break }
+		}
+	}
+
+	for row := 0; row < e.ROWS; row++ {
+		ry := row + e.Y // index to get right row in characters buffer by scrolling offset Y
+		if row >= len(e.Content) || ry >= len(e.Content) { break }
+		e.DrawLineNumber(ry, row)
+
+		if _, found := e.Tests[ry]; found { e.DrawTest(ry, row) }
+
+		tabsOffset := 0
+
+		for col := 0; true; col++ {
+			cx := col + e.X // index to get right column in characters buffer by scrolling offset x
+
+			if cx < 0 { break }
+			if col >= len(e.Content[ry]) { break }
+			ch := e.Content[ry][col]
+
+			isOutside := col-e.X+e.LINES_WIDTH+tabsOffset+e.FilesPanelWidth > e.COLUMNS
+			if isOutside || e.X > col { bytesCounter += utf8.RuneLen(ch); continue }
+
+			style := StyleDefault
+
+			//minRange := coloredByteRanges[0]
+
+			for _, i := range coloredByteRanges {
+				if i.StartByte <= bytesCounter && bytesCounter < i.EndByte {
+					//len := i.EndByte - i.StartByte
+					//if len < minRange.EndByte - minRange.StartByte {
+					//	minRange = i
+					style = StyleDefault.Foreground(Color(i.Color))
+					//}
+					//continue
+					break
+				}
+			}
+
+			if e.Selection.IsUnderSelection(col, ry) {
+				style = style.Background(Color(SelectionColor))
+			}
+			if e.DebugInfo.stopline == ry {
+				style = style.Background(Color(SelectionColor))
+			}
+
+			if ch == '\t' && e.X == 0 { // draw big cursor for tab
+				if ry == e.Row && cx == e.Col {
+					style = StyleDefault.Background(Color(AccentColor))
+				}
+				for i := 0; i < e.langTabWidth; i++ {
+					x := col - e.X + e.LINES_WIDTH + tabsOffset + e.FilesPanelWidth
+					e.Screen.SetContent(x, row, ' ', nil, style)
+					if i != e.langTabWidth-1 { tabsOffset++ }
+				}
+			} else {
+				x := col - e.X + e.LINES_WIDTH + tabsOffset + e.FilesPanelWidth
+				e.Screen.SetContent(x, row, ch, nil, style)
+			}
+			//e.Screen.Show()
+			bytesCounter += utf8.RuneLen(ch)
+		}
+
+		if hightlightElements, found := e.HighlightElements[ry]; found && e.X == 0 {
+			for _, helement := range hightlightElements {
+				tabs := CountTabsTo(e.Content[helement.Ssy], helement.Ssx)
+				tabcorrection := tabs * (e.langTabWidth - 1)
+				skip := false
+				for i := helement.Ssx; !skip && i < helement.Sex; i++ {
+					x := i + e.LINES_WIDTH + e.FilesPanelWidth + tabcorrection
+					mainc, _, stylec, _ := e.Screen.GetContent(x, row)
+					if e.Selection.IsUnderSelection(i, ry) {
+						skip = true
+					} else {
+						e.Screen.SetContent(x, row, mainc, nil, stylec.Background(Color(HighlightColor)))
+					}
+				}
+			}
+
+		}
+
+		bytesCounter += 1 // for '/n'
+	}
+
+	e.DrawDiagnostic()
+
+	ttr := time.Since(start).String()
+	var changes = ""
+	if e.IsContentChanged { changes = "*" }
+	status := fmt.Sprintf(" %s %s %d %d %s%s ", ttr, e.Lang, e.Row+1, e.Col+1, e.Filename, changes)
+	e.DrawStatus(status)
+
+	// if tab under cursor, hide cursor because it has already drawn
+	if e.Row < len(e.Content) && e.Col < len(e.Content[e.Row]) && e.Content[e.Row][e.Col] == '\t' {
+		e.Screen.HideCursor()
+	} else {
+		tabs := CountTabsTo(e.Content[e.Row], e.Col) * (e.langTabWidth - 1)
+		e.Screen.ShowCursor(e.Col-e.X+e.LINES_WIDTH+tabs+e.FilesPanelWidth, e.Row-e.Y) // show cursor
+		if e.X != 0 {
+			e.Screen.ShowCursor(e.Col-e.X+e.LINES_WIDTH+e.FilesPanelWidth, e.Row-e.Y) // show cursor
+		}
+	}
+
+	if e.Row-e.Y >= e.ROWS { e.Screen.HideCursor() }
+
+	e.DrawProcessPanel()
+
+	if e.IsContentSearch {
+		e.DrawSearch(e.SearchPattern, len(e.SearchPattern))
+	}
+	if e.IsFilesSearch && !e.Dap.IsStarted {
+		e.DrawTreeSearch(e.FilesSearchPattern, len(e.FilesSearchPattern))
+	}
+	if e.Dap.IsStarted {
+		e.DrawDebugPanel()
+	}
+
+	//e.Update = false
+}
+
+func (e *Editor) CleanProcessPanel() {
+	for j := e.ROWS; j < e.TERMINAL_HEIGHT; j++ {
+		for i := 0; i < e.COLUMNS; i++ {
+			e.Screen.SetContent(i, j, ' ', nil, StyleDefault)
+		}
+	}
+}
+
+func (e *Editor) DrawProcessPanel() {
+	if e.langConf.Cmd != "" && (e.Process == nil || e.Process != nil && e.Process.IsStopped()) {
+		e.Screen.SetContent(e.COLUMNS-2, 0, '▶', nil, StyleDefault.Foreground(Color(HighlighterGlobal.GetRunButtonStyle())))
+	}
+
+	for i := 0; i < e.COLUMNS-7; i++ {
+		e.Screen.SetContent(i, e.ROWS, '─', nil, SeparatorStyle)
+	}
+
+	e.Screen.SetContent(e.COLUMNS-7, e.ROWS, ' ', nil, StyleDefault)
+
+	e.Screen.SetContent(e.COLUMNS-6, e.ROWS, '▶', nil, StyleDefault.Foreground(Color(HighlighterGlobal.GetRunButtonStyle())))
+
+	e.Screen.SetContent(e.COLUMNS-5, e.ROWS, ' ', nil, StyleDefault)
+
+	if e.Process != nil && e.Process.IsStopped() {
+		e.Screen.SetContent(e.COLUMNS-4, e.ROWS, ' ', nil, StyleDefault)
+	} else {
+		e.Screen.SetContent(e.COLUMNS-4, e.ROWS, '■', nil, StyleDefault.Foreground(Color(AccentColor)))
+	}
+	e.Screen.SetContent(e.COLUMNS-3, e.ROWS, ' ', nil, StyleDefault)
+	e.Screen.SetContent(e.COLUMNS-2, e.ROWS, 'x', nil, StyleDefault)
+
+	screenCols, screenRows := e.Screen.Size()
+
+	if e.ProcessPanelCursorX < e.ProcessPanelHScroll {
+		e.ProcessPanelHScroll = e.ProcessPanelCursorX
+	}
+	if e.ProcessPanelCursorX >= e.ProcessPanelHScroll+screenCols-e.ProcessPanelSpacing {
+		e.ProcessPanelHScroll = e.ProcessPanelCursorX - screenCols + e.ProcessPanelSpacing + 1
+	}
+
+	for index := 0; index < len(e.ProcessContent); index++ {
+		if index+e.ProcessPanelScroll > len(e.ProcessContent)-1 {
+			break
+		}
+		line := e.ProcessContent[index+e.ProcessPanelScroll]
+		y := e.ROWS + index + 1
+		if y > screenRows { break }
+
+		for col := 0; col <= e.COLUMNS; col++ {
+			cx := col + e.ProcessPanelHScroll // index to get right column in characters buffer by scrolling offset x
+			if cx >= len(line) { break }
+			ch := line[cx]
+
+			style := StyleDefault
+			style = style.Foreground(Color(AccentColor3))
+			if e.ProcessPanelSelection.IsUnderSelection(cx, index+e.ProcessPanelScroll) {
+				style = style.Background(Color(SelectionColor))
+			}
+
+			e.Screen.SetContent(col+e.ProcessPanelSpacing, y, ch, nil, style)
+		}
+
+		for i := len(line); i < e.COLUMNS; i++ {
+			e.Screen.SetContent(i+e.ProcessPanelSpacing, y, ' ', nil, StyleDefault)
+		}
+	}
+
+	if e.IsProcessPanelFocused {
+		if e.ProcessPanelCursorY-e.ProcessPanelScroll+e.ROWS+1 <= e.ROWS {
+			e.Screen.HideCursor()
+		} else {
+			e.Screen.ShowCursor(e.ProcessPanelCursorX+e.ProcessPanelSpacing-e.ProcessPanelHScroll, e.ProcessPanelCursorY-e.ProcessPanelScroll+e.ROWS+1)
+		}
+
+	} else {
+		//e.Screen.HideCursor()
+	}
+}
+
+func (e *Editor) DrawDiagnostic() {
+	if e.Lang == "" { return }
+	lsp := e.lsp2lang[e.Lang]
+	if !lsp.IsReady { return }
+
+	maybeDiagnostic, found := lsp.GetDiagnostic("file://" + e.AbsoluteFilePath)
+
+	if found {
+		//style := tcell.StyleDefault.Background(tcell.ColorIndianRed).Foreground(tcell.ColorWhite)
+		style := StyleDefault.Foreground(Color(AccentColor))
+		//textStyle := tcell.StyleDefault.Foreground(tcell.ColorIndianRed)
+
+		for _, diagnostic := range maybeDiagnostic.Diagnostics {
+			dline := int(diagnostic.Range.Start.Line)
+			if dline >= len(e.Content) { continue } // sometimes it out of e.Content
+			if dline-e.Y > e.ROWS { continue } // sometimes it out of e.Content
+
+			// iterate over error range and, todo::fix
+			//for i := dline; i <= int(diagnostic.Range.End.Line); i++ {
+			//	if i >= len(e.Content) { continue }
+			//	tabs := CountTabs(e.Content[i], dline)
+			//	for j := int(diagnostic.Range.Start.Character); j <= int(diagnostic.Range.End.Character); j++ {
+			//		if j >= len(e.Content[i]) { continue }
+			//
+			//		ch := e.Content[dline][j]
+			//		e.Screen.SetContent(j+LINES_WIDTH + tabs*e.langTabWidth + X, i-Y, ch, nil, textStyle)
+			//	}
+			//}
+
+			tabs := CountTabs(e.Content[dline], len(e.Content[dline]))
+			var shifty = 0
+			errorMessage := "error: " + diagnostic.Message
+			errorMessage = PadLeft(errorMessage, e.COLUMNS-len(e.Content[dline])-tabs*e.langTabWidth-5-e.LINES_WIDTH-e.FilesPanelWidth)
+
+			// iterate over message characters and draw it
+			for i, m := range errorMessage {
+				ypos := dline - e.Y
+				if ypos < 0 || ypos >= len(e.Content) { break }
+
+				tabs = CountTabs(e.Content[dline], len(e.Content[dline]))
+				xpos := i + e.LINES_WIDTH + e.FilesPanelWidth + len(e.Content[dline+shifty]) + tabs*e.langTabWidth + 5
+
+				//for { // draw ch on the next Line if not fit to e.Screen
+				//	if xpos >= COLUMNS {
+				//		shifty++
+				//		tabs = CountTabs(e.Content[dline+shifty], len(e.Content[dline+shifty]))
+				//		ypos +=  (i / COLUMNS) + 1
+				//		if ypos >= len(e.Content) { break}
+				//		xpos = len(e.Content[dline+shifty]) + 5 + (xpos % COLUMNS) % COLUMNS
+				//	} else { break }
+				//}
+
+				e.Screen.SetContent(xpos, ypos, m, nil, style)
+			}
+		}
+
+	}
+}
+
+func (e *Editor) DrawLineNumber(brw int, row int) {
+	var style = StyleDefault.Foreground(247)
+	if brw == e.Row { style = StyleDefault }
+	//if e.Added.Contains(brw+1) {
+	//	style = StyleDefault.Foreground(Color(AccentColor))
+	//}
+
+	bps, found := e.Dap.Breakpoints[e.AbsoluteFilePath]
+	if found && Contains(bps, brw+1) {
+		style = StyleDefault.Foreground(Color(AccentColor))
+		e.Screen.SetContent(e.FilesPanelWidth+e.LINES_WIDTH/2-1, row, '●', nil, style)
+		return
+	}
+
+	lineNumber := CenterNumber(brw+1, e.LINES_WIDTH)
+	for index, char := range lineNumber {
+		e.Screen.SetContent(index+e.FilesPanelWidth, row, char, nil, style)
+	}
+}
+
+func (e *Editor) DrawStatus(text string) {
+	//var style = StyleDefault
+	var style = StyleDefault.Foreground(247)
+	e.DrawText(e.ROWS-1, e.COLUMNS-len(text), text, style)
+}
+
+func (e *Editor) DrawText(row, col int, text string, style Style) {
+	e.Screen.SetContent(col-1, row, ' ', nil, style)
+	for _, ch := range []rune(text) {
+		if col > e.COLUMNS { break }
+		e.Screen.SetContent(col, row, ch, nil, style)
+		col++
+	}
+}
+
+func (e *Editor) DrawErrors(atx int, width int, aty int, height int, options []string,
+	selectedOffset int, selected int, style Style) int {
+
+	var shifty = 0
+	for row := 0; row < aty+height; row++ {
+		if row >= len(options) || row >= height { break }
+		var option = options[row+selectedOffset]
+
+		isRowSelected := selected == row+selectedOffset
+		if isRowSelected {
+			style = style.Background(Color(AccentColor))
+		} else {
+			style = StyleDefault.Background(Color(OverlayColor))
+		}
+
+		shiftx := 0
+		runes := []rune(option)
+		for j := 0; j < len(runes); j++ {
+			ch := runes[j]
+			nextWord := FindNextWord(runes, j)
+			if shiftx == 0 {
+				e.Screen.SetContent(atx, row+aty+shifty, ' ', nil, style)
+			}
+			if shiftx+atx+(nextWord-j) >= e.COLUMNS {
+				for k := shiftx; k <= e.COLUMNS; k++ { // Fill the remaining space
+					e.Screen.SetContent(k+atx, row+aty+shifty, ' ', nil, style)
+				}
+				shifty++
+				shiftx = 0
+			}
+			e.Screen.SetContent(atx+shiftx, row+aty+shifty, ch, nil, style)
+			shiftx++
+		}
+
+		for col := shiftx; col < e.COLUMNS; col++ { // Fill the remaining space
+			e.Screen.SetContent(col+atx, row+aty+shifty, ' ', nil, style)
+		}
+	}
+
+	for col := 0; col < e.COLUMNS; col++ { // Fill empty Line below
+		e.Screen.SetContent(col+atx, height+aty+shifty,
+			//' ', nil, StyleDefault.Background(Color(OverlayColor)))
+			'─', nil, SeparatorStyle)
+	}
+
+	return shifty
+}
+
+func (e *Editor) DrawSearch(pattern []rune, patternx int) {
+	var prefix = []rune("search: ")
+
+	for i := 0; i < len(prefix); i++ {
+		e.Screen.SetContent(i+e.LINES_WIDTH+e.FilesPanelWidth, e.ROWS-1, prefix[i], nil, StyleDefault)
+	}
+
+	e.Screen.SetContent(len(prefix)+e.LINES_WIDTH+e.FilesPanelWidth, e.ROWS-1, ' ', nil, StyleDefault)
+
+	for i := 0; i < len(pattern); i++ {
+		e.Screen.SetContent(len(prefix)+i+e.LINES_WIDTH+e.FilesPanelWidth, e.ROWS-1, pattern[i], nil, StyleDefault)
+	}
+
+	e.Screen.ShowCursor(len(prefix)+patternx+e.LINES_WIDTH+e.FilesPanelWidth, e.ROWS-1)
+
+	for i := len(prefix) + len(pattern) + e.LINES_WIDTH + e.FilesPanelWidth; i < e.COLUMNS; i++ {
+		e.Screen.SetContent(i, e.ROWS-1, ' ', nil, StyleDefault)
+	}
+
+	if len(e.SearchResults) > 0 {
+		status := fmt.Sprintf("  %d/%d", e.SearchResultIndex+1, len(e.SearchResults))
+
+		for i := 0; i < len(status); i++ {
+			e.Screen.SetContent(e.FilesPanelWidth+e.LINES_WIDTH+len(prefix)+len(pattern)+i, e.ROWS-1,
+				rune(status[i]), nil, StyleDefault)
+		}
+	}
+
+	e.Screen.ShowCursor(len(prefix)+patternx+e.LINES_WIDTH+e.FilesPanelWidth, e.ROWS-1)
+}
+
+func (e *Editor) CleanContentSearch() {
+	for i := e.LINES_WIDTH + e.FilesPanelWidth; i < e.COLUMNS; i++ {
+		e.Screen.SetContent(i, e.ROWS-1, ' ', nil, StyleDefault)
+	}
+
+	if len(e.Content) == 0 {
+		e.Screen.HideCursor()
+	}
+}
+
+func (e *Editor) DrawCodePreview(atx int, aty int, height int, options []string,
+	selectedOffset int, selected int,
+	style Style, searchResults []FileSearchResult, status string) {
+
+	//searchPattern, _ := ParsePattern(string(e.SearchPattern))
+
+	// draw options
+	for row := aty; row < aty+height; row++ {
+		if row >= len(options) || row >= height { break }
+
+		var option = options[row+selectedOffset]
+
+		isRowSelected := selected == row+selectedOffset
+		if isRowSelected {
+			style = style.Background(Color(AccentColor))
+		} else {
+			style = StyleDefault.Background(Color(OverlayColor))
+		}
+
+		for i, ch := range option {
+			e.Screen.SetContent(atx+i, row, ch, nil, style)
+		}
+
+		for i := atx + len(option); i < e.COLUMNS; i++ {
+			e.Screen.SetContent(i, row, ' ', nil, style)
+		}
+	}
+
+	for i := atx; i < e.COLUMNS; i++ {
+		e.Screen.SetContent(i, height, ' ', nil, StyleDefault)
+	}
+
+	file, searchResult, found := e.findSearchGlobalOption(searchResults, selected)
+	if found {
+		rowsToShow := e.ROWS - height
+		previewContent := e.ReadContent(file, searchResult.Line-rowsToShow/2, searchResult.Line+rowsToShow/2)
+		lang := DetectLang(file)
+		if e.treeSitterHighlighter.GetLangStr() != lang {
+			e.treeSitterHighlighter.SetLang(lang)
+		}
+
+		// clear
+		for j := height + 1; j < e.ROWS; j++ {
+			for i := atx; i < e.COLUMNS; i++ {
+				e.Screen.SetContent(i, j, ' ', nil, StyleDefault)
+			}
+		}
+
+		linenumber := searchResult.Line - rowsToShow/2
+		if linenumber < 0 { linenumber = 0 }
+
+		// draw preview
+		for row := 0; row < len(previewContent); row++ {
+			y := row + height + 1
+			if y >= e.ROWS { break }
+			var shiftTabs = 0
+
+			var lineNumberStyle = StyleDefault.Foreground(ColorDimGray)
+			for index, char := range CenterNumber(linenumber+1, e.LINES_WIDTH) {
+				e.Screen.SetContent(index+e.FilesPanelWidth, y, char, nil, lineNumberStyle)
+			}
+
+			for col := 0; col < len(previewContent[row]); col++ {
+
+				chstyle := StyleDefault
+
+				//if linenumber == searchResult.Line-1 &&  // color match
+				//	col >= searchResult.Position && col < searchResult.Position + len(searchPattern) {
+				//	chstyle = chstyle.Background(Color(SelectionColor))
+				//}
+
+				if linenumber == searchResult.Line-1 {
+					chstyle = chstyle.Background(Color(SelectionColor))
+				}
+
+				if previewContent[row][col] == '\n' { continue }
+				if previewContent[row][col] == '\t' {
+					for i := 0; i < e.langTabWidth; i++ {
+						e.Screen.SetContent(atx+e.LINES_WIDTH+col+shiftTabs, y, ' ', nil, chstyle)
+						if i != e.langTabWidth-1 { shiftTabs++ }
+					}
+				} else {
+					e.Screen.SetContent(atx+e.LINES_WIDTH+col+shiftTabs, y, previewContent[row][col], nil, chstyle)
+				}
+
+				if atx+e.LINES_WIDTH+col+shiftTabs >= e.COLUMNS { break }
+			}
+
+			for i := atx + len(previewContent[row]) + e.LINES_WIDTH + shiftTabs; i < e.COLUMNS; i++ {
+				e.Screen.SetContent(i, y, ' ', nil, StyleDefault)
+			}
+
+			linenumber++
+		}
+
+		label := append([]rune(status), []rune(strings.Repeat(" ", e.COLUMNS-atx))...)
+
+		for i := 0; i < len(label); i++ {
+			e.Screen.SetContent(atx+i, e.ROWS-1, label[i], nil, StyleDefault)
+		}
+	}
+
+}
+
+func (e *Editor) DrawTree(fileInfo FileInfo, level int, fileindex *int, aty *int) {
+
+	isNeedToShow := *fileindex >= e.FileScrollingOffset
+
+	if isNeedToShow {
+		if *aty >= e.ROWS { return }
+
+		style := StyleDefault
+		isSelectedFile := e.IsFileSelection && e.FileSelectedIndex != -1 && *fileindex == e.FileSelectedIndex
+		if fileInfo.IsDir {
+			style = style.Foreground(Color(AccentColor2))
+		} else {
+			style = style.Foreground(Color(AccentColor3))
+		}
+		if isSelectedFile { style = style.Foreground(Color(AccentColor)) }
+
+		if e.InputFile != "" && e.InputFile == fileInfo.FullName {
+			style = style.Background(Color(AccentColor)).Foreground(ColorWhite)
+		}
+
+		for i := 0; i <= level; i++ {
+			if i+1 >= e.FilesPanelWidth-2 { break }
+			e.Screen.SetContent(i+1, *aty, ' ', nil, StyleDefault)
+		}
+
+		label := []rune(" " + fileInfo.Name + " ")
+		for i := 0; i < len(label); i++ {
+			if i+1+level >= e.FilesPanelWidth-2 { break }
+			e.Screen.SetContent(i+1+level, *aty, label[i], nil, style)
+		}
+		//e.Screen.Show()
+		*aty++
+	}
+
+	*fileindex++
+
+	if fileInfo.IsDir && fileInfo.IsDirOpen {
+		for _, child := range fileInfo.Childs {
+			e.DrawTree(child, level+1, fileindex, aty)
+		}
+	}
+
+}
+
+func (e *Editor) DrawTreeSearch(filterPattern []rune, patternx int) {
+	e.Screen.HideCursor()
+
+	if e.IsFilesSearch {
+		pref := " search: "
+		e.Screen.ShowCursor(len(pref)+patternx, e.ROWS-1)
+		for i, ch := range pref { // draw prefix
+			e.Screen.SetContent(i, e.ROWS-1, ch, nil, StyleDefault)
+		}
+
+		for i, ch := range filterPattern { // draw pattern
+			e.Screen.SetContent(i+len(pref), e.ROWS-1, ch, nil, StyleDefault)
+		}
+		for col := len(pref) + len(filterPattern); col < e.FilesPanelWidth-1; col++ { // clean
+			e.Screen.SetContent(col, e.ROWS-1, ' ', nil, StyleDefault)
+		}
+	}
+}
+
+func (e *Editor) CleanFilesSearch() {
+	e.Screen.HideCursor()
+	for col := 0; col < e.FilesPanelWidth-1; col++ { // clean
+		e.Screen.SetContent(col, e.ROWS-1, ' ', nil, StyleDefault)
+	}
+}
+
+func (e *Editor) DrawTest(line int, row int) {
+	x := e.COLUMNS - 2
+
+	//x := e.FilesPanelWidth + e.LINES_WIDTH/2
+
+	//for i:= 0; i < e.LINES_WIDTH; i++ {
+	//	e.Screen.SetContent(e.FilesPanelWidth + i, row, ' ', nil, StyleDefault)
+	//}
+
+	e.Screen.SetContent(x, row, '▶', nil,
+		StyleDefault.Foreground(Color(HighlighterGlobal.GetRunButtonStyle())))
+	//e.Screen.Show()
+}
+
+func (e *Editor) DrawProcessPanelSearch(pattern []rune, patternx int) {
+
+	var prefix = []rune("  search: ")
+
+	for i := 0; i < len(prefix); i++ {
+		e.Screen.SetContent(i, e.TERMINAL_HEIGHT-1, prefix[i], nil, StyleDefault)
+	}
+
+	e.Screen.SetContent(len(prefix), e.TERMINAL_HEIGHT-1, ' ', nil, StyleDefault)
+
+	for i := 0; i < len(pattern); i++ {
+		e.Screen.SetContent(len(prefix)+i, e.TERMINAL_HEIGHT-1, pattern[i], nil, StyleDefault)
+	}
+
+	e.Screen.ShowCursor(len(prefix)+patternx, e.TERMINAL_HEIGHT-1)
+
+	for i := len(prefix) + len(pattern); i < e.COLUMNS; i++ {
+		e.Screen.SetContent(i, e.TERMINAL_HEIGHT-1, ' ', nil, StyleDefault)
+	}
+
+	if len(e.ProcessPanelSearchResults) > 0 {
+		status := fmt.Sprintf("  %d/%d", e.ProcessPanelSearchResultIndex+1, len(e.ProcessPanelSearchResults))
+
+		for i := 0; i < len(status); i++ {
+			e.Screen.SetContent(len(prefix)+len(pattern)+i, e.TERMINAL_HEIGHT-1,
+				rune(status[i]), nil, StyleDefault)
+		}
+	}
+}
+
+func (e *Editor) Drawtext(text string, x, y int) {
+	for i, ch := range text {
+		e.Screen.SetContent(x+i, y, ch, nil, StyleDefault)
+	}
+}
