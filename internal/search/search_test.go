@@ -6,14 +6,15 @@ import (
 	"runtime"
 	"testing"
 	"time"
+	. "github.com/vipmax/edgo/internal/utils"
 	assert "github.com/stretchr/testify/assert"
 )
 
 func TestSearch(t *testing.T) {
-	text := [][]rune{
-		[]rune("Hello, World!"),
-		[]rune("This is a test"),
-		[]rune("Another test"),
+	var lines = []Line{
+		Line{[]rune("Hello, World!")},
+		Line{[]rune("This is a test")},
+		Line{[]rune("Another test")},
 	}
 
 	testCases := []struct {
@@ -62,7 +63,7 @@ func TestSearch(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		results := Search(text, tc.pattern)
+		results := Search(lines, tc.pattern)
 		assert.Equal(t, true, reflect.DeepEqual(results, tc.expected), 
 			"Search did not return the expected results for pattern '%s'. Expected: %v, Got: %v",
 			tc.pattern, tc.expected, results)
