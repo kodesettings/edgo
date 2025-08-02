@@ -29,12 +29,12 @@ func (e *Editor) OnSelectLessAtCursor() {
 }
 
 func (e *Editor) OnSelectAll() {
-	if len(e.Content) == 0 { return }
+	if len(e.Lines) == 0 { return }
 	e.Selection.Ssx = 0; e.Selection.Ssy = 0
-	e.Selection.Sey = len(e.Content)
-	lastElement := len(e.Content[len(e.Content)-1])
+	e.Selection.Sey = len(e.Lines)
+	lastElement := len(e.Lines[len(e.Lines)-1].Buf)
 	e.Selection.Sex = lastElement
-	e.Selection.Sey = len(e.Content)
+	e.Selection.Sey = len(e.Lines)
 	e.Selection.IsSelected = true
 }
 

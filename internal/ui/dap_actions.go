@@ -63,7 +63,7 @@ func (e *Editor) OnDebug() {
 		e.ProcessPanelScroll = 0
 		e.ProcessPanelSpacing = 2
 		e.DebugInfo = DebugInfo{stopline: -1}
-		e.ProcessContent = [][]rune{}
+		e.ProcessContent = []Line{Line{[]rune{}}}
 
 		var cmd = ""
 		var runtype = "launch"
@@ -80,7 +80,7 @@ func (e *Editor) OnDebug() {
 
 		split := strings.Split(cmd, " ")
 		e.Dap.Start(split[0], split[1:]...)
-		e.ProcessContent = append(e.ProcessContent, []rune(cmd))
+		e.ProcessContent = append(e.ProcessContent, Line{[]rune(cmd)})
 
 		go e.processStdout()
 		go e.processDapEvents()
@@ -141,7 +141,7 @@ func (e *Editor) processDapEvents() {
 func (e *Editor) processStdout() {
 	for line := range e.Dap.StdoutMessages {
 
-		e.ProcessContent = append(e.ProcessContent, []rune(line))
+		e.ProcessContent = append(e.ProcessContent, Line{[]rune(line)})
 
 		if len(e.ProcessContent) > e.ProcessPanelHeight {
 			if e.ProcessPanelScroll >= len(e.ProcessContent)-e.ProcessPanelHeight-1 {

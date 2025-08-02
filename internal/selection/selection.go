@@ -68,7 +68,7 @@ func Equal(x, y, x1, y1 int) bool {
 	return x == x1 && y == y1
 }
 
-func (this *Selection) GetSelectedIndices(content [][]rune) [][]int {
+func (this *Selection) GetSelectedIndices(lines []Line) [][]int {
 	var selectedIndices = [][]int{}
 
 	// check for empty selection
@@ -87,13 +87,13 @@ func (this *Selection) GetSelectedIndices(content [][]rune) [][]int {
 	}
 
 	var inside = false
-	// iterate over Content, starting from selection Start point until out ouf selection
-	for j := starty; j < len(content); j++ {
-		if len(content[j]) == 0 && this.IsUnderSelection(0, j) {
+	// iterate over lines, starting from selection Start point until out ouf selection
+	for j := starty; j < len(lines); j++ {
+		if len(lines[j].Buf) == 0 && this.IsUnderSelection(0, j) {
 			selectedIndices = append(selectedIndices, []int{0, j})
 			inside = true
 		}
-		for i := 0; i < len(content[j]); i++ {
+		for i := 0; i < len(lines[j].Buf); i++ {
 			if this.IsUnderSelection(i, j) {
 				selectedIndices = append(selectedIndices, []int{i, j})
 				inside = true
@@ -107,7 +107,7 @@ func (this *Selection) GetSelectedIndices(content [][]rune) [][]int {
 	return selectedIndices
 }
 
-func (this *Selection) GetSelectionString(content [][]rune) string {
+func (this *Selection) GetSelectionString(lines []Line) string {
 	var ret = []rune {}
 	var in = false
 
@@ -123,9 +123,9 @@ func (this *Selection) GetSelectionString(content [][]rune) string {
 		starty, endy = endy, starty
 	}
 
-	for j := starty; j < len(content); j++ {
-		row := content[j]
-		for i, char := range row {
+	for j := starty; j < len(lines); j++ {
+		line := lines[j].Buf
+		for i, char := range line {
 			// if inside selection
 			if GreaterEqual(i, j, startx, starty) && LessThan(i, j, endx, endy) {
 				ret = append(ret, char)
@@ -150,7 +150,7 @@ func (this *Selection) GetSelectionString(content [][]rune) string {
 }
 
 
-func (this *Selection) GetSelectedLines(content [][]rune)  []int {
+func (this *Selection) GetSelectedLines(lines []Line)  []int {
 	var lineNumbers = make(Set)
 	var in = false
 
@@ -166,9 +166,9 @@ func (this *Selection) GetSelectedLines(content [][]rune)  []int {
 		starty, endy = endy, starty
 	}
 
-	for j := starty; j < len(content); j++ {
-		row := content[j]
-		for i, _ := range row {
+	for j := starty; j < len(lines); j++ {
+		line := lines[j].Buf
+		for i, _ := range line {
 			// if inside selection
 			if GreaterEqual(i, j, startx, starty) && LessThan(i, j, endx, endy) {
 				lineNumbers.Add(j)

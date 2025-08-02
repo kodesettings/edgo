@@ -46,14 +46,14 @@ type SearchResult struct {
 	Position int
 }
 
-func Search(text [][]rune, pattern string) []SearchResult {
+func Search(lines []utils.Line, pattern string) []SearchResult {
 	results := []SearchResult{}
 
-	if len(pattern) == 0 || len(text) == 0 { return results }
+	if len(pattern) == 0 || len(lines) == 0 { return results }
 
-	for i := 0; i < len(text); i++ {
+	for i := 0; i < len(lines); i++ {
 		from := 0
-		line := string(text[i])
+		line := string(lines[i].Buf)
 		for {
 			pos := strings.Index(line[from:], pattern)
 			if pos == -1 { break } else {

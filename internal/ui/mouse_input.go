@@ -37,7 +37,7 @@ func (e *Editor) HandleMouse(mx int, my int, buttons ButtonMask, modifiers ModMa
 		e.OnProcessStop()
 		e.ROWS = screenRows
 		e.ProcessPanelHeight = 0
-		e.ProcessContent = [][]rune{}
+		e.ProcessContent = []Line{Line{[]rune{}}}
 		return
 	}
 
@@ -86,8 +86,8 @@ func (e *Editor) HandleMouse(mx int, my int, buttons ButtonMask, modifiers ModMa
 			if e.ProcessPanelCursorY >= len(e.ProcessContent) {
 				e.ProcessPanelCursorY = len(e.ProcessContent) - 1
 			}
-			if e.ProcessPanelCursorY < len(e.ProcessContent) && e.ProcessPanelCursorX > len(e.ProcessContent[e.ProcessPanelCursorY]) {
-				e.ProcessPanelCursorX = len(e.ProcessContent[e.ProcessPanelCursorY])
+			if e.ProcessPanelCursorY < len(e.ProcessContent) && e.ProcessPanelCursorX > len(e.ProcessContent[e.ProcessPanelCursorY].Buf) {
+				e.ProcessPanelCursorX = len(e.ProcessContent[e.ProcessPanelCursorY].Buf)
 			}
 
 			if e.ProcessPanelSelection.Ssx < 0 {
@@ -117,7 +117,7 @@ func (e *Editor) HandleMouse(mx int, my int, buttons ButtonMask, modifiers ModMa
 
 	if !e.IsFilesPanelMoving && buttons&Button1 == 1 &&
 		(mx == e.FilesPanelWidth-2 || mx == e.FilesPanelWidth-1) &&
-		my < e.ROWS && len(e.Selection.GetSelectedLines(e.Content)) == 0 {
+		my < e.ROWS && len(e.Selection.GetSelectedLines(e.Lines)) == 0 {
 		e.IsFilesPanelMoving = true
 		return
 	}
@@ -150,16 +150,16 @@ func (e *Editor) HandleMouse(mx int, my int, buttons ButtonMask, modifiers ModMa
 
 	if mx < 0 { return }
 	if my > e.ROWS { return }
-	if e.Content == nil { return }
+	if e.Lines == nil { return }
 
 	// if click with control or option, lookup for definition or references
 	if buttons&Button1 == 1 && (modifiers&ModAlt != 0 || modifiers&ModCtrl != 0) {
 		e.Row = my + e.Y
-		if e.Row > len(e.Content)-1 { e.Row = len(e.Content) - 1 } // fit cursor to e.Content
+		if e.Row > len(e.Lines) - 1 { e.Row = len(e.Lines) - 1 } // fit cursor to e.Lines
 
 		e.Col = e.FindCursorXPosition(mx)
 
-		if len(e.Selection.GetSelectedLines(e.Content)) > 0 { // if text selected
+		if len(e.Selection.GetSelectedLines(e.Lines)) > 0 { // if text selected
 			e.Selection.Sey = e.Row
 			e.Selection.Sex = e.Col
 			return
@@ -173,22 +173,21 @@ func (e *Editor) HandleMouse(mx int, my int, buttons ButtonMask, modifiers ModMa
 	if e.Selection.IsSelected && buttons&Button1 == 1 {
 		e.Update = true
 		e.Row = my + e.Y
-		if e.Row > len(e.Content)-1 { e.Row = len(e.Content) - 1 } // fit cursor to e.Content
+		if e.Row > len(e.Lines) - 1 { e.Row = len(e.Lines) - 1 } // fit cursor to e.Lines
 
 		xPosition := e.FindCursorXPosition(mx)
 
 		isTripleClick := e.Selection.IsUnderSelection(xPosition, e.Row) &&
-			len(e.Selection.GetSelectedLines(e.Content)) == 1
+			len(e.Selection.GetSelectedLines(e.Lines)) == 1
 
 		if isTripleClick {
 			e.Row = my + e.Y
 			e.Col = xPosition
-			if e.Row > len(e.Content)-1 { e.Row = len(e.Content) - 1 } // fit cursor to e.Content
-			if e.Col > len(e.Content[e.Row]) { e.Col = len(e.Content[e.Row]) }
-			//if e.Col < 0 { Sex = len(e.Content[Row]) }
+			if e.Row > len(e.Lines) - 1 { e.Row = len(e.Lines) - 1 } // fit cursor to e.Lines
+			if e.Col > len(e.Lines[e.Row].Buf) { e.Col = len(e.Lines[e.Row].Buf) }
 
 			e.Selection.Ssx = 0
-			e.Selection.Sex = len(e.Content[e.Row])
+			e.Selection.Sex = len(e.Lines[e.Row].Buf)
 			e.Selection.Ssy = e.Row
 			e.Selection.Sey = e.Row
 
@@ -215,20 +214,20 @@ func (e *Editor) HandleMouse(mx int, my int, buttons ButtonMask, modifiers ModMa
 		e.Update = true
 
 		e.Row = my + e.Y
-		if e.Row > len(e.Content)-1 { e.Row = len(e.Content) - 1 } // fit cursor to e.Content
+		if e.Row > len(e.Lines) - 1 { e.Row = len(e.Lines) - 1 } // fit cursor to e.Lines
 
 		xPosition := e.FindCursorXPosition(mx)
 
-		if prevRow == e.Row && e.Col == xPosition && len(e.Selection.GetSelectedLines(e.Content)) == 0 {
+		if prevRow == e.Row && e.Col == xPosition && len(e.Selection.GetSelectedLines(e.Lines)) == 0 {
 			// double click
-			lastChar := len(e.Content[e.Row]) == e.Col
+			lastChar := len(e.Lines[e.Row].Buf) == e.Col
 			if lastChar {
 				e.Selection.Ssx, e.Selection.Ssy = e.Col, e.Row
 				e.Selection.Sex, e.Selection.Sey = e.Col, e.Row
 				return
 			}
-			prw := FindPrevWord(e.Content[e.Row], e.Col)
-			nxw := FindNextWord(e.Content[e.Row], e.Col)
+			prw := FindPrevWord(e.Lines[e.Row].Buf, e.Col)
+			nxw := FindNextWord(e.Lines[e.Row].Buf, e.Col)
 			e.Selection.Ssx, e.Selection.Ssy = prw, e.Row
 			e.Selection.Sex, e.Selection.Sey = nxw, e.Row
 			e.Col = nxw

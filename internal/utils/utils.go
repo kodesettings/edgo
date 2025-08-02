@@ -158,14 +158,15 @@ func ReadFileToString(filePath string) (string, error) {
 	return string(filecontent), nil
 }
 
-func ConvertContentToString(content [][]rune) string {
+func ConvertLinesToString(lines []Line) string {
 	var result strings.Builder
-	for i, row := range content {
-		for _, ch := range row { result.WriteRune(ch) }
-		if i != len(content)-1 { result.WriteByte('\n') }
+	for i, line := range lines {
+		for _, ch := range line.Buf { result.WriteRune(ch) }
+		if i != len(lines) - 1 { result.WriteByte('\n') }
 	}
 	return result.String()
 }
+
 func RunesToBytes(content [][]rune) []byte {
 	var result []byte
 
@@ -341,7 +342,10 @@ func IsMatchExt(path string, ignoreExts []string) bool {
 	return false
 }
 
-
+// Inner struct to contain a line of text
+type Line struct {
+	Buf []rune
+}
 
 const Phi = 1.61803398875 // The Golden Ratio
 

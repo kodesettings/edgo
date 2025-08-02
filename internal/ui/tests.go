@@ -4,7 +4,7 @@ import (
 	. "github.com/vipmax/edgo/internal/highlighter"
 	"github.com/vipmax/edgo/internal/process"
 	. "github.com/vipmax/edgo/internal/tests"
-	"github.com/vipmax/edgo/internal/utils"
+	. "github.com/vipmax/edgo/internal/utils"
 	"github.com/gdamore/tcell"
 	sitter "github.com/tree-sitter/go-tree-sitter"
 	"os"
@@ -24,7 +24,7 @@ func (e *Editor) FindTests() {
 	}
 
 	if e.Test == nil { return }
-	codeBytes := []byte(utils.ConvertContentToString(e.Content))
+	codeBytes := []byte(ConvertLinesToString(e.Lines))
 	rootNode := e.treeSitterHighlighter.GetTree().RootNode()
 	e.Tests = e.Test.Find(&e.TestFinder, rootNode, e.AbsoluteFilePath, codeBytes)
 }
@@ -49,7 +49,7 @@ func (e *Editor) RunTest(test TestData) {
 	if e.Lang == "python" {
 		e.Process.Cmd.Env = append(e.Process.Cmd.Env, "PYTHONUNBUFFERED=1")
 	}
-	e.ProcessContent = [][]rune{}
+	e.ProcessContent = []Line{Line{[]rune{}}}
 	e.ProcessPanelScroll = 0
 	e.ProcessPanelSpacing = 2
 
@@ -59,7 +59,7 @@ func (e *Editor) RunTest(test TestData) {
 		for range e.Process.Updates {
 			newLines := e.Process.GetLines(len(e.ProcessContent))
 			for _, line := range newLines {
-				e.ProcessContent = append(e.ProcessContent, []rune(line))
+				e.ProcessContent = append(e.ProcessContent, Line{[]rune(line)})
 			}
 
 			e.DrawProcessPanel()

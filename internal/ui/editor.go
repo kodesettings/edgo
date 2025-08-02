@@ -42,8 +42,7 @@ type Editor struct {
 	Y   int // row offset for scrolling
 	X   int // col offset for scrolling
 
-	Content [][]rune // text characters
-
+	Lines  []Line // Lines of text characters
 	Screen Screen // Screen for drawing
 
 	Lang         string // current file language
@@ -84,14 +83,10 @@ type Editor struct {
 	CursorHistory     []CursorMove
 	CursorHistoryUndo []CursorMove
 
-	//LastCommitFileContent string
-	//Added                 Set
-	//Removed               Set
-
 	// process panel vars
 	ProcessPanelHeight            int
 	ProcessPanelWidth             int
-	ProcessContent                [][]rune
+	ProcessContent                []Line
 	ProcessPanelScroll            int
 	ProcessPanelHScroll           int
 	IsProcessPanelMoving          bool
@@ -253,24 +248,11 @@ func (e *Editor) OpenFile(fname string) error {
 	e.langTabWidth = conf.TabWidth
 
 	code := e.ReadFile(e.AbsoluteFilePath)
-	//e.Colors = HighlighterGlobal.Colorize(code, e.Filename)
 	e.treeSitterHighlighter = NewTreeSitter()
 	e.treeSitterHighlighter.SetTheme(e.Config.Theme)
 	e.treeSitterHighlighter.SetLang(e.Lang)
 	e.treeSitterHighlighter.Parse(&code)
-	//e.Colors = e.treeSitterHighlighter.Colorize(code)
 	clear(e.HighlightElements)
-
-	//cwd, _ := os.Getwd()
-	//relativePath, _ := filepath.Rel(cwd, e.AbsoluteFilePath)
-	//
-	//lastCommitFileContent, err := GetLastCommitFileContent(relativePath)
-	//if err != nil { e.LastCommitFileContent = "" } else  {
-	//	e.LastCommitFileContent = lastCommitFileContent
-	//	added, removed := Diff(lastCommitFileContent, ConvertContentToString(e.Content))
-	//	e.Added = added
-	//	e.Removed = removed
-	//}
 
 	e.Undo = []EditOperation{}
 	e.Redo = []EditOperation{}
@@ -282,7 +264,7 @@ func (e *Editor) OpenFile(fname string) error {
 	e.SearchResults = []SearchResult{}
 
 	// Opening file for LSP
-	e.UpdateLsp(true, ConvertContentToString(e.Content))
+	e.UpdateLsp(true, ConvertLinesToString(e.Lines))
 
 	e.FileWatcher.UpdateFile(e.AbsoluteFilePath)
 	e.FileWatcher.UpdateStats()
@@ -340,7 +322,7 @@ func (e *Editor) Init() {
 func (e *Editor) FindCursorXPosition(mx int) int {
 	count := 0
 	realCount := 0 // searching x position
-	for _, ch := range e.Content[e.Row] {
+	for _, ch := range e.Lines[e.Row].Buf {
 		if count >= mx+e.X { break }
 		if ch == '\t' && e.X == 0 {
 			count += e.langTabWidth; realCount++
@@ -350,8 +332,6 @@ func (e *Editor) FindCursorXPosition(mx int) int {
 }
 
 func (e *Editor) InitLsp(lang string) {
-	//Start := time.Now()
-
 	// Getting the lsp command with args for a language:
 	conf, ok := e.Config.Langs[strings.ToLower(lang)]
 	if !ok || len(conf.Lsp) == 0 { return }  // lang is not supported.
@@ -367,16 +347,7 @@ func (e *Editor) InitLsp(lang string) {
 	currentDir, _ := os.Getwd()
 
 	lsp.Init(currentDir)
-	e.UpdateLsp(true, ConvertContentToString(e.Content))
-
-	//e.DrawEverything()
-	//
-	//lspStatus := "lsp started, elapsed " + time.Since(Start).String()
-	//if !lsp.isReady { lspStatus = "lsp is not ready yet" }
-	//Log.Info("lsp status", lspStatus)
-	//status := fmt.Sprintf(" %e.Screen %e.Screen %d %d %e.Screen ", lspStatus,  lang, Row+1, Col+1, InputFile)
-	//e.drawText(COLUMNS- len(status), ROWS-1, COLUMNS, ROWS-1, status)
-	//e.Screen.Show()
+	e.UpdateLsp(true, ConvertLinesToString(e.Lines))
 
 	go func() {
 		// diagnostic updates
@@ -494,7 +465,6 @@ func (e *Editor) OnErrors() {
 			}
 		}
 	}
-
 }
 
 func (e *Editor) OnFilesTree(forceOpen bool) {
@@ -658,6 +628,7 @@ func (e *Editor) SelectAndOpenFile() bool {
 	}
 	return false
 }
+
 func (e *Editor) IsMouseUnderFile(mx int) bool {
 	found, selectedFile := GetSelected(e.Tree, e.FileSelectedIndex)
 	if found {
@@ -676,7 +647,7 @@ func (e *Editor) OverlayFalse() {
 }
 
 func (e *Editor) UpdateColors() {
-	code := ConvertContentToString(e.Content)
+	code := ConvertLinesToString(e.Lines)
 	e.treeSitterHighlighter.ReParse(&code) //  todo:: optimize
 }
 
@@ -694,10 +665,10 @@ func (e *Editor) OnFileUpdate() {
 	e.OpenFile(e.AbsoluteFilePath)
 
 	// if row and col fits to content, restore cursor
-	if row < len(e.Content) {
+	if row < len(e.Lines) {
 		e.Row = row
 		e.X = x
-		if col < len(e.Content[row]) {
+		if col < len(e.Lines[row].Buf) {
 			e.Col = col
 			e.Y = y
 		}
@@ -843,11 +814,11 @@ func (e *Editor) OnCursorChanged() {
 	nodename, noderange := e.treeSitterHighlighter.GetNodeAt(e.Row, e.Col, e.Row, e.Col)
 
 	if strings.Contains(nodename, "identifier") {
-		//if len(e.Content) >= noderange.Ssy { return }
-		runes := e.Content[noderange.Ssy][noderange.Ssx:noderange.Sex]
+		if len(e.Lines) >= noderange.Ssy { return }
+		runes := e.Lines[noderange.Ssy].Buf[noderange.Ssx:noderange.Sex]
 		content := string(runes)
 
-		searchResults := Search(e.Content, content)
+		searchResults := Search(e.Lines, content)
 		e.HighlightElements = make(map[int][]NodeRange)
 
 		if len(searchResults) > 1 {
@@ -907,6 +878,6 @@ func (e *Editor) GoToLine() {
 	e.Col = 0
 
 	if e.Row < 0 { e.Row = 0 } // fit to content
-	if e.Row >= len(e.Content) { e.Row = len(e.Content) - 1 } // fit to content
+	if e.Row >= len(e.Lines) { e.Row = len(e.Lines) - 1 } // fit to content
 	e.Focus()
 }

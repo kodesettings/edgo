@@ -49,11 +49,6 @@ func (e *Editor) UpdateLsp(isOpen bool, text string) {
 }
 
 func (e *Editor) WriteFile(saveFile bool) {
-	//too much cpu usage for big files
-	//added, removed := Diff(e.LastCommitFileContent, ConvertContentToString(e.Content))
-	//e.Added = added
-	//e.Removed = removed
-
 	// Create a new file, or open it if it exists
 	f, err := os.Create(e.AbsoluteFilePath)
 	if err != nil { panic(err) }
@@ -63,16 +58,13 @@ func (e *Editor) WriteFile(saveFile bool) {
 
 	if !saveFile { f.Close(); goto update }
 
-	for _, row := range e.Content {
-		for j := 0; j < len(row); {
-			if _, err := w.WriteRune(row[j]); err != nil { panic(err) }
+	for _, line := range e.Lines {
+		for j := 0; j < len(line.Buf); {
+			if _, err := w.WriteRune(line.Buf[j]); err != nil { panic(err) }
 			j++
 		}
 
-		//if i != len(e.Content) - 1 { // do not write \n at the end
-			if _, err := w.WriteRune('\n'); err != nil { panic(err) }
-		//}
-
+		if _, err := w.WriteRune('\n'); err != nil { panic(err) }
 	}
 
 	// Don't forget to flush the buffered writer to ensure all data is written
@@ -82,14 +74,10 @@ func (e *Editor) WriteFile(saveFile bool) {
 	e.IsContentChanged = false
 	e.FileWatcher.UpdateStats()
 update:
-	e.UpdateLsp(true, ConvertContentToString(e.Content))
+	e.UpdateLsp(true, ConvertLinesToString(e.Lines))
 }
 
 func (e *Editor) BuildContent(filename string, limit int) string {
-	//Start := time.Now()
-	//Log.info("read file Start", Name, string(limit))
-	//defer Log.info("read file end",   Name, string(limit), "elapsed", time.Since(Start).String())
-
 	file, err := os.Open(filename)
 	if err != nil {
 		filec, err2 := os.Create(filename)
@@ -100,22 +88,22 @@ func (e *Editor) BuildContent(filename string, limit int) string {
 
 	scanner := bufio.NewScanner(file)
 
-	e.Content = make([][]rune, 0)
+	e.Lines = make([]Line, 0)
 
 	for scanner.Scan() {
 		var line = scanner.Text()
 		var lineChars = []rune{}
 		for _, char := range line { lineChars = append(lineChars, char) }
-		e.Content = append(e.Content, lineChars)
-		if len(e.Content) > limit { break }
+		e.Lines = append(e.Lines, Line{lineChars})
+		if len(e.Lines) > limit { break }
 	}
 
 	// if no e.Content, consider it like one Line for next editing
-	if e.Content == nil || len(e.Content) == 0 {
-		e.Content = make([][]rune, 1)
+	if e.Lines == nil || len(e.Lines) == 0 {
+		e.Lines = make([]Line, 1)
 	}
 
-	return ConvertContentToString(e.Content)
+	return ConvertLinesToString(e.Lines)
 }
 
 func (e *Editor) ReadContent(filename string, fromline int, toline int) [][]rune {

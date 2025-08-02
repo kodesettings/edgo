@@ -8,7 +8,7 @@ import (
 )
 
 func (e *Editor) OnCopy() {
-	selectionString := e.Selection.GetSelectionString(e.Content)
+	selectionString := e.Selection.GetSelectionString(e.Lines)
 	clipboard.WriteAll(selectionString)
 }
 
@@ -38,8 +38,8 @@ func (e *Editor) OnPaste() {
 func (e *Editor) Cut(isCopySelected bool) {
 	e.Focus()
 
-	if len(e.Content) < 1 {
-		e.Content[0] = []rune{};
+	if len(e.Lines) < 1 {
+		e.Lines[0].Buf = []rune{};
 		e.Row, e.Col = 0, 0
 		return
 	}
@@ -47,12 +47,12 @@ func (e *Editor) Cut(isCopySelected bool) {
 	var ops = EditOperation{}
 
 	if isCopySelected {
-		selectionString := e.Selection.GetSelectionString(e.Content)
+		selectionString := e.Selection.GetSelectionString(e.Lines)
 		clipboard.WriteAll(selectionString)
 	}
 
 	ops = append(ops, Operation{MoveCursor, ' ', e.Row, e.Col})
-	selectedIndices := e.Selection.GetSelectedIndices(e.Content)
+	selectedIndices := e.Selection.GetSelectedIndices(e.Lines)
 
 	firstCol := e.Col
 	firstRow := e.Row
@@ -65,35 +65,35 @@ repeat:
 	yd := indices[1]
 	e.Col, e.Row = xd, yd
 
-	if len(e.Content[yd]) > 0 {
+	if len(e.Lines[yd].Buf) > 0 {
 		// Delete the character at index (x, j)
-		ch := e.Content[yd][xd]
+		ch := e.Lines[yd].Buf[xd]
 		ops = append(ops, Operation{Delete, ch, yd, xd})
-		e.Content[yd] = append(e.Content[yd][:xd], e.Content[yd][xd+1:]...)
+		e.Lines[yd].Buf = append(e.Lines[yd].Buf[:xd], e.Lines[yd].Buf[xd+1:]...)
 	}
 
-	if len(e.Content[yd]) == 0 { // delete Line
+	if len(e.Lines[yd].Buf) == 0 { // delete Line
 		if e.Row == 0 {
 			ops = append(ops, Operation{DeleteLine, '\n', 0, 0})
 		} else {
-			ops = append(ops, Operation{DeleteLine, '\n', e.Row -1, len(e.Content[e.Row-1])})
+			ops = append(ops, Operation{DeleteLine, '\n', e.Row -1, len(e.Lines[e.Row-1].Buf)})
 		}
 
-		e.Content = append(e.Content[:yd], e.Content[yd+1:]...)
+		e.Lines = append(e.Lines[:yd], e.Lines[yd+1:]...)
 	}
 
 	if index > 0 { index--; goto repeat; }
 
-	code := ConvertContentToString(e.Content)
+	code := ConvertLinesToString(e.Lines)
 	e.treeSitterHighlighter.RemoveCharsEdit(&code, firstCol, firstRow, e.Col, e.Row)
 
-	if len(e.Content) == 0 {
-		e.Content = make([][]rune, 1)
+	if len(e.Lines) == 0 {
+		e.Lines = make([]Line, 1)
 	}
 
-	if e.Row >= len(e.Content)  {
-		e.Row = len(e.Content) - 1
-		if e.Col >= len(e.Content[e.Row]) { e.Col = len(e.Content[e.Row]) - 1 }
+	if e.Row >= len(e.Lines)  {
+		e.Row = len(e.Lines) - 1
+		if e.Col >= len(e.Lines[e.Row].Buf) { e.Col = len(e.Lines[e.Row].Buf) - 1 }
 	}
 
 	if e.Row < 0 { e.Row = 0 }
@@ -103,7 +103,7 @@ repeat:
 	e.Undo = append(e.Undo, ops)
 	e.Selection.CleanSelection()
 	e.Update = true
-	e.UpdateLsp(false, ConvertContentToString(e.Content))
+	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	e.IsContentChanged = true
 	e.UpdateNeeded() // optimize
 }
@@ -111,21 +111,21 @@ repeat:
 func (e *Editor) Duplicate() {
 	e.Focus()
 
-	if len(e.Content) == 0 { return }
+	if len(e.Lines) == 0 { return }
 
 	if e.Selection.Ssx == -1 && e.Selection.Ssy == -1 ||
 		e.Selection.Ssx == e.Selection.Sex && e.Selection.Ssy == e.Selection.Sey {
 		var ops = EditOperation{}
 		ops = append(ops, Operation{MoveCursor, ' ', e.Row, e.Col})
-		ops = append(ops, Operation{Enter, '\n', e.Row, len(e.Content[e.Row])})
+		ops = append(ops, Operation{Enter, '\n', e.Row, len(e.Lines[e.Row].Buf)})
 
-		duplicatedSlice := make([]rune, len(e.Content[e.Row]))
-		copy(duplicatedSlice, e.Content[e.Row])
+		duplicatedSlice := make([]rune, len(e.Lines[e.Row].Buf))
+		copy(duplicatedSlice, e.Lines[e.Row].Buf)
 		for i, ch := range duplicatedSlice {
 			ops = append(ops, Operation{Insert, ch, e.Row, i})
 		}
 		e.Row++
-		e.Content = InsertTo(e.Content, e.Row, duplicatedSlice)
+		e.Lines = InsertTo(e.Lines, e.Row, Line{duplicatedSlice})
 
 		e.UpdateColors()
 		e.Undo = append(e.Undo, ops)
@@ -133,7 +133,7 @@ func (e *Editor) Duplicate() {
 		e.IsContentChanged = true
 		e.FindTests()
 	} else {
-		selection := e.Selection.GetSelectionString(e.Content)
+		selection := e.Selection.GetSelectionString(e.Lines)
 		if len(selection) == 0 { return }
 		lines := strings.Split(selection, "\n")
 
@@ -155,7 +155,7 @@ func (e *Editor) Duplicate() {
 }
 
 func (e *Editor) OnUndo() {
-	if len(e.Undo) == 0 { e.UpdateLsp(true, ConvertContentToString(e.Content)); return }
+	if len(e.Undo) == 0 { e.UpdateLsp(true, ConvertLinesToString(e.Lines)); return }
 
 	lastOperation := e.Undo[len(e.Undo)-1]
 	e.Undo = e.Undo[:len(e.Undo)-1]
@@ -167,24 +167,24 @@ repeat:
 
 	if o.Action == Insert {
 		e.Row = o.Line; e.Col = o.Column
-		e.Content[e.Row] = append(e.Content[e.Row][:e.Col], e.Content[e.Row][e.Col+1:]...)
+		e.Lines[e.Row].Buf = append(e.Lines[e.Row].Buf[:e.Col], e.Lines[e.Row].Buf[e.Col+1:]...)
 	} else if o.Action == Delete {
 		e.Row = o.Line; e.Col = o.Column
-		e.Content[e.Row] = InsertTo(e.Content[e.Row], e.Col, o.Char)
+		e.Lines[e.Row].Buf = InsertTo(e.Lines[e.Row].Buf, e.Col, o.Char)
 	} else if o.Action == Enter {
 		// Merge lines
-		e.Content[o.Line] = append(e.Content[o.Line], e.Content[o.Line+1]...)
-		e.Content = append(e.Content[:o.Line+1], e.Content[o.Line+2:]...)
+		e.Lines[o.Line].Buf = append(e.Lines[o.Line].Buf, e.Lines[o.Line+1].Buf...)
+		e.Lines = append(e.Lines[:o.Line+1], e.Lines[o.Line+2:]...)
 		e.Row = o.Line; e.Col = o.Column
 	} else if o.Action == DeleteLine {
 		// Insert enter
 		e.Row = o.Line; e.Col = o.Column
-		after := e.Content[e.Row][e.Col:]
-		before := e.Content[e.Row][:e.Col]
-		e.Content[e.Row] = before
+		after := e.Lines[e.Row].Buf[e.Col:]
+		before := e.Lines[e.Row].Buf[:e.Col]
+		e.Lines[e.Row].Buf = before
 		e.Row++; e.Col = 0
 		newline := append([]rune{}, after...)
-		e.Content = InsertTo(e.Content, e.Row, newline)
+		e.Lines = InsertTo(e.Lines, e.Row, Line{newline})
 	} else if o.Action == MoveCursor {
 		e.Row = o.Line; e.Col = o.Column
 	} else {
@@ -194,7 +194,7 @@ repeat:
 	if index > 0 { index--; goto repeat; }
 
 	e.UpdateColors()
-	e.UpdateLsp(false, ConvertContentToString(e.Content))
+	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	e.Redo = append(e.Redo, lastOperation)
 	e.UpdateNeeded()
 }
@@ -211,23 +211,23 @@ repeat:
 
 	if o.Action == Insert {
 		e.Row = o.Line; e.Col = o.Column
-		e.Content[e.Row] = InsertTo(e.Content[e.Row], e.Col, o.Char)
+		e.Lines[e.Row].Buf = InsertTo(e.Lines[e.Row].Buf, e.Col, o.Char)
 		e.Col++
 	} else if o.Action == Delete {
 		e.Row = o.Line; e.Col = o.Column
-		e.Content[e.Row] = append(e.Content[e.Row][:e.Col], e.Content[e.Row][e.Col+1:]...)
+		e.Lines[e.Row].Buf = append(e.Lines[e.Row].Buf[:e.Col], e.Lines[e.Row].Buf[e.Col+1:]...)
 	} else if o.Action == Enter {
 		e.Row = o.Line; e.Col = o.Column
-		after := e.Content[e.Row][e.Col:]
-		before := e.Content[e.Row][:e.Col]
-		e.Content[e.Row] = before
+		after := e.Lines[e.Row].Buf[e.Col:]
+		before := e.Lines[e.Row].Buf[:e.Col]
+		e.Lines[e.Row].Buf = before
 		e.Row++; e.Col = 0
 		newline := append([]rune{}, after...)
-		e.Content = InsertTo(e.Content, e.Row, newline)
+		e.Lines = InsertTo(e.Lines, e.Row, Line{newline})
 	} else if o.Action == DeleteLine {
 		// Merge lines
-		e.Content[o.Line] = append(e.Content[o.Line], e.Content[o.Line+1]...)
-		e.Content = append(e.Content[:o.Line+1], e.Content[o.Line+2:]...)
+		e.Lines[o.Line].Buf = append(e.Lines[o.Line].Buf, e.Lines[o.Line+1].Buf...)
+		e.Lines = append(e.Lines[:o.Line+1], e.Lines[o.Line+2:]...)
 		e.Row = o.Line; e.Col = o.Column
 	} else if o.Action == MoveCursor {
 		e.Row = o.Line; e.Col = o.Column
@@ -236,7 +236,7 @@ repeat:
 	if index < len(lastRedoOperation) - 1 { index++; goto repeat; }
 
 	e.UpdateColors()
-	e.UpdateLsp(false, ConvertContentToString(e.Content))
+	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	e.Undo = append(e.Undo, lastRedoOperation)
 	e.UpdateNeeded()
 }

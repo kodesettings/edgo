@@ -63,14 +63,12 @@ func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 		return
 	}
 
-	if key == KeyRune && modifiers&ModAlt != 0 && len(e.Content) > 0 {
+	if key == KeyRune && modifiers&ModAlt != 0 && len(e.Lines) > 0 {
 		e.HandleSmartMove(ev.Rune())
 		return
 	}
 
-	if modifiers&ModAlt != 0 &&
-		(int(ev.Key()) == 259 || int(ev.Key()) == 260) &&
-		len(e.Content) > 0 {
+	if modifiers&ModAlt != 0 && (int(ev.Key()) == 259 || int(ev.Key()) == 260) && len(e.Lines) > 0 {
 		e.HandleSmartMoveAlac(int(ev.Key()))
 		return
 	}

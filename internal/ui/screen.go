@@ -33,10 +33,10 @@ func (e *Editor) DrawEverything() {
 		e.DrawTree(e.Tree, 0, &fileindex, &aty)
 	}
 
-	if len(e.Content) == 0 { e.DrawLogo(); return }
+	if len(e.Lines) == 0 { e.DrawLogo(); return }
 	//if e.Update == false { return }
 
-	countTabsTo := CountTabsTo(e.Content[e.Row], e.Col)
+	countTabsTo := CountTabsTo(e.Lines[e.Row].Buf, e.Col)
 	tabcor := countTabsTo * (e.langTabWidth - 1)
 
 	if e.Col < e.X { e.X = e.Col }
@@ -52,12 +52,8 @@ func (e *Editor) DrawEverything() {
 	*/
 
 	start := time.Now()
-	code := ConvertContentToString(e.Content)
-	//Log.Info("ConvertContentToString", time.Since(start).String())
-
-	//start = time.Now()
+	code := ConvertLinesToString(e.Lines)
 	coloredByteRanges := e.treeSitterHighlighter.ColorRanges(e.Y, e.Y+e.TERMINAL_HEIGHT, []byte(code))
-	//Log.Info("ColorRanges", time.Since(start).String())
 
 	bytesCounter := 0
 
@@ -72,7 +68,7 @@ func (e *Editor) DrawEverything() {
 
 	for row := 0; row < e.ROWS; row++ {
 		ry := row + e.Y // index to get right row in characters buffer by scrolling offset Y
-		if row >= len(e.Content) || ry >= len(e.Content) { break }
+		if row >= len(e.Lines) || ry >= len(e.Lines) { break }
 		e.DrawLineNumber(ry, row)
 
 		if _, found := e.Tests[ry]; found { e.DrawTest(ry, row) }
@@ -83,8 +79,8 @@ func (e *Editor) DrawEverything() {
 			cx := col + e.X // index to get right column in characters buffer by scrolling offset x
 
 			if cx < 0 { break }
-			if col >= len(e.Content[ry]) { break }
-			ch := e.Content[ry][col]
+			if col >= len(e.Lines[ry].Buf) { break }
+			ch := e.Lines[ry].Buf[col]
 
 			isOutside := col-e.X+e.LINES_WIDTH+tabsOffset+e.FilesPanelWidth > e.COLUMNS
 			if isOutside || e.X > col { bytesCounter += utf8.RuneLen(ch); continue }
@@ -131,7 +127,7 @@ func (e *Editor) DrawEverything() {
 
 		if hightlightElements, found := e.HighlightElements[ry]; found && e.X == 0 {
 			for _, helement := range hightlightElements {
-				tabs := CountTabsTo(e.Content[helement.Ssy], helement.Ssx)
+				tabs := CountTabsTo(e.Lines[helement.Ssy].Buf, helement.Ssx)
 				tabcorrection := tabs * (e.langTabWidth - 1)
 				skip := false
 				for i := helement.Ssx; !skip && i < helement.Sex; i++ {
@@ -159,10 +155,10 @@ func (e *Editor) DrawEverything() {
 	e.DrawStatus(status)
 
 	// if tab under cursor, hide cursor because it has already drawn
-	if e.Row < len(e.Content) && e.Col < len(e.Content[e.Row]) && e.Content[e.Row][e.Col] == '\t' {
+	if e.Row < len(e.Lines) && e.Col < len(e.Lines[e.Row].Buf) && e.Lines[e.Row].Buf[e.Col] == '\t' {
 		e.Screen.HideCursor()
 	} else {
-		tabs := CountTabsTo(e.Content[e.Row], e.Col) * (e.langTabWidth - 1)
+		tabs := CountTabsTo(e.Lines[e.Row].Buf, e.Col) * (e.langTabWidth - 1)
 		e.Screen.ShowCursor(e.Col-e.X+e.LINES_WIDTH+tabs+e.FilesPanelWidth, e.Row-e.Y) // show cursor
 		if e.X != 0 {
 			e.Screen.ShowCursor(e.Col-e.X+e.LINES_WIDTH+e.FilesPanelWidth, e.Row-e.Y) // show cursor
@@ -230,7 +226,7 @@ func (e *Editor) DrawProcessPanel() {
 		if index+e.ProcessPanelScroll > len(e.ProcessContent)-1 {
 			break
 		}
-		line := e.ProcessContent[index+e.ProcessPanelScroll]
+		line := e.ProcessContent[index+e.ProcessPanelScroll].Buf
 		y := e.ROWS + index + 1
 		if y > screenRows { break }
 
@@ -279,7 +275,7 @@ func (e *Editor) DrawDiagnostic() {
 
 		for _, diagnostic := range maybeDiagnostic.Diagnostics {
 			dline := int(diagnostic.Range.Start.Line)
-			if dline >= len(e.Content) { continue } // sometimes it out of e.Content
+			if dline >= len(e.Lines) { continue } // sometimes it out of e.Content
 			if dline-e.Y > e.ROWS { continue } // sometimes it out of e.Content
 
 			// iterate over error range and, todo::fix
@@ -294,18 +290,18 @@ func (e *Editor) DrawDiagnostic() {
 			//	}
 			//}
 
-			tabs := CountTabs(e.Content[dline], len(e.Content[dline]))
+			tabs := CountTabs(e.Lines[dline].Buf, len(e.Lines[dline].Buf))
 			var shifty = 0
 			errorMessage := "error: " + diagnostic.Message
-			errorMessage = PadLeft(errorMessage, e.COLUMNS-len(e.Content[dline])-tabs*e.langTabWidth-5-e.LINES_WIDTH-e.FilesPanelWidth)
+			errorMessage = PadLeft(errorMessage, e.COLUMNS-len(e.Lines[dline].Buf)-tabs*e.langTabWidth-5-e.LINES_WIDTH-e.FilesPanelWidth)
 
 			// iterate over message characters and draw it
 			for i, m := range errorMessage {
 				ypos := dline - e.Y
-				if ypos < 0 || ypos >= len(e.Content) { break }
+				if ypos < 0 || ypos >= len(e.Lines) { break }
 
-				tabs = CountTabs(e.Content[dline], len(e.Content[dline]))
-				xpos := i + e.LINES_WIDTH + e.FilesPanelWidth + len(e.Content[dline+shifty]) + tabs*e.langTabWidth + 5
+				tabs = CountTabs(e.Lines[dline].Buf, len(e.Lines[dline].Buf))
+				xpos := i + e.LINES_WIDTH + e.FilesPanelWidth + len(e.Lines[dline+shifty].Buf) + tabs*e.langTabWidth + 5
 
 				//for { // draw ch on the next Line if not fit to e.Screen
 				//	if xpos >= COLUMNS {
@@ -443,7 +439,7 @@ func (e *Editor) CleanContentSearch() {
 		e.Screen.SetContent(i, e.ROWS-1, ' ', nil, StyleDefault)
 	}
 
-	if len(e.Content) == 0 {
+	if len(e.Lines) == 0 {
 		e.Screen.HideCursor()
 	}
 }

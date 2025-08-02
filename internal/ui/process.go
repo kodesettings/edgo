@@ -42,7 +42,7 @@ func (e *Editor) OnProcessRun(newRun bool) {
 		e.Process.Cmd.Env = append(e.Process.Cmd.Env, "PYTHONUNBUFFERED=1")
 	}
 
-	e.ProcessContent = [][]rune{}
+	e.ProcessContent = []Line{Line{[]rune{}}}
 	e.ProcessPanelScroll = 0
 	e.ProcessPanelSpacing = 2
 
@@ -56,7 +56,7 @@ func (e *Editor) OnProcessRun(newRun bool) {
 			//newLines := e.Process.Lines[len(e.ProcessContent):]
 			newLines := e.Process.GetLines(len(e.ProcessContent))
 			for _, line := range newLines {
-				e.ProcessContent = append(e.ProcessContent, []rune(line))
+				e.ProcessContent = append(e.ProcessContent, Line{[]rune(line)})
 				if len(e.ProcessContent) > e.ProcessPanelHeight {
 					if e.ProcessPanelScroll >= len(e.ProcessContent)-e.ProcessPanelHeight-1 {
 						e.ProcessPanelScroll = len(e.ProcessContent) - e.ProcessPanelHeight + 1 // focusing
@@ -89,23 +89,23 @@ func (e *Editor) OnProcessKeyHandle(key Key, keyrune rune) {
 	if key == KeyUp {
 		e.ProcessPanelCursorY--
 		if e.ProcessPanelCursorY < 0 { e.ProcessPanelCursorY = 0 }
-		if e.ProcessPanelCursorX > len(e.ProcessContent[e.ProcessPanelCursorY]) {
-			e.ProcessPanelCursorX = len(e.ProcessContent[e.ProcessPanelCursorY])
+		if e.ProcessPanelCursorX > len(e.ProcessContent[e.ProcessPanelCursorY].Buf) {
+			e.ProcessPanelCursorX = len(e.ProcessContent[e.ProcessPanelCursorY].Buf)
 		}
 		e.FocusProcessPanel()
 	}
 	if key == KeyDown {
 		e.ProcessPanelCursorY++
 		if e.ProcessPanelCursorY >= len(e.ProcessContent) { e.ProcessPanelCursorY = len(e.ProcessContent) - 1 }
-		if e.ProcessPanelCursorX > len(e.ProcessContent[e.ProcessPanelCursorY]) {
-			e.ProcessPanelCursorX = len(e.ProcessContent[e.ProcessPanelCursorY])
+		if e.ProcessPanelCursorX > len(e.ProcessContent[e.ProcessPanelCursorY].Buf) {
+			e.ProcessPanelCursorX = len(e.ProcessContent[e.ProcessPanelCursorY].Buf)
 		}
 		e.FocusProcessPanel()
 	}
 	if key == KeyRight {
 		e.ProcessPanelCursorX++
-		if e.ProcessPanelCursorX > len(e.ProcessContent[e.ProcessPanelCursorY]) {
-			e.ProcessPanelCursorX = len(e.ProcessContent[e.ProcessPanelCursorY])
+		if e.ProcessPanelCursorX > len(e.ProcessContent[e.ProcessPanelCursorY].Buf) {
+			e.ProcessPanelCursorX = len(e.ProcessContent[e.ProcessPanelCursorY].Buf)
 		}
 
 		//if e.ProcessPanelCursorX >= e.TERMINAL_WIDHT - e.ProcessPanelSpacing {
@@ -115,8 +115,8 @@ func (e *Editor) OnProcessKeyHandle(key Key, keyrune rune) {
 	if key == KeyLeft {
 		e.ProcessPanelCursorX--
 		if e.ProcessPanelCursorX < 0 { e.ProcessPanelCursorX = 0 }
-		if e.ProcessPanelCursorX > len(e.ProcessContent[e.ProcessPanelCursorY]) {
-			e.ProcessPanelCursorX = len(e.ProcessContent[e.ProcessPanelCursorY])
+		if e.ProcessPanelCursorX > len(e.ProcessContent[e.ProcessPanelCursorY].Buf) {
+			e.ProcessPanelCursorX = len(e.ProcessContent[e.ProcessPanelCursorY].Buf)
 		}
 
 		//if e.ProcessPanelCursorX >= e.TERMINAL_WIDHT - e.ProcessPanelSpacing {

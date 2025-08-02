@@ -12,19 +12,19 @@ func (e *Editor) OnDown(isPaging bool) {
 	if e.ROWS / 3 < 30 { numberOfLines = 30 } else { numberOfLines = e.ROWS / 3 } // adjustment
 	if !isPaging { numberOfLines = 1; } // normal scroll
 
-	if len(e.Content) == 0 { return }
-	if e.Row + numberOfLines >= len(e.Content) {
+	if len(e.Lines) == 0 { return }
+	if e.Row + numberOfLines >= len(e.Lines) {
 		if !isPaging {
 			e.Y = e.Row - e.ROWS + 1
 			if e.Y < 0 { e.Y = 0; }
 			return
 		} else {
-			numberOfLines = len(e.Content) - e.Row - 1
+			numberOfLines = len(e.Lines) - e.Row - 1
 		}
 	}
 
 	e.Row += numberOfLines
-	if e.Col > len(e.Content[e.Row]) { e.Col = len(e.Content[e.Row]) } // fit to e.Content
+	if e.Col > len(e.Lines[e.Row].Buf) { e.Col = len(e.Lines[e.Row].Buf) } // fit to e.Lines
 	if e.Row < e.Y { e.Y = e.Row }
 	if e.Row >= e.Y + e.ROWS { e.Y = e.Row - e.ROWS + 1  }
 
@@ -39,10 +39,10 @@ func (e *Editor) OnUp(isPaging bool) {
 	if e.ROWS / 3 < 30 { numberOfLines = 30 } else { numberOfLines = e.ROWS / 3 } // adjustment
 	if !isPaging { numberOfLines = 1; } // normal scroll
 
-	if len(e.Content) == 0 { return }
+	if len(e.Lines) == 0 { return }
 	if e.Row == 0 { e.Y = 0; return }
 	if e.Row - numberOfLines <= 0 {e.Row = 0 } else { e.Row -= numberOfLines }
-	if e.Col > len(e.Content[e.Row]) { e.Col = len(e.Content[e.Row]) } // fit to e.Content
+	if e.Col > len(e.Lines[e.Row].Buf) { e.Col = len(e.Lines[e.Row].Buf) } // fit to e.Lines
 	if e.Row < e.Y { e.Y = e.Row }
 	if e.Row > e.Y + e.ROWS { e.Y = e.Row - e.ROWS + 1  }
 
@@ -52,14 +52,14 @@ func (e *Editor) OnUp(isPaging bool) {
 
 func (e *Editor) OnLeft() {
 	e.Update = false
-	if len(e.Content) == 0 { return }
+	if len(e.Lines) == 0 { return }
 
 	if e.Col > 0 {
 		e.Col--
 		e.Update = true
 	} else if e.Row > 0 {
 		e.Row--
-		e.Col = len(e.Content[e.Row]) // fit to e.Content
+		e.Col = len(e.Lines[e.Row].Buf) // fit to e.Lines
 		if e.Row < e.Y { e.Y = e.Row }
 		e.Update = true
 	}
@@ -68,12 +68,12 @@ func (e *Editor) OnLeft() {
 
 func (e *Editor) OnRight() {
 	e.Update = false
-	if len(e.Content) == 0 { return }
+	if len(e.Lines) == 0 { return }
 
-	if e.Col < len(e.Content[e.Row]) {
+	if e.Col < len(e.Lines[e.Row].Buf) {
 		e.Col++
 		e.Update = true
-	} else if e.Row < len(e.Content)-1 {
+	} else if e.Row < len(e.Lines)-1 {
 		e.Row++
 		e.Col = 0
 		if e.Row > e.Y+ e.ROWS { e.Y++  }
@@ -87,10 +87,10 @@ func (e *Editor) GoTop() {
 }
 
 func (e *Editor) GoBottom() {
-	if len(e.Content) == 0 {
+	if len(e.Lines) == 0 {
 		return
 	} else {
-		e.Row = len(e.Content)-1; e.Col = 0;
+		e.Row = len(e.Lines)-1; e.Col = 0;
 		e.X = 0;
 		if e.Row > e.TERMINAL_HEIGHT { e.FocusCenter()}
 		e.OnDown(false)
@@ -99,7 +99,7 @@ func (e *Editor) GoBottom() {
 
 func (e *Editor) OnScrollUp() {
 	e.Update = false
-	if len(e.Content) == 0 { return }
+	if len(e.Lines) == 0 { return }
 	if e.Y == 0 { return }
 	e.Y--
 	e.Update = true
@@ -107,20 +107,20 @@ func (e *Editor) OnScrollUp() {
 
 func (e *Editor) OnScrollDown() {
 	e.Update = false
-	if len(e.Content) == 0 { return }
-	if e.Y+ e.ROWS >= len(e.Content) { return }
+	if len(e.Lines) == 0 { return }
+	if e.Y+ e.ROWS >= len(e.Lines) { return }
 	e.Y++
 	e.Update = true
 }
 
 func (e *Editor) OnEnter() {
 	var ops = EditOperation{{Enter, '\n', e.Row, e.Col}}
-	tabs := CountTabs(e.Content[e.Row], e.Col)
-	spaces := CountSpaces(e.Content[e.Row], e.Col)
+	tabs := CountTabs(e.Lines[e.Row].Buf, e.Col)
+	spaces := CountSpaces(e.Lines[e.Row].Buf, e.Col)
 
-	after := e.Content[e.Row][e.Col:]
-	before := e.Content[e.Row][:e.Col]
-	e.Content[e.Row] = before
+	after := e.Lines[e.Row].Buf[e.Col:]
+	before := e.Lines[e.Row].Buf[:e.Col]
+	e.Lines[e.Row].Buf = before
 
 	e.Row++
 	e.Col = 0
@@ -137,9 +137,9 @@ func (e *Editor) OnEnter() {
 	e.Col = countToInsert
 
 	newline := append(begining, after...)
-	e.Content = InsertTo(e.Content, e.Row, newline)
+	e.Lines = InsertTo(e.Lines, e.Row, Line{newline})
 
-	contentToString := ConvertContentToString(e.Content)
+	contentToString := ConvertLinesToString(e.Lines)
 	e.treeSitterHighlighter.AddCharEdit(&contentToString, e.Row, max(e.Col,0), '\n')
 
 	e.Undo = append(e.Undo, ops)
@@ -147,7 +147,7 @@ func (e *Editor) OnEnter() {
 	e.OnCursorChanged()
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
 	e.Update = true
-	e.UpdateLsp(false, ConvertContentToString(e.Content))
+	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	e.IsContentChanged = true
 	e.FindTests()
 }
@@ -163,20 +163,20 @@ func (e *Editor) OnDelete() {
 		e.Col--
 		e.DeleteCharacter(e.Row, e.Col)
 		e.OnCursorChanged()
-		e.UpdateLsp(false, ConvertContentToString(e.Content))
+		e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	} else if e.Row > 0 { // delete line
-		e.Undo = append(e.Undo, EditOperation{{DeleteLine, ' ', e.Row -1, len(e.Content[e.Row-1])}})
-		left := e.Content[e.Row][e.Col:]
-		e.Content = Remove(e.Content, e.Row)
+		e.Undo = append(e.Undo, EditOperation{{DeleteLine, ' ', e.Row -1, len(e.Lines[e.Row-1].Buf)}})
+		left := e.Lines[e.Row].Buf[e.Col:]
+		e.Lines = Remove(e.Lines, e.Row)
 
 		e.Row--
-		e.Col = len(e.Content[e.Row])
-		e.Content[e.Row] = append(e.Content[e.Row], left...)
+		e.Col = len(e.Lines[e.Row].Buf)
+		e.Lines[e.Row].Buf = append(e.Lines[e.Row].Buf, left...)
 
-		code := ConvertContentToString(e.Content)
+		code := ConvertLinesToString(e.Lines)
 		e.treeSitterHighlighter.RemoveCharEdit(&code, e.Row, e.Col, '\n')
 		e.OnCursorChanged()
-		e.UpdateLsp(false, ConvertContentToString(e.Content))
+		e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	}
 
 	e.Focus()
@@ -189,27 +189,27 @@ func (e *Editor) OnDelete() {
 func (e *Editor) OnTab() {
 	e.Focus()
 
-	selectedLines := e.Selection.GetSelectedLines(e.Content)
+	selectedLines := e.Selection.GetSelectedLines(e.Lines)
 
 	if len(selectedLines) == 0 {
 		ch := '\t'
 		e.InsertCharacter(e.Row, e.Col, ch)
 		e.Col++
 		e.OnCursorChanged()
-		e.UpdateLsp(false, ConvertContentToString(e.Content))
+		e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	} else  {
 		var ops = EditOperation{}
 		e.Selection.Ssx = 0
 		for _, linenumber := range selectedLines {
 			e.Row = linenumber
-			e.Content[e.Row] = InsertTo(e.Content[e.Row], 0, '\t')
+			e.Lines[e.Row].Buf = InsertTo(e.Lines[e.Row].Buf, 0, '\t')
 			ops = append(ops, Operation{Insert, '\t', e.Row, 0})
-			e.Col = len(e.Content[e.Row])
+			e.Col = len(e.Lines[e.Row].Buf)
 		}
 		e.Selection.Sex = e.Col
 		e.Undo = append(e.Undo, ops)
 		e.UpdateColors()
-		e.UpdateLsp(false, ConvertContentToString(e.Content))
+		e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	}
 
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
@@ -221,11 +221,11 @@ func (e *Editor) OnTab() {
 func (e *Editor) OnBackTab() {
 	e.Focus()
 
-	selectedLines := e.Selection.GetSelectedLines(e.Content)
+	selectedLines := e.Selection.GetSelectedLines(e.Lines)
 
 	// deleting tabs from beginning
 	if len(selectedLines) == 0 {
-		if e.Content[e.Row][0] == '\t'  {
+		if e.Lines[e.Row].Buf[0] == '\t'  {
 			e.DeleteCharacter(e.Row,0)
 			e.Col--
 		}
@@ -233,9 +233,9 @@ func (e *Editor) OnBackTab() {
 		e.Selection.Ssx = 0
 		for _, linenumber := range selectedLines {
 			e.Row = linenumber
-			if len(e.Content[e.Row]) > 0 && e.Content[e.Row][0] == '\t'  {
+			if len(e.Lines[e.Row].Buf) > 0 && e.Lines[e.Row].Buf[0] == '\t'  {
 				e.DeleteCharacter(e.Row,0)
-				e.Col = len(e.Content[e.Row])
+				e.Col = len(e.Lines[e.Row].Buf)
 			}
 		}
 		e.UpdateColors()
@@ -243,7 +243,7 @@ func (e *Editor) OnBackTab() {
 
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
 	e.Update = true
-	e.UpdateLsp(false, ConvertContentToString(e.Content))
+	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	e.IsContentChanged = true
 	e.FindTests()
 }
@@ -255,14 +255,14 @@ func (e *Editor) OnSwapLinesUp() {
 	var ops = EditOperation{}
 	ops = append(ops, Operation{MoveCursor, ' ', e.Row, e.Col})
 
-	line1 := e.Content[e.Row]; line2 := e.Content[e.Row-1]
+	line1 := e.Lines[e.Row].Buf; line2 := e.Lines[e.Row-1].Buf
 
 	for i := len(line1)-1; i >= 0; i-- { ops = append(ops, Operation{Delete, line1[i], e.Row, i}) }
 	for i := len(line2)-1; i >= 0; i-- { ops = append(ops, Operation{Delete, line2[i], e.Row -1, i}) }
 	for i, ch := range line1 { ops = append(ops, Operation{Insert, ch, e.Row -1, i}) }
 	for i, ch := range line2 { ops = append(ops, Operation{Insert, ch, e.Row, i}) }
 
-	e.Content[e.Row] = line2; e.Content[e.Row-1] = line1 // swap
+	e.Lines[e.Row].Buf = line2; e.Lines[e.Row-1].Buf = line1 // swap
 	e.Row--
 
 	e.UpdateColors()
@@ -276,19 +276,19 @@ func (e *Editor) OnSwapLinesUp() {
 func (e *Editor) OnSwapLinesDown() {
 	e.Focus()
 
-	if e.Row+1 == len(e.Content) { return }
+	if e.Row+1 == len(e.Lines) { return }
 
 	var ops = EditOperation{}
 	ops = append(ops, Operation{MoveCursor, ' ', e.Row, e.Col})
 
-	line1 := e.Content[e.Row]; line2 := e.Content[e.Row+1]
+	line1 := e.Lines[e.Row].Buf; line2 := e.Lines[e.Row+1].Buf
 
 	for i := len(line1)-1; i >= 0; i-- { ops = append(ops, Operation{Delete, line1[i], e.Row, i}) }
 	for i := len(line2)-1; i >= 0; i-- { ops = append(ops, Operation{Delete, line2[i], e.Row +1, i}) }
 	for i, ch := range line1 { ops = append(ops, Operation{Insert, ch, e.Row +1, i}) }
 	for i, ch := range line2 { ops = append(ops, Operation{Insert, ch, e.Row, i}) }
 
-	e.Content[e.Row] = line2; e.Content[e.Row+1] = line1 // swap
+	e.Lines[e.Row].Buf = line2; e.Lines[e.Row+1].Buf = line1 // swap
 	e.Row++
 
 	e.UpdateColors()
@@ -302,12 +302,12 @@ func (e *Editor) OnSwapLinesDown() {
 func (e *Editor) HandleSmartMove(char rune) {
 	e.Focus()
 	if char == 'f' || char == 'F' {
-		nw := FindNextWord(e.Content[e.Row], e.Col+ 1)
+		nw := FindNextWord(e.Lines[e.Row].Buf, e.Col+ 1)
 		e.Col = nw
-		e.Col = Min(e.Col, len(e.Content[e.Row]))
+		e.Col = Min(e.Col, len(e.Lines[e.Row].Buf))
 	}
 	if char == 'b' || char == 'B' {
-		nw := FindPrevWord(e.Content[e.Row], e.Col-1)
+		nw := FindPrevWord(e.Lines[e.Row].Buf, e.Col-1)
 		e.Col = nw
 	}
 }
@@ -315,12 +315,12 @@ func (e *Editor) HandleSmartMove(char rune) {
 func (e *Editor) HandleSmartMoveAlac(char int) {
 	e.Focus()
 	if char == 259 {
-		nw := FindNextWord(e.Content[e.Row], e.Col+ 1)
+		nw := FindNextWord(e.Lines[e.Row].Buf, e.Col+ 1)
 		e.Col = nw
-		e.Col = Min(e.Col, len(e.Content[e.Row]))
+		e.Col = Min(e.Col, len(e.Lines[e.Row].Buf))
 	}
 	if char == 260 {
-		nw := FindPrevWord(e.Content[e.Row], e.Col-1)
+		nw := FindPrevWord(e.Lines[e.Row].Buf, e.Col-1)
 		e.Col = nw
 	}
 }
@@ -330,17 +330,17 @@ func (e *Editor) HandleSmartMoveDown() {
 	var ops = EditOperation{{Enter, '\n', e.Row, e.Col}}
 
 	// moving down, insert new Line, add same amount of tabs
-	tabs := CountTabs(e.Content[e.Row], e.Col)
-	spaces := CountSpaces(e.Content[e.Row], e.Col)
+	tabs := CountTabs(e.Lines[e.Row].Buf, e.Col)
+	spaces := CountSpaces(e.Lines[e.Row].Buf, e.Col)
 
 	countToInsert := tabs
 	characterToInsert := '\t'
 	if tabs == 0 && spaces != 0 { characterToInsert = ' '; countToInsert = spaces }
 
 	e.Row++; e.Col = 0
-	e.Content = InsertTo(e.Content, e.Row, []rune{})
+	e.Lines = InsertTo(e.Lines, e.Row, Line{[]rune{}})
 	for i := 0; i < countToInsert; i++ {
-		e.Content[e.Row] = InsertTo(e.Content[e.Row], e.Col, characterToInsert)
+		e.Lines[e.Row].Buf = InsertTo(e.Lines[e.Row].Buf, e.Col, characterToInsert)
 		ops = append(ops, Operation{Insert, characterToInsert, e.Row, e.Col})
 		e.Col++
 	}
@@ -355,19 +355,19 @@ func (e *Editor) HandleSmartMoveDown() {
 func (e *Editor) HandleSmartMoveUp() {
 	e.Focus()
 	// add new Line and shift all lines, add same amount of tabs/spaces
-	tabs := CountTabs(e.Content[e.Row], e.Col)
-	spaces := CountSpaces(e.Content[e.Row], e.Col)
+	tabs := CountTabs(e.Lines[e.Row].Buf, e.Col)
+	spaces := CountSpaces(e.Lines[e.Row].Buf, e.Col)
 
 	countToInsert := tabs
 	characterToInsert := '\t'
 	if tabs == 0 && spaces != 0 { characterToInsert = ' '; countToInsert = spaces }
 
 	var ops = EditOperation{{Enter, '\n', e.Row, e.Col}}
-	e.Content = InsertTo(e.Content, e.Row, []rune{})
+	e.Lines = InsertTo(e.Lines, e.Row, Line{[]rune{}})
 
 	e.Col = 0
 	for i := 0; i < countToInsert; i++ {
-		e.Content[e.Row] = InsertTo(e.Content[e.Row], e.Col, characterToInsert)
+		e.Lines[e.Row].Buf = InsertTo(e.Lines[e.Row].Buf, e.Col, characterToInsert)
 		ops = append(ops, Operation{Insert, characterToInsert, e.Row, e.Col})
 		e.Col++
 	}

@@ -34,8 +34,8 @@ func (e *Editor) OnDefinition() {
 		e.OpenFile(e.InputFile)
 	}
 
-	if int(definition.Result[0].Range.Start.Line) > len(e.Content) || // not out of e.Content
-		int(definition.Result[0].Range.Start.Character) > len(e.Content[int(definition.Result[0].Range.Start.Line)]) {
+	if int(definition.Result[0].Range.Start.Line) > len(e.Lines) || // not out of e.Lines
+		int(definition.Result[0].Range.Start.Character) > len(e.Lines[int(definition.Result[0].Range.Start.Line)].Buf) {
 		return
 	}
 
@@ -46,7 +46,7 @@ func (e *Editor) OnDefinition() {
 	e.Selection.Sex = int(definition.Result[0].Range.End.Character)
 	e.Row = e.Selection.Sey; e.Col = e.Selection.Sex
 	e.Selection.IsSelected = true
-	if e.Row >= len(e.Content) { e.Row = 0; e.Col = 0; e.Selection.CleanSelection() }
+	if e.Row >= len(e.Lines) { e.Row = 0; e.Col = 0; e.Selection.CleanSelection() }
 
 	e.FocusCenter()
 }
@@ -76,7 +76,7 @@ func (e *Editor) OnHover() {
 		options := strings.Split(hover.Result.Contents.Value, "\n")
 		if len(options) == 0 { return }
 
-		tabs := CountTabsTo(e.Content[e.Row], e.Col)
+		tabs := CountTabsTo(e.Lines[e.Row].Buf, e.Col)
 		width := Max(30, MaxString(options))                                                                             // width depends on max option len or 30 at min
 		height := MinMany(10, len(options))                                                                              // depends on min option len or 5 at min or how many rows to the end of e.Screen
 		atx := (e.Col - tabs) + e.LINES_WIDTH + tabs * (e.langTabWidth) + e.FilesPanelWidth; aty := e.Row - height - e.Y // Define the window  position and dimensions
@@ -143,7 +143,7 @@ func (e *Editor) OnSignatureHelp() {
 
 		if len(options) == 0 { return }
 
-		tabs := CountTabsTo(e.Content[e.Row], e.Col)
+		tabs := CountTabsTo(e.Lines[e.Row].Buf, e.Col)
 		width := Max(30, MaxString(options))                                                                           // width depends on max option len or 30 at min
 		height := MinMany(10, len(options))                                                                            // depends on min option len or 5 at min or how many rows to the end of e.Screen
 		atx := (e.Col - tabs) + e.LINES_WIDTH + tabs*(e.langTabWidth) + e.FilesPanelWidth; aty := e.Row - height - e.Y // Define the window  position and dimensions
@@ -316,7 +316,7 @@ func (e *Editor) OnCompletion() {
 		options := e.buildCompletionOptions(completion)
 		if err != nil || len(options) == 0 { return }
 
-		tabs := CountTabsTo(e.Content[e.Row], e.Col)
+		tabs := CountTabsTo(e.Lines[e.Row].Buf, e.Col)
 		atx := (e.Col - tabs) + e.LINES_WIDTH + tabs*(e.langTabWidth) + e.FilesPanelWidth
 		if e.X != 0  { atx = (e.Col) + e.LINES_WIDTH + e.FilesPanelWidth - e.X }
 		aty := e.Row + 1 - e.Y // Define the window  position and dimensions
@@ -363,8 +363,8 @@ func (e *Editor) buildCompletionOptions(completion CompletionResponse) []string 
 	var options []string
 	var maxOptlen = 5
 
-	prev := FindPrevWord(e.Content[e.Row], e.Col)
-	filterword := string(e.Content[e.Row][prev:e.Col])
+	prev := FindPrevWord(e.Lines[e.Row].Buf, e.Col)
+	filterword := string(e.Lines[e.Row].Buf[prev:e.Col])
 
 	sortItemsByMatchCount(&completion.Result, filterword)
 
@@ -441,26 +441,26 @@ func (e *Editor) completionApply(completion CompletionResponse, selected int) {
 		// move cursor to beginning
 		e.Col = int(from)
 		// remove chars between from and end
-		e.Content[e.Row] = append(e.Content[e.Row][:e.Col], e.Content[e.Row][int(end):]...)
+		e.Lines[e.Row].Buf = append(e.Lines[e.Row].Buf[:e.Col], e.Lines[e.Row].Buf[int(end):]...)
 		newText = item.TextEdit.NewText
 	}
 
 	if from == 0 && end == 0 {
 		// text edit not supported by lsp
-		prev := FindPrevWord(e.Content[e.Row], e.Col)
-		next := FindNextWord(e.Content[e.Row], e.Col)
+		prev := FindPrevWord(e.Lines[e.Row].Buf, e.Col)
+		next := FindNextWord(e.Lines[e.Row].Buf, e.Col)
 		from = int(prev)
 		newText = item.InsertText
 		if len(newText) == 0 { newText = item.Label }
 		end = int(next)
 		e.Col = prev
-		e.Content[e.Row] = append(e.Content[e.Row][:e.Col], e.Content[e.Row][int(end) :]...)
+		e.Lines[e.Row].Buf = append(e.Lines[e.Row].Buf[:e.Col], e.Lines[e.Row].Buf[int(end) :]...)
 	}
 
 	// add newText
 	for _, char := range newText { e.InsertCharacter(e.Row, e.Col, char); e.Col++ }
 	e.UpdateColors()
-	e.UpdateLsp(false, ConvertContentToString(e.Content))
+	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	e.Update = true
 	e.IsContentChanged = true
 }
@@ -549,12 +549,12 @@ func (e *Editor) applyRename(renameResponse RenameResponse) {
 				endc := int(edit.Range.End.Character)
 
 				// replace the old text with the new text
-				after := e.Content[line][endc:]
+				after := e.Lines[line].Buf[endc:]
 				newText := []rune(edit.NewText)
 				newTextAndAfter := append(newText, after...)
-				before := e.Content[line][:startc]
+				before := e.Lines[line].Buf[:startc]
 				wholeNewLine := append(before, newTextAndAfter...)
-				e.Content[line] = wholeNewLine
+				e.Lines[line].Buf = wholeNewLine
 
 				e.UpdateColors()
 			}
@@ -593,10 +593,10 @@ func (e *Editor) handleEdits(edits []Edit) {
 		newLines := strings.Split(edit.NewText, "\n")
 		for i, line := range newLines {
 			index := int(start.Line) + i
-			if index >= len(e.Content) {
-				e.Content = append(e.Content,  []rune(line))
+			if index >= len(e.Lines) {
+				e.Lines = append(e.Lines, Line{[]rune(line)})
 			} else  {
-				e.Content[index] = []rune(line)
+				e.Lines[index] = Line{[]rune(line)}
 			}
 		}
 	}

@@ -18,8 +18,8 @@ func (e *Editor) OnSearch() {
 	var end = false
 	if e.SearchPattern == nil { e.SearchPattern = []rune{} }
 	if e.Selection.IsSelectionNonEmpty() {
-		e.SearchPattern = []rune(e.Selection.GetSelectionString(e.Content))
-		e.SearchResults = Search(e.Content, string(e.SearchPattern))
+		e.SearchPattern = []rune(e.Selection.GetSelectionString(e.Lines))
+		e.SearchResults = Search(e.Lines, string(e.SearchPattern))
 		e.SearchResultIndex = 0
 	}
 
@@ -75,14 +75,14 @@ func (e *Editor) OnSearch() {
 				e.SearchPattern = InsertTo(e.SearchPattern, patternx, ev.Rune())
 				patternx++
 				isChanged = true
-				e.SearchResults = Search(e.Content, string(e.SearchPattern))
+				e.SearchResults = Search(e.Lines, string(e.SearchPattern))
 				e.SearchResultIndex = 0
 			}
 			if key == KeyBackspace2 && patternx > 0 && len(e.SearchPattern) > 0 {
 				patternx--
 				e.SearchPattern = Remove(e.SearchPattern, patternx)
 				isChanged = true
-				e.SearchResults = Search(e.Content, string(e.SearchPattern))
+				e.SearchResults = Search(e.Lines, string(e.SearchPattern))
 				e.SearchResultIndex = 0
 			}
 			if key == KeyLeft && patternx > 0 { patternx-- }
@@ -115,7 +115,7 @@ func (e *Editor) OnSearch() {
 				e.Screen.Show()
 			}
 			if key == KeyEnter {
-				if len(e.Content) == 0 { // global search if no content and enter
+				if len(e.Lines) == 0 { // global search if no content and enter
 					end = e.OnGlobalSearch()
 					e.FocusCenter()
 					e.DrawEverything()
