@@ -52,14 +52,13 @@ func (e *Editor) DrawEverything() {
 	*/
 
 	start := time.Now()
-	code := ConvertLinesToString(e.Lines)
-	coloredByteRanges := e.treeSitterHighlighter.ColorRanges(e.Y, e.Y+e.TERMINAL_HEIGHT, []byte(code))
+	coloredByteRanges := e.treeSitterHighlighter.ColorRanges(e.Y, e.Y+e.TERMINAL_HEIGHT, []byte(e.code))
 
 	bytesCounter := 0
 
 	if e.Y > 0 { //  if scrolling needs to recalculate bytesCounter offset
 		newlineCount := 0
-		for _, c := range code {
+		for _, c := range e.code {
 			bytesCounter += utf8.RuneLen(c)
 			if c == '\n' { newlineCount++ }
 			if newlineCount == e.Y { break }

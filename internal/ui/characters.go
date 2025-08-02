@@ -25,11 +25,10 @@ func (e *Editor) AddChar(ch rune) {
 
 func (e *Editor) InsertCharacter(line, pos int, ch rune) {
 	e.Lines[line].Buf = InsertTo(e.Lines[line].Buf, pos, ch)
-	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	e.Undo = append(e.Undo, EditOperation{{Insert, ch, e.Row, e.Col}})
 
-	code := ConvertLinesToString(e.Lines)
-	e.treeSitterHighlighter.AddCharEdit(&code, line, pos, ch)
+	e.code = ConvertLinesToString(e.Lines)
+	e.treeSitterHighlighter.AddCharEdit(&e.code, line, pos, ch)
 }
 
 func (e *Editor) InsertString(line, pos int, linestring string) {
@@ -84,10 +83,9 @@ func (e *Editor) DeleteCharacter(line, pos int) {
 	})
 
 	e.Lines[line].Buf = Remove(e.Lines[line].Buf, pos)
-	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 
-	code := ConvertLinesToString(e.Lines)
-	e.treeSitterHighlighter.RemoveCharEdit(&code, line, pos, ch)
+	e.code = ConvertLinesToString(e.Lines)
+	e.treeSitterHighlighter.RemoveCharEdit(&e.code, line, pos, ch)
 }
 
 func (e *Editor) MaybeAddPair(ch rune) {

@@ -9,7 +9,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"unicode/utf8"
 )
 
 func Max(x, y int) int {
@@ -38,6 +37,7 @@ func maxMany(nums ...int) int {
 	}
 	return maxValue
 }
+
 func MinMany(nums ...int) int {
 	if len(nums) == 0 {
 		panic("min: no arguments provided")
@@ -141,7 +141,6 @@ func FindAndRemove[T comparable](slice []T, element T) []T {
 	return append(slice[:index], slice[index+1:]...)
 }
 
-
 func MaxString(arr []string) int {
 	maxLength := 0
 	for _, str := range arr {
@@ -167,35 +166,6 @@ func ConvertLinesToString(lines []Line) string {
 	return result.String()
 }
 
-func RunesToBytes(content [][]rune) []byte {
-	var result []byte
-
-	for _, row := range content {
-		for _, r := range row {
-			encodedRune := make([]byte, utf8.RuneLen(r))
-			utf8.EncodeRune(encodedRune, r)
-			result = append(result, encodedRune...)
-		}
-	}
-
-	return result
-}
-
-func BytesUntilRow(content [][]rune, targetRow int) int {
-	var totalBytes int
-
-	for row := 0; row != targetRow && row < len(content); row++ {
-		for _, r := range content[row] {
-			//encodedRune := make([]byte, )
-			//utf8.EncodeRune(encodedRune, r)
-			totalBytes += utf8.RuneLen(r)
-		}
-		totalBytes += 1
-	}
-
-	return totalBytes
-}
-
 func CountNewlines(data []byte) int {
 	newlineCount := 0
 	for _, b := range data {
@@ -216,6 +186,7 @@ func CountTabs(str []rune, stopIndex int) int {
 	}
 	return count
 }
+
 func CountTabsTo(str []rune, stopIndex int) int {
 	if stopIndex == 0 { return 0 }
 
@@ -226,6 +197,7 @@ func CountTabsTo(str []rune, stopIndex int) int {
 	}
 	return count
 }
+
 func CountSpaces(str []rune, stopIndex int) int {
 	if stopIndex == 0 { return 0 }
 
@@ -295,7 +267,6 @@ func Intersect(set1, set2 Set) Set {
 	}
 	return intersection
 }
-
 
 func PadLeft(str string, length int) string {
 	format := fmt.Sprintf("%%%ds", length)

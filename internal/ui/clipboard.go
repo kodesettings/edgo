@@ -91,8 +91,8 @@ repeat:
 
 	if index > 0 { index--; goto repeat; }
 
-	code := ConvertLinesToString(e.Lines)
-	e.treeSitterHighlighter.RemoveCharsEdit(&code, firstCol, firstRow, e.Col, e.Row)
+	e.code = ConvertLinesToString(e.Lines)
+	e.treeSitterHighlighter.RemoveCharsEdit(&e.code, firstCol, firstRow, e.Col, e.Row)
 
 	if len(e.Lines) == 0 {
 		e.Lines = make([]Line, 1)
@@ -162,6 +162,9 @@ func (e *Editor) OnUndo() {
 	e.Undo = e.Undo[:len(e.Undo)-1]
 	e.Focus()
 
+	firstCol := e.Col
+	firstRow := e.Row
+
 	index := len(lastOperation) - 1
 repeat:
 	o := lastOperation[index]
@@ -194,6 +197,9 @@ repeat:
 
 	if index > 0 { index--; goto repeat; }
 
+	e.code = ConvertLinesToString(e.Lines)
+	e.treeSitterHighlighter.RemoveCharsEdit(&e.code, firstCol, firstRow, e.Col, e.Row)
+
 	e.Redo = append(e.Redo, lastOperation)
 	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	e.set_update_parameters(true)
@@ -204,6 +210,9 @@ func (e *Editor) OnRedo() {
 
 	lastRedoOperation := e.Redo[len(e.Redo)-1]
 	e.Redo = e.Redo[:len(e.Redo)-1]
+
+	firstCol := e.Col
+	firstRow := e.Row
 
 	index := 0
 repeat:
@@ -234,6 +243,9 @@ repeat:
 	}
 
 	if index < len(lastRedoOperation) - 1 { index++; goto repeat; }
+
+	e.code = ConvertLinesToString(e.Lines)
+	e.treeSitterHighlighter.RemoveCharsEdit(&e.code, firstCol, firstRow, e.Col, e.Row)
 
 	e.Undo = append(e.Undo, lastRedoOperation)
 	e.UpdateLsp(false, ConvertLinesToString(e.Lines))

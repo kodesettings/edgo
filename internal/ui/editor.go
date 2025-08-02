@@ -108,6 +108,7 @@ type Editor struct {
 	DebugInfo DebugInfo
 
 	treeSitterHighlighter *TreeSitterHighlighter
+	code string // storing UTF-8 representation of buffer
 
 	FileWatcher *FileWatcher
 	DirWatcher  *DirWatcher
@@ -247,11 +248,11 @@ func (e *Editor) OpenFile(fname string) error {
 	e.langConf = conf
 	e.langTabWidth = conf.TabWidth
 
-	code := e.ReadFile(e.AbsoluteFilePath)
+	e.code = e.ReadFile(e.AbsoluteFilePath)
 	e.treeSitterHighlighter = NewTreeSitter()
 	e.treeSitterHighlighter.SetTheme(e.Config.Theme)
 	e.treeSitterHighlighter.SetLang(e.Lang)
-	e.treeSitterHighlighter.Parse(&code)
+	e.treeSitterHighlighter.Parse(&e.code)
 	clear(e.HighlightElements)
 
 	e.Undo = []EditOperation{}

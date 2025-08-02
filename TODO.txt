@@ -11,15 +11,21 @@ AVAILABLE ISSUES:
 == adding more unit tests for full test coverage
   - covering all editor methods with test cases for safety
 
+== on large files redo/undo operations are still slow
+  - this has to be optimized as well, probably rewriting both routines
+
 SOLVED ISSUES:
+
+++ optimized scrolling and typing for speed and memory usage
+  - updated line buffer as well from the previous 2d content
 
 ++ removed unused broken git implementation from the project
 
 ++ speed up and optimization of cut, redo, undo operations
 
-++ fixed crashing of process upon opening big files at function ColorRanges() that was caused
-   by spawning lsp processes with incorrect async theads and timing in lsp_client.go Start()
+++ fixed crashing of process upon opening big files
+  - this was caused by spawning lsp processes with incorrect async theads and timing
 
-++ transitioned from github.com/smacker/go-tree-sitter to github.com/tree-sitter/go-tree-sitter
+++ transitioned from smacker to native tree-sitter go bindings
   - this was due to the lower level API that is supported natively by the tree sitter dev team
   
