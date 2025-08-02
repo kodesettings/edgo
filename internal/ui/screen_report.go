@@ -24,9 +24,9 @@ func (e *Editor) OnLangLinesCount() {
 			}
 		}
 
-		e.Drawtext("Lang lines count report, elapsed "+elapsed.String(), e.FilesPanelWidth+1, 0)
-		e.Drawtext("Total files "+strconv.Itoa(totalFilesProcessed), e.FilesPanelWidth+1, 2)
-		e.Drawtext("Total rows "+strconv.Itoa(totalRowsProcessed), e.FilesPanelWidth+1, 3)
+		e.DrawTextScreenReport("Lang lines count report, elapsed "+elapsed.String(), e.FilesPanelWidth+1, 0)
+		e.DrawTextScreenReport("Total files "+strconv.Itoa(totalFilesProcessed), e.FilesPanelWidth+1, 2)
+		e.DrawTextScreenReport("Total rows "+strconv.Itoa(totalRowsProcessed), e.FilesPanelWidth+1, 3)
 
 		maxLangLen := 0
 		maxFilesLen := 0
@@ -47,14 +47,14 @@ func (e *Editor) OnLangLinesCount() {
 		l2 := fmt.Sprintf("%-*s", maxFilesLen+5, "Files")
 		l3 := fmt.Sprintf("%-*s", maxLinesLen+3, "Lines")
 		line := fmt.Sprintf("%s %s %s %s", l, l2, l3, "Empty/Code")
-		e.Drawtext(line, e.FilesPanelWidth+1, 5)
+		e.DrawTextScreenReport(line, e.FilesPanelWidth+1, 5)
 
 		for i, result := range langCount {
 			l := fmt.Sprintf("%-*s", maxLangLen+5, result.Lang)
 			l2 := fmt.Sprintf("%-*s", maxFilesLen+5, strconv.Itoa(result.FilesCount))
 			l3 := fmt.Sprintf("%-*s", maxLinesLen+3, strconv.Itoa(result.LinesCount))
 			line := fmt.Sprintf("%s %s %s %d/%d", l, l2, l3, result.EmptyLinesCount, result.LinesCount-result.EmptyLinesCount)
-			e.Drawtext(line, e.FilesPanelWidth+1, i+7)
+			e.DrawTextScreenReport(line, e.FilesPanelWidth+1, i+7)
 		}
 		e.Screen.Show()
 

@@ -316,6 +316,12 @@ func (e *Editor) DrawText(row, col int, text string, style Style) {
 	}
 }
 
+func (e *Editor) DrawTextScreenReport(text string, x, y int) {
+	for i, ch := range text {
+		e.Screen.SetContent(x+i, y, ch, nil, StyleDefault)
+	}
+}
+
 func (e *Editor) DrawErrors(atx int, width int, aty int, height int, options []string,
 	selectedOffset int, selected int, style Style) int {
 
@@ -606,11 +612,5 @@ func (e *Editor) DrawProcessPanelSearch(pattern []rune, patternx int) {
 			e.Screen.SetContent(len(prefix)+len(pattern)+i, e.TERMINAL_HEIGHT-1,
 				rune(status[i]), nil, StyleDefault)
 		}
-	}
-}
-
-func (e *Editor) Drawtext(text string, x, y int) {
-	for i, ch := range text {
-		e.Screen.SetContent(x+i, y, ch, nil, StyleDefault)
 	}
 }
