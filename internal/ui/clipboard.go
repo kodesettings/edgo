@@ -7,6 +7,14 @@ import (
 	"strings"
 )
 
+// this function sets the required parameters to validate updates
+func (e *Editor) set_update_parameters(changed bool) {
+	e.Update = true
+	e.IsContentChanged = changed
+	e.UpdateColors()
+	e.FindTests()
+}
+
 func (e *Editor) OnCopy() {
 	selectionString := e.Selection.GetSelectionString(e.Lines)
 	clipboard.WriteAll(selectionString)
@@ -31,8 +39,7 @@ func (e *Editor) OnPaste() {
 		e.InsertLines(e.Row, e.Col, lines)
 	}
 	
-	e.Update = true
-	e.UpdateNeeded()
+	e.set_update_parameters(true)
 }
 
 func (e *Editor) Cut(isCopySelected bool) {
@@ -99,13 +106,11 @@ repeat:
 	if e.Row < 0 { e.Row = 0 }
 	if e.Col < 0 { e.Col = 0 }
 
-	e.UpdateColors()
 	e.Undo = append(e.Undo, ops)
 	e.Selection.CleanSelection()
-	e.Update = true
+
 	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
-	e.IsContentChanged = true
-	e.UpdateNeeded() // optimize
+	e.set_update_parameters(true)
 }
 
 func (e *Editor) Duplicate() {
@@ -127,11 +132,8 @@ func (e *Editor) Duplicate() {
 		e.Row++
 		e.Lines = InsertTo(e.Lines, e.Row, Line{duplicatedSlice})
 
-		e.UpdateColors()
 		e.Undo = append(e.Undo, ops)
-		e.Update = true
-		e.IsContentChanged = true
-		e.FindTests()
+		e.set_update_parameters(true)
 	} else {
 		selection := e.Selection.GetSelectionString(e.Lines)
 		if len(selection) == 0 { return }
@@ -147,11 +149,10 @@ func (e *Editor) Duplicate() {
 		if len(lines) > 1 { // multiple Line
 			e.InsertLines(e.Row, e.Col, lines)
 		}
-		e.UpdateColors()
-		e.Selection.CleanSelection()
-		e.UpdateNeeded()
-	}
 
+		e.Selection.CleanSelection()
+		e.set_update_parameters(true)
+	}
 }
 
 func (e *Editor) OnUndo() {
@@ -193,10 +194,9 @@ repeat:
 
 	if index > 0 { index--; goto repeat; }
 
-	e.UpdateColors()
-	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	e.Redo = append(e.Redo, lastOperation)
-	e.UpdateNeeded()
+	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
+	e.set_update_parameters(true)
 }
 
 func (e *Editor) OnRedo() {
@@ -235,8 +235,7 @@ repeat:
 
 	if index < len(lastRedoOperation) - 1 { index++; goto repeat; }
 
-	e.UpdateColors()
-	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	e.Undo = append(e.Undo, lastRedoOperation)
-	e.UpdateNeeded()
+	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
+	e.set_update_parameters(true)
 }

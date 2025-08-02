@@ -651,14 +651,6 @@ func (e *Editor) UpdateColors() {
 	e.treeSitterHighlighter.ReParse(&code) //  todo:: optimize
 }
 
-// todo, get rid of this function, cause UpdateColors is slow for big files
-func (e *Editor) UpdateNeeded() {
-	e.Update = true
-	e.IsContentChanged = true
-	e.UpdateColors()
-	e.FindTests()
-}
-
 func (e *Editor) OnFileUpdate() {
 	row, col := e.Row, e.Col // save cursor
 	x, y := e.X, e.Y         // safe scroll
@@ -832,10 +824,6 @@ func (e *Editor) OnCursorChanged() {
 				}
 			}
 		}
-
-		//Log.Info(nodename,
-		//	fmt.Sprintf("%d %d %d %d %s elapsed %s", noderange.Ssx,
-		//		noderange.Ssy, noderange.Sex, noderange.Sey, content, elapsed))
 	}
 
 	elapsed := time.Since(start).String()

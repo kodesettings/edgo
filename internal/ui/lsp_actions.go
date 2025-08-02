@@ -226,24 +226,16 @@ func (e *Editor) OnReferences() {
 			return
 		}
 
-		//tabs := CountTabsTo(e.Content[e.Row], e.Col)
-		//width := Max(30, MaxString(options))                                                                          // width depends on max option len or 30 at min
 		height := MinMany(3, len(options))                                                                           // depends on min option len or 5 at min or how many rows to the end of e.Screen
-		//atx := (e.Col -tabs) + e.LINES_WIDTH + tabs*(e.langTabWidth) + e.FilesPanelWidth;
 		atx := e.FilesPanelWidth;
-		//aty := e.Row - height - e.Y // Define the window  position and dimensions
 		aty := 0 // Define the window  position and dimensions
 		style := StyleDefault.Foreground(ColorWhite)
-		//if len(options) > e.Row - e.Y { aty = e.Row + 1 }
 
 		var selectionEnd = false; var selected = 0; var selectedOffset = 0
 
 		for !selectionEnd {
 			if selected < selectedOffset { selectedOffset = selected }  // calculate offsets for scrolling completion
 			if selected >= selectedOffset+height { selectedOffset = selected - height + 1 }
-
-			//e.drawCompletion(atx,aty, height, width, options, selected, selectedOffset, style)
-			//e.Screen.Show()
 
 			e.DrawCodePreview(atx, aty, height, options, selectedOffset, selected, style, searchResults, lspStatus)
 
@@ -566,7 +558,6 @@ func (e *Editor) applyRename(renameResponse RenameResponse) {
 		e.OpenFile(e.InputFile)
 		e.Row = tmpr; e.Col = tmpc;  e.Y = tmpy;  e.X = tmpx;
 	}
-
 }
 
 func (e *Editor) OnCodeAction() {
@@ -600,5 +591,4 @@ func (e *Editor) handleEdits(edits []Edit) {
 			}
 		}
 	}
-	e.UpdateNeeded()
 }
