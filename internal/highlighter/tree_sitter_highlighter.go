@@ -221,11 +221,6 @@ func (h *TreeSitterHighlighter) Parse(code *string) {
 	h.tree = tree
 }
 
-func (h *TreeSitterHighlighter) ReParseBytes(codeBytes []byte) {
-	tree := h.parser.ParseCtx(context.Background(), codeBytes, nil)
-	h.tree = tree
-}
-
 func (h *TreeSitterHighlighter) ColorRanges(from, to int, codeBytes []byte) []ColoredByteRange {
 
 	queryCursor := sitter.NewQueryCursor()
@@ -245,43 +240,19 @@ func (h *TreeSitterHighlighter) ColorRanges(from, to int, codeBytes []byte) []Co
 
 			contentstr := string(codeBytes[capture.Node.StartByte():capture.Node.EndByte()]); Use(contentstr) // for debug
 
-			if !strings.Contains(name, "injection") {
-				colors = append(colors, ColoredByteRange{
-					StartByte: int(capture.Node.StartByte()),
-					EndByte:   int(capture.Node.EndByte()),
-					Color:     color,
-				})
-			} else {
-				injLang := split[len(split)-1]
-
-				if h.injectionLangs == nil { h.injectionLangs = make(map[string]*TreeSitterHighlighter) }
-				injectionHighlighter, injLangFound := h.injectionLangs[injLang]
-				if !injLangFound {
-					injectionHighlighter = NewTreeSitter()
-					injectionHighlighter.SetLang(injLang)
-					injectionHighlighter.SetTheme(h.themePath)
-					h.injectionLangs[injLang] = injectionHighlighter
-				}
-
-				contentInjection := codeBytes[capture.Node.StartByte():capture.Node.EndByte()]
-				injectionHighlighter.ReParseBytes(contentInjection)
-
-				injectionLength := int(capture.Node.EndPosition().Row) - int(capture.Node.StartPosition().Row)
-				Use(injectionLength)
-
-				fromInj := from - int(capture.Node.StartPosition().Row)
-				if fromInj < 0 { fromInj = 0 }
-				toInj := to - int(capture.Node.EndPosition().Row)
-				if toInj < to { toInj = to }
-				colorsInjection := injectionHighlighter.ColorRanges(fromInj, toInj, contentInjection)
-
-				startByte := int(capture.Node.StartByte())
-				for _, colorsInj := range colorsInjection {
-					colorsInj.StartByte += startByte
-					colorsInj.EndByte += startByte
-					colors = append(colors, colorsInj)
-				}
+			if strings.Contains(name, "injection") {
+				// We don't colorize embedded content for different languages in the editor.
+				// Only languages that can be identified for the entire source are colorized.
+				// This usually means excluding markdown or html files or any documentation
+				// related content.
+				continue
 			}
+
+			colors = append(colors, ColoredByteRange{
+				StartByte: int(capture.Node.StartByte()),
+				EndByte:   int(capture.Node.EndByte()),
+				Color:     color,
+			})
 		}
 	}
 	return colors
