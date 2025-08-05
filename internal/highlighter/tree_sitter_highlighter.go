@@ -31,7 +31,6 @@ type TreeSitterHighlighter struct {
 	query          *sitter.Query
 	colorsMap      map[string]string
 	themePath      string
-	injectionLangs map[string]*TreeSitterHighlighter
 }
 
 func NewTreeSitter() *TreeSitterHighlighter {
@@ -176,12 +175,13 @@ func (h *TreeSitterHighlighter) RemoveCharEdit(code *string, row int, col int, c
 	h.tree = h.parser.ParseCtx(context.Background(), []byte(*code), h.tree)
 }
 
-func (h *TreeSitterHighlighter) RemoveCharsEdit(code *string, row int, col int, nrow int, ncol int) {
+func (h *TreeSitterHighlighter) UpdateCharsEdit(code *string, row int, col int, nrow int, ncol int) {
 	StartIndex1 := GetStartIndex(code, row, col)
 	StartIndex2 := GetStartIndex(code, nrow, ncol)
 	Row1 := uint(row); Column1 := uint(col)
 	Row2 := uint(nrow); Column2 := uint(ncol)
 
+	// TODO: fixing this
 	editInput := sitter.InputEdit{
 		StartByte: StartIndex1,
 		OldEndByte: StartIndex2,

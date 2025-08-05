@@ -60,8 +60,8 @@ func (e *Editor) Cut(isCopySelected bool) {
 	ops = append(ops, Operation{MoveCursor, ' ', e.Row, e.Col})
 	selectedIndices := e.Selection.GetSelectedIndices(e.Lines)
 
-	firstCol := e.Col
-	firstRow := e.Row
+	fromCol := e.Col
+	fromRow := e.Row
 
 	// Sort selectedIndices in reverse order to delete characters from the end
 	index := len(selectedIndices) - 1
@@ -91,7 +91,7 @@ repeat:
 	if index > 0 { index--; goto repeat; }
 
 	e.code = ConvertLinesToString(e.Lines)
-	e.treeSitterHighlighter.RemoveCharsEdit(&e.code, firstCol, firstRow, e.Col, e.Row)
+	e.treeSitterHighlighter.UpdateCharsEdit(&e.code, fromRow, fromCol, e.Row, e.Col)
 
 	if len(e.Lines) == 0 {
 		e.Lines = make([]Line, 1)
@@ -161,8 +161,8 @@ func (e *Editor) OnUndo() {
 	e.Undo = e.Undo[:len(e.Undo)-1]
 	e.Focus()
 
-	firstCol := e.Col
-	firstRow := e.Row
+	fromCol := e.Col
+	fromRow := e.Row
 
 	index := len(lastOperation) - 1
 repeat:
@@ -197,7 +197,7 @@ repeat:
 	if index > 0 { index--; goto repeat; }
 
 	e.code = ConvertLinesToString(e.Lines)
-	e.treeSitterHighlighter.RemoveCharsEdit(&e.code, firstCol, firstRow, e.Col, e.Row)
+	e.treeSitterHighlighter.UpdateCharsEdit(&e.code, fromRow, fromCol, e.Row, e.Col)
 
 	e.Redo = append(e.Redo, lastOperation)
 	e.UpdateLsp(false, e.code)
@@ -210,8 +210,8 @@ func (e *Editor) OnRedo() {
 	lastRedoOperation := e.Redo[len(e.Redo)-1]
 	e.Redo = e.Redo[:len(e.Redo)-1]
 
-	firstCol := e.Col
-	firstRow := e.Row
+	fromCol := e.Col
+	fromRow := e.Row
 
 	index := 0
 repeat:
@@ -244,7 +244,7 @@ repeat:
 	if index < len(lastRedoOperation) - 1 { index++; goto repeat; }
 
 	e.code = ConvertLinesToString(e.Lines)
-	e.treeSitterHighlighter.RemoveCharsEdit(&e.code, firstCol, firstRow, e.Col, e.Row)
+	e.treeSitterHighlighter.UpdateCharsEdit(&e.code, fromRow, fromCol, e.Row, e.Col)
 
 	e.Undo = append(e.Undo, lastRedoOperation)
 	e.UpdateLsp(false, e.code)
