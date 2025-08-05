@@ -451,7 +451,6 @@ func (e *Editor) completionApply(completion CompletionResponse, selected int) {
 
 	// add newText
 	for _, char := range newText { e.InsertCharacter(e.Row, e.Col, char); e.Col++ }
-	e.UpdateColors()
 	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	e.Update = true
 	e.IsContentChanged = true
@@ -547,8 +546,6 @@ func (e *Editor) applyRename(renameResponse RenameResponse) {
 				before := e.Lines[line].Buf[:startc]
 				wholeNewLine := append(before, newTextAndAfter...)
 				e.Lines[line].Buf = wholeNewLine
-
-				e.UpdateColors()
 			}
 		}
 	}

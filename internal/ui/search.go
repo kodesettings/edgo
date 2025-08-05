@@ -211,7 +211,6 @@ func (e *Editor) OnGlobalSearch() bool {
 					end = true
 					if e.treeSitterHighlighter.GetLangStr() != initialLang {
 						e.treeSitterHighlighter.SetLang(initialLang)
-						e.UpdateColors()
 					}
 
 					return true

@@ -11,7 +11,6 @@ import (
 func (e *Editor) set_update_parameters(changed bool) {
 	e.Update = true
 	e.IsContentChanged = changed
-	e.UpdateColors()
 	e.FindTests()
 }
 
@@ -201,7 +200,7 @@ repeat:
 	e.treeSitterHighlighter.RemoveCharsEdit(&e.code, firstCol, firstRow, e.Col, e.Row)
 
 	e.Redo = append(e.Redo, lastOperation)
-	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
+	e.UpdateLsp(false, e.code)
 	e.set_update_parameters(true)
 }
 
@@ -248,6 +247,6 @@ repeat:
 	e.treeSitterHighlighter.RemoveCharsEdit(&e.code, firstCol, firstRow, e.Col, e.Row)
 
 	e.Undo = append(e.Undo, lastRedoOperation)
-	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
+	e.UpdateLsp(false, e.code)
 	e.set_update_parameters(true)
 }

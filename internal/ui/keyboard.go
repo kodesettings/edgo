@@ -208,7 +208,6 @@ func (e *Editor) OnTab() {
 		}
 		e.Selection.Sex = e.Col
 		e.Undo = append(e.Undo, ops)
-		e.UpdateColors()
 		e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	}
 
@@ -238,7 +237,6 @@ func (e *Editor) OnBackTab() {
 				e.Col = len(e.Lines[e.Row].Buf)
 			}
 		}
-		e.UpdateColors()
 	}
 
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
@@ -265,7 +263,6 @@ func (e *Editor) OnSwapLinesUp() {
 	e.Lines[e.Row].Buf = line2; e.Lines[e.Row-1].Buf = line1 // swap
 	e.Row--
 
-	e.UpdateColors()
 	e.Undo = append(e.Undo, ops)
 	e.Selection.CleanSelection()
 	e.Update = true
@@ -291,7 +288,6 @@ func (e *Editor) OnSwapLinesDown() {
 	e.Lines[e.Row].Buf = line2; e.Lines[e.Row+1].Buf = line1 // swap
 	e.Row++
 
-	e.UpdateColors()
 	e.Undo = append(e.Undo, ops)
 	e.Selection.CleanSelection()
 	e.Update = true
@@ -345,7 +341,6 @@ func (e *Editor) HandleSmartMoveDown() {
 		e.Col++
 	}
 
-	e.UpdateColors()
 	e.Focus(); e.OnScrollDown()
 	e.Undo = append(e.Undo, ops)
 	e.Update = true
@@ -372,7 +367,6 @@ func (e *Editor) HandleSmartMoveUp() {
 		e.Col++
 	}
 
-	e.UpdateColors()
 	e.Undo = append(e.Undo, ops)
 	e.Update = true
 	e.IsContentChanged = true

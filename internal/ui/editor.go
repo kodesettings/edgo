@@ -647,11 +647,6 @@ func (e *Editor) OverlayFalse() {
 	e.IsOverlay = false
 }
 
-func (e *Editor) UpdateColors() {
-	code := ConvertLinesToString(e.Lines)
-	e.treeSitterHighlighter.ReParse(&code) //  todo:: optimize
-}
-
 func (e *Editor) OnFileUpdate() {
 	row, col := e.Row, e.Col // save cursor
 	x, y := e.X, e.Y         // safe scroll
