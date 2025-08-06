@@ -23,4 +23,6 @@ SOLVED ISSUES:
   - this was caused by spawning lsp processes with incorrect async theads and timing
 == transitioned from smacker to native tree-sitter go bindings
   - this was due to the lower level API that is supported natively by the tree sitter dev team
-  
+== fixed lsp models, lsp handling routines and added didChange events
+== updated default theme of the editor
+== disabled autosave feature as it was writing to file all the time

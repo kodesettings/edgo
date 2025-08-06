@@ -21,7 +21,6 @@ type LspClient struct {
 	stdin io.WriteCloser
 	stdout io.ReadCloser
 	stop   context.CancelFunc
-	//reader    *textproto.Reader
 	reader *bufio.Reader
 
 	IsReady   bool
@@ -39,8 +38,6 @@ type LspClient struct {
 	id              int
 	file2diagnostic map[string]DiagnosticParams
 }
-
-
 
 func (l *LspClient) Start(cmd string, args ...string) bool {
 	Log.Info("starting lsp", cmd, strings.Join(args," "))
@@ -104,19 +101,6 @@ func (this *LspClient) send(o interface{})  {
 	_, err = this.stdin.Write([]byte(message))
 	if err != nil { Log.Error(err.Error()) }
 }
-
-//func (l *LspClient) receive() string {
-//	headers, err := l.reader.ReadMIMEHeader()
-//	if err != nil { fmt.Println(err); return "" }
-//
-//	length, err := strconv.Atoi(headers.Get("Content-Length"))
-//	if err != nil { fmt.Println(err); return ""}
-//
-//	body := make([]byte, length)
-//	if _, err := l.reader.R.Read(body); err != nil { fmt.Println(err); return "" }
-//
-//	return string(body)
-//}
 
 func (this *LspClient) receiveDiagnostics() string {
 
@@ -514,7 +498,6 @@ func (this *LspClient) Command(command Command) (CommandResponse, error) {
 	if err != nil { Log.Error("Error parsing JSON:" + err.Error()) }
 	return response, err
 }
-
 
 func (this *LspClient) ApplyEdit(key int) {
 	request := ApplyEditRequest {

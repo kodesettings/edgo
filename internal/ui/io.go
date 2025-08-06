@@ -106,13 +106,13 @@ func (e *Editor) BuildContent(filename string, limit int) string {
 	return ConvertLinesToString(e.Lines)
 }
 
-func (e *Editor) ReadContent(filename string, fromline int, toline int) [][]rune {
+func (e *Editor) ReadContent(filename string, fromline int, toline int) []Line {
 
 	file, err := os.Open(filename)
 	if err != nil { return nil }
 	defer file.Close()
 
-	content := make([][]rune, 0)
+	lines := make([]Line, 0)
 
 	var i = 0
 	scanner := bufio.NewScanner(file)
@@ -121,12 +121,12 @@ func (e *Editor) ReadContent(filename string, fromline int, toline int) [][]rune
 		if i < fromline { i++; continue }
 		var lineChars = []rune{}
 		for _, char := range line { lineChars = append(lineChars, char) }
-		content = append(content, lineChars)
+		lines = append(lines, Line{lineChars})
 		if i > toline { break }
 		i++
 	}
 
-	return content
+	return lines
 }
 
 func (e *Editor) UpdateFilesOpenStats(file string) {

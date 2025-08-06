@@ -470,7 +470,7 @@ func (e *Editor) DrawCodePreview(atx int, aty int, height int, options []string,
 				e.Screen.SetContent(index+e.FilesPanelWidth, y, char, nil, lineNumberStyle)
 			}
 
-			for col := 0; col < len(previewContent[row]); col++ {
+			for col := 0; col < len(previewContent[row].Buf); col++ {
 
 				chstyle := StyleDefault
 
@@ -478,20 +478,20 @@ func (e *Editor) DrawCodePreview(atx int, aty int, height int, options []string,
 					chstyle = chstyle.Background(Color(SelectionColor))
 				}
 
-				if previewContent[row][col] == '\n' { continue }
-				if previewContent[row][col] == '\t' {
+				if previewContent[row].Buf[col] == '\n' { continue }
+				if previewContent[row].Buf[col] == '\t' {
 					for i := 0; i < e.langTabWidth; i++ {
 						e.Screen.SetContent(atx+e.LINES_WIDTH+col+shiftTabs, y, ' ', nil, chstyle)
 						if i != e.langTabWidth-1 { shiftTabs++ }
 					}
 				} else {
-					e.Screen.SetContent(atx+e.LINES_WIDTH+col+shiftTabs, y, previewContent[row][col], nil, chstyle)
+					e.Screen.SetContent(atx+e.LINES_WIDTH+col+shiftTabs, y, previewContent[row].Buf[col], nil, chstyle)
 				}
 
 				if atx+e.LINES_WIDTH+col+shiftTabs >= e.COLUMNS { break }
 			}
 
-			for i := atx + len(previewContent[row]) + e.LINES_WIDTH + shiftTabs; i < e.COLUMNS; i++ {
+			for i := atx + len(previewContent[row].Buf) + e.LINES_WIDTH + shiftTabs; i < e.COLUMNS; i++ {
 				e.Screen.SetContent(i, y, ' ', nil, StyleDefault)
 			}
 
