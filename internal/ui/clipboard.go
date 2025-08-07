@@ -190,8 +190,6 @@ repeat:
 		e.Lines = InsertTo(e.Lines, e.Row, Line{newline})
 	} else if o.Action == MoveCursor {
 		e.Row = o.Line; e.Col = o.Column
-	} else {
-		e.OnCursorChanged()
 	}
 
 	if index > 0 { index--; goto repeat; }

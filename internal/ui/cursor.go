@@ -63,7 +63,6 @@ func (e *Editor) OnCursorBackUndo() {
 	e.Y = lastCursor.Y
 	e.X = lastCursor.X
 	e.Focus()
-	e.OnCursorChanged()
 	e.CursorHistory = append(e.CursorHistory, lastCursor)
 }
 func (e *Editor) OnCursorBack() {
@@ -84,5 +83,4 @@ func (e *Editor) OnCursorBack() {
 	e.Y = lastCursor.Y
 	e.X = lastCursor.X
 	e.Focus()
-	e.OnCursorChanged()
 }

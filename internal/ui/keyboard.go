@@ -144,7 +144,6 @@ func (e *Editor) OnEnter() {
 
 	e.Undo = append(e.Undo, ops)
 	e.Focus(); if e.Row- e.Y == e.ROWS { e.OnScrollDown() }
-	e.OnCursorChanged()
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
 	e.Update = true
 	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
@@ -162,7 +161,6 @@ func (e *Editor) OnDelete() {
 	if e.Col > 0 {
 		e.Col--
 		e.DeleteCharacter(e.Row, e.Col)
-		e.OnCursorChanged()
 		e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	} else if e.Row > 0 { // delete line
 		e.Undo = append(e.Undo, EditOperation{{DeleteLine, ' ', e.Row -1, len(e.Lines[e.Row-1].Buf)}})
@@ -175,7 +173,6 @@ func (e *Editor) OnDelete() {
 
 		code := ConvertLinesToString(e.Lines)
 		e.treeSitterHighlighter.RemoveCharEdit(&code, e.Row, e.Col, '\n')
-		e.OnCursorChanged()
 		e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	}
 
@@ -195,7 +192,6 @@ func (e *Editor) OnTab() {
 		ch := '\t'
 		e.InsertCharacter(e.Row, e.Col, ch)
 		e.Col++
-		e.OnCursorChanged()
 		e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	} else  {
 		var ops = EditOperation{}

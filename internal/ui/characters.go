@@ -13,7 +13,6 @@ func (e *Editor) AddChar(ch rune) {
 	e.Col++
 
 	e.MaybeAddPair(ch)
-	e.OnCursorChanged()
 
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
 

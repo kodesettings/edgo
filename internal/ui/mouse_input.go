@@ -235,7 +235,6 @@ func (e *Editor) HandleMouse(mx int, my int, buttons ButtonMask, modifiers ModMa
 		}
 
 		e.Col = xPosition
-		e.OnCursorChanged()
 		e.CursorHistory = append(e.CursorHistory,
 			CursorMove{e.AbsoluteFilePath, e.Row, e.Col, e.Y, e.X},
 		)

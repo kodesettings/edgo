@@ -26,7 +26,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 )
 
 type Editor struct {
@@ -791,41 +790,6 @@ func (e *Editor) NewFileOrDir() {
 	for col := 0; col <= len(pref)+len(inputName); col++ { // clean
 		e.Screen.SetContent(col, e.ROWS-1, ' ', nil, StyleDefault)
 	}
-}
-
-func (e *Editor) OnCursorChanged() {
-	clear(e.HighlightElements)
-
-	if e.Selection.IsSelectionNonEmpty() { return }
-
-	start := time.Now()
-	nodename, noderange := e.treeSitterHighlighter.GetNodeAt(e.Row, e.Col, e.Row, e.Col)
-
-	if strings.Contains(nodename, "identifier") {
-		if len(e.Lines) >= noderange.Ssy { return }
-		runes := e.Lines[noderange.Ssy].Buf[noderange.Ssx:noderange.Sex]
-		content := string(runes)
-
-		searchResults := Search(e.Lines, content)
-		e.HighlightElements = make(map[int][]NodeRange)
-
-		if len(searchResults) > 1 {
-			for _, searchResult := range searchResults {
-				searchnodename, searchnoderange := e.treeSitterHighlighter.GetNodeAt(
-					searchResult.Line, searchResult.Position, searchResult.Line, searchResult.Position+len(content))
-				if nodename == searchnodename {
-					if len(content) != searchnoderange.Sex-searchnoderange.Ssx { continue }
-					e.HighlightElements[searchResult.Line] = append(
-							e.HighlightElements[searchResult.Line], searchnoderange)
-				}
-			}
-		}
-	}
-
-	elapsed := time.Since(start).String()
-	Log.Info(nodename,
-		fmt.Sprintf("%d %d %d %d elapsed %s", noderange.Ssx,
-			noderange.Ssy, noderange.Sex, noderange.Sey, elapsed))
 }
 
 func (e *Editor) GoToLine() {
