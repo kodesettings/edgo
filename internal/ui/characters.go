@@ -56,14 +56,10 @@ func (e *Editor) InsertLines(line, pos int, lines []string) {
 		e.Col = 0
 		if e.Row >= len(e.Lines)  { e.Lines = append(e.Lines, Line{[]rune{}}) } // if last Line adding empty Line before
 
-		//l := RemoveLeadingTabsSpaces(linestr)
-		l := linestr
-		//nl := strings.Repeat("\t", tabs) + l
-		nl := l
-		e.Lines = InsertTo(e.Lines, e.Row, Line{[]rune(nl)})
+		e.Lines = InsertTo(e.Lines, e.Row, Line{[]rune(linestr)})
 
 		ops = append(ops, Operation{Enter, '\n', e.Row, e.Col})
-		for _, ch := range nl {
+		for _, ch := range linestr {
 			ops = append(ops, Operation{Insert, ch, e.Row, e.Col})
 			e.Col++
 		}
@@ -85,6 +81,18 @@ func (e *Editor) DeleteCharacter(line, pos int) {
 
 	e.code = ConvertLinesToString(e.Lines)
 	e.treeSitterHighlighter.RemoveCharEdit(&e.code, line, pos, ch)
+}
+
+func (e *Editor) DeleteLine(line, pos int) {
+	e.Undo = append(e.Undo, EditOperation{{DeleteLine, ' ', line, len(e.Lines[line].Buf)}})
+	left := e.Lines[line].Buf[pos:]
+	e.Lines = Remove(e.Lines, line)
+
+	e.Col = len(e.Lines[line-1].Buf)
+	e.Lines[line-1].Buf = append(e.Lines[line-1].Buf, left...)
+
+	e.code = ConvertLinesToString(e.Lines)
+	e.treeSitterHighlighter.RemoveCharEdit(&e.code, line-1, e.Col, '\n')
 }
 
 func (e *Editor) MaybeAddPair(ch rune) {

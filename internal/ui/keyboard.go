@@ -161,24 +161,15 @@ func (e *Editor) OnDelete() {
 	if e.Col > 0 {
 		e.Col--
 		e.DeleteCharacter(e.Row, e.Col)
-		e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	} else if e.Row > 0 { // delete line
-		e.Undo = append(e.Undo, EditOperation{{DeleteLine, ' ', e.Row -1, len(e.Lines[e.Row-1].Buf)}})
-		left := e.Lines[e.Row].Buf[e.Col:]
-		e.Lines = Remove(e.Lines, e.Row)
-
+		e.DeleteLine(e.Row, e.Col)
 		e.Row--
-		e.Col = len(e.Lines[e.Row].Buf)
-		e.Lines[e.Row].Buf = append(e.Lines[e.Row].Buf, left...)
-
-		code := ConvertLinesToString(e.Lines)
-		e.treeSitterHighlighter.RemoveCharEdit(&code, e.Row, e.Col, '\n')
-		e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	}
 
 	e.Focus()
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
 	e.Update = true
+	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	e.IsContentChanged = true
 	e.FindTests()
 }

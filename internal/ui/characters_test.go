@@ -81,6 +81,17 @@ func TestDeleteCharacter(t *testing.T) {
 	assert.Equal(t, expected, e.code, "delete character error")
 }
 
+func TestDeleteLine(t *testing.T) {
+	e.Lines = []Line{
+		Line{Buf: []rune("this is a sample text")},
+		Line{Buf: []rune("\n")},
+	}
+
+	assert.Equal(t, 2, len(e.Lines), "delete line error")
+	e.DeleteLine(1, 0)
+	assert.Equal(t, 1, len(e.Lines), "delete line error")
+}
+
 func TestMaybeAddPair(t *testing.T) {
 	e.Lines = []Line{
 		Line{Buf: []rune("")},
