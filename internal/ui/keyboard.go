@@ -114,9 +114,17 @@ func (e *Editor) OnScrollDown() {
 }
 
 func (e *Editor) OnEnter() {
+	if e.Selection.IsSelectionNonEmpty() {
+		e.Cut(false)
+		// TODO: remove extra line
+	}
+
 	e.InsertEnter(e.Row, e.Col)
-	e.Focus(); if e.Row- e.Y == e.ROWS { e.OnScrollDown() }
+	e.Focus();
+
+	if e.Row - e.Y == e.ROWS { e.OnScrollDown() }
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
+
 	e.Update = true
 	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	e.IsContentChanged = true

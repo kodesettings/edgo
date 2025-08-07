@@ -7,13 +7,12 @@ AVAILABLE ISSUES:
   - failing test cases are: dap, io, lsp (for golang only, due to gopls timeout)
   - do we have to support dap?
   - why lsp is timing out after didOpen in test case?
-== adding more unit tests for full test coverage
-  - covering all editor methods with test cases for safety
-== reparsing edit method in tree sitter highlighter has to be fixed with parameters
+== UpdateCharsEdit() method has to be fixed with parameters at line 178, its buggy
 == the entire line buffer handling op has to be rewritten for better redo/undo
 
 SOLVED ISSUES:
 
+== covered characters and clipboard methods with unit test cases
 == fixed and optimized syntax highlighting colorization
 == optimized scrolling and typing for speed and memory usage
   - updated line buffer as well from the previous 2d content
