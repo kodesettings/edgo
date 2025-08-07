@@ -95,6 +95,54 @@ func (e *Editor) DeleteLine(line, pos int) {
 	e.treeSitterHighlighter.RemoveCharEdit(&e.code, line-1, e.Col, '\n')
 }
 
+func (e *Editor) InsertEnter(line, pos int) {
+	var ops = EditOperation{{Enter, '\n', line, pos}}
+	tabs := CountTabs(e.Lines[line].Buf, pos)
+	spaces := CountSpaces(e.Lines[line].Buf, pos)
+
+	after := e.Lines[line].Buf[pos:]
+	before := e.Lines[line].Buf[:pos]
+	e.Lines[line].Buf = before
+
+	e.Row++
+	e.Col = 0
+
+	countToInsert := tabs
+	characterToInsert := '\t'
+	if tabs == 0 && spaces != 0 { characterToInsert = ' '; countToInsert = spaces }
+
+	begining := []rune{}
+	for i := 0; i < countToInsert; i++ {
+		begining = append(begining, characterToInsert)
+		ops = append(ops, Operation{Insert, characterToInsert, e.Row, e.Col + i})
+	}
+
+	e.Undo = append(e.Undo, ops)
+	e.Col = countToInsert
+
+	newline := append(begining, after...)
+	e.Lines = InsertTo(e.Lines, e.Row, Line{newline})
+
+	contentToString := ConvertLinesToString(e.Lines)
+	e.treeSitterHighlighter.AddCharEdit(&contentToString, e.Row, max(e.Col,0), '\n')
+}
+
+func (e *Editor) ShiftWithTabsToRight(line, pos int, selectedLines []int) {
+	var ops = EditOperation{}
+	e.Selection.Ssx = 0
+
+	for _, linenumber := range selectedLines {
+		line = linenumber
+		e.Row = linenumber
+		e.Lines[line].Buf = InsertTo(e.Lines[line].Buf, 0, '\t')
+		ops = append(ops, Operation{Insert, '\t', line, 0})
+		e.Col = len(e.Lines[line].Buf)
+	}
+
+	e.Selection.Sex = pos
+	e.Undo = append(e.Undo, ops)
+}
+
 func (e *Editor) MaybeAddPair(ch rune) {
 	pairMap := map[rune]rune{
 		'(': ')', '{': '}', '[': ']',

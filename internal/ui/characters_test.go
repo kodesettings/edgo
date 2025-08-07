@@ -92,6 +92,40 @@ func TestDeleteLine(t *testing.T) {
 	assert.Equal(t, 1, len(e.Lines), "delete line error")
 }
 
+func TestInsertEnter(t *testing.T) {
+	e.Lines = []Line{
+		Line{Buf: []rune("this is a sample text")},
+		Line{Buf: []rune("\n")},
+	}
+
+	assert.Equal(t, 2, len(e.Lines), "insert enter error")
+	e.InsertEnter(1, 0)
+	assert.Equal(t, 3, len(e.Lines), "insert enter error")
+}
+
+func TestShiftWithTabsToRight(t *testing.T) {
+	e.Lines = []Line{
+		Line{Buf: []rune("this is a sample text")},
+		Line{Buf: []rune("one more line")},
+	}
+
+	e.Selection.Ssx = 0
+	e.Selection.Ssy = 0
+	e.Selection.Sex = 0
+	e.Selection.Sey = 2
+
+	got := e.Selection.GetSelectionString(e.Lines)
+	expected := "this is a sample text\none more line"
+	assert.Equal(t, expected, got, "selection of string error")
+
+	selectedLines := e.Selection.GetSelectedLines(e.Lines)
+	e.ShiftWithTabsToRight(0, 0, selectedLines)
+
+	e.code = ConvertLinesToString(e.Lines)
+	expected = "\tthis is a sample text\n\tone more line"
+	assert.Equal(t, expected, e.code, "shift with tabs error")
+}
+
 func TestMaybeAddPair(t *testing.T) {
 	e.Lines = []Line{
 		Line{Buf: []rune("")},

@@ -114,35 +114,7 @@ func (e *Editor) OnScrollDown() {
 }
 
 func (e *Editor) OnEnter() {
-	var ops = EditOperation{{Enter, '\n', e.Row, e.Col}}
-	tabs := CountTabs(e.Lines[e.Row].Buf, e.Col)
-	spaces := CountSpaces(e.Lines[e.Row].Buf, e.Col)
-
-	after := e.Lines[e.Row].Buf[e.Col:]
-	before := e.Lines[e.Row].Buf[:e.Col]
-	e.Lines[e.Row].Buf = before
-
-	e.Row++
-	e.Col = 0
-
-	countToInsert := tabs
-	characterToInsert := '\t'
-	if tabs == 0 && spaces != 0 { characterToInsert = ' '; countToInsert = spaces }
-
-	begining := []rune{}
-	for i := 0; i < countToInsert; i++ {
-		begining = append(begining, characterToInsert)
-		ops = append(ops, Operation{Insert, characterToInsert, e.Row, e.Col + i})
-	}
-	e.Col = countToInsert
-
-	newline := append(begining, after...)
-	e.Lines = InsertTo(e.Lines, e.Row, Line{newline})
-
-	contentToString := ConvertLinesToString(e.Lines)
-	e.treeSitterHighlighter.AddCharEdit(&contentToString, e.Row, max(e.Col,0), '\n')
-
-	e.Undo = append(e.Undo, ops)
+	e.InsertEnter(e.Row, e.Col)
 	e.Focus(); if e.Row- e.Y == e.ROWS { e.OnScrollDown() }
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
 	e.Update = true
@@ -185,16 +157,7 @@ func (e *Editor) OnTab() {
 		e.Col++
 		e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	} else  {
-		var ops = EditOperation{}
-		e.Selection.Ssx = 0
-		for _, linenumber := range selectedLines {
-			e.Row = linenumber
-			e.Lines[e.Row].Buf = InsertTo(e.Lines[e.Row].Buf, 0, '\t')
-			ops = append(ops, Operation{Insert, '\t', e.Row, 0})
-			e.Col = len(e.Lines[e.Row].Buf)
-		}
-		e.Selection.Sex = e.Col
-		e.Undo = append(e.Undo, ops)
+		e.ShiftWithTabsToRight(e.Row, e.Col, selectedLines)
 		e.UpdateLsp(false, ConvertLinesToString(e.Lines))
 	}
 
