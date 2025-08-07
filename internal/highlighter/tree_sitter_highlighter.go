@@ -154,7 +154,7 @@ func (h *TreeSitterHighlighter) AddCharEdit(code *string, row int, col int, ch r
 		OldEndPosition: sitter.Point{Row: 0, Column: 0},
 		NewEndPosition: sitter.Point{Row: 0, Column: 0},
 	}
-	h.tree.Edit(&editInput)
+	if h.tree != nil { h.tree.Edit(&editInput) }
 	h.tree = h.parser.ParseCtx(context.Background(), []byte(*code), h.tree)
 }
 
@@ -171,7 +171,7 @@ func (h *TreeSitterHighlighter) RemoveCharEdit(code *string, row int, col int, c
 		OldEndPosition: sitter.Point{Row: Row, Column: Column + runeLen},
 		NewEndPosition: sitter.Point{Row: Row, Column: Column},
 	}
-	h.tree.Edit(&editInput)
+	if h.tree != nil { h.tree.Edit(&editInput) }
 	h.tree = h.parser.ParseCtx(context.Background(), []byte(*code), h.tree)
 }
 
@@ -190,7 +190,7 @@ func (h *TreeSitterHighlighter) UpdateCharsEdit(code *string, row int, col int, 
 		OldEndPosition: sitter.Point{Row: Row2, Column: Column2},
 		NewEndPosition: sitter.Point{Row: Row1, Column: Column1},
 	}
-	h.tree.Edit(&editInput)
+	if h.tree != nil { h.tree.Edit(&editInput) }
 	h.tree = h.parser.ParseCtx(context.Background(), []byte(*code), nil)
 }
 
@@ -243,8 +243,7 @@ func (h *TreeSitterHighlighter) ColorRanges(from, to int, codeBytes []byte) []Co
 			if strings.Contains(name, "injection") {
 				// We don't colorize embedded content for different languages in the editor.
 				// Only languages that can be identified for the entire source are colorized.
-				// This usually means excluding markdown or html files or any documentation
-				// related content.
+				// This usually means markdown or html files or any documentation related content.
 				continue
 			}
 
