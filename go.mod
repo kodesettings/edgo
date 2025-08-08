@@ -12,7 +12,6 @@ require (
 	github.com/gdamore/tcell v1.4.0
 	github.com/go-enry/go-enry/v2 v2.8.6
 	github.com/goccy/go-json v0.10.2
-	github.com/rjeczalik/notify v0.9.3
 	github.com/stretchr/testify v1.10.0
 	github.com/tree-sitter/go-tree-sitter v0.25.0
 	github.com/tree-sitter/tree-sitter-bash v0.25.0
