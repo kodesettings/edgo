@@ -3,6 +3,7 @@ package logger
 import (
 	"log/slog"
 	"os"
+	"io"
 )
 
 type FileHandler struct {
@@ -23,9 +24,13 @@ func (h *FileHandler) textHandler() *slog.TextHandler {
 	return slog.NewTextHandler(h.file, &slog.HandlerOptions{Level: slog.LevelInfo})
 }
 
+func (h *FileHandler) nullHandler() *slog.TextHandler {
+	return slog.NewTextHandler(io.Discard, nil)
+}
+
 func (h *FileHandler) SetLogger() {
 	logFileName, exists := os.LookupEnv("EDGO_LOG")
-	if !exists { return }
+	if !exists { slog.SetDefault(slog.New(h.nullHandler())); return; }
 
 	// Initialize the custom file handler
 	fh, err := h.newFileHandler(logFileName)
