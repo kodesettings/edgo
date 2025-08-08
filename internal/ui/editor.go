@@ -4,7 +4,6 @@ import (
 	. "github.com/vipmax/edgo/internal/config"
 	. "github.com/vipmax/edgo/internal/highlighter"
 	. "github.com/vipmax/edgo/internal/io"
-	. "github.com/vipmax/edgo/internal/logger"
 	. "github.com/vipmax/edgo/internal/lsp"
 	. "github.com/vipmax/edgo/internal/operations"
 	. "github.com/vipmax/edgo/internal/process"
@@ -17,7 +16,7 @@ import (
 	. "github.com/gdamore/tcell"
 	"github.com/gdamore/tcell/encoding"
 	"github.com/rjeczalik/notify"
-	"log"
+	"log/slog"
 	"os"
 	"os/user"
 	"path"
@@ -121,7 +120,7 @@ type Editor struct {
 }
 
 func (e *Editor) Start() {
-	Log.Info("starting edgo")
+	slog.Info("starting edgo")
 
 	e.Init()
 
@@ -143,12 +142,12 @@ func (e *Editor) Start() {
 		if info != nil && info.IsDir() {
 			// if arg is dir, go to dir and open
 			err = os.Chdir(e.InputFile)
-			if err != nil { log.Fatal(err) }
+			if err != nil { slog.Error(err.Error()) }
 			e.OnFilesTree(true)
 		} else {
 			// if arg is file, open file
 			err := e.OpenFile(e.InputFile)
-			if err != nil { log.Fatal(err) }
+			if err != nil { slog.Error(err.Error()) }
 		}
 	}
 
@@ -207,10 +206,10 @@ func (e *Editor) OpenFile(fname string) error {
 	e.Filename = filepath.Base(fname)
 	e.AbsoluteFilePath = path.Join(absoluteDir, e.Filename)
 
-	Log.Info("open", e.AbsoluteFilePath)
+	slog.Info("open", "file", e.AbsoluteFilePath)
 
 	newLang := DetectLang(e.AbsoluteFilePath)
-	Log.Info("new lang is", newLang)
+	slog.Info("new lang is", "lang", newLang)
 
 	if newLang != "" && newLang != e.Lang {
 		e.Lang = newLang

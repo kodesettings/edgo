@@ -3,7 +3,6 @@ package search
 import (
 	"bufio"
 	"github.com/vipmax/edgo/internal/highlighter"
-	. "github.com/vipmax/edgo/internal/logger"
 	"github.com/vipmax/edgo/internal/utils"
 	"os"
 	"path/filepath"
@@ -12,6 +11,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"log/slog"
 )
 
 /*  strings.Index() function in Go's standard library is implemented
@@ -23,7 +23,7 @@ import (
 
 func SearchDown(text [][]rune, pattern string, startLine int, startcol int) (int, int) {
 	start := time.Now()
-	defer Log.Info("search up end, elapsed:", time.Since(start).String())
+	defer slog.Info("search up end, elapsed:", "time", time.Since(start).String())
 
 	if len(pattern) == 0 { return -1, -1 }
 	if startLine < 0 || startLine >= len(text) { return -1, -1 }

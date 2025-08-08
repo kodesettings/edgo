@@ -2,7 +2,6 @@ package io
 
 import (
 	"cmp"
-	. "github.com/vipmax/edgo/internal/logger"
 	. "github.com/vipmax/edgo/internal/search"
 	. "github.com/vipmax/edgo/internal/utils"
 	"fmt"
@@ -10,6 +9,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"log/slog"
 )
 
 type FileInfo struct {
@@ -51,7 +51,7 @@ func ReadDirTree(dirPath string, filter string, isOpen bool, level int) (FileInf
 		if file.IsDir() && !IsIgnored(file.Name(), IgnoreDirs) {
 			childInfo, err2 := ReadDirTree(childPath, filter, isOpen, level + 1)
 			if err2 != nil {
-				Log.Info("Failed to process directory:", err2.Error())
+				slog.Info("Failed to process directory:", "err", err2.Error())
 				continue
 			}
 			fileInfo.Childs = append(fileInfo.Childs, childInfo)

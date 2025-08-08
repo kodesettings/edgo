@@ -1,7 +1,6 @@
 package highlighter
 
 import (
-	. "github.com/vipmax/edgo/internal/logger"
 	. "github.com/vipmax/edgo/internal/themes"
 	"github.com/alecthomas/chroma"
 	"github.com/alecthomas/chroma/lexers"
@@ -9,6 +8,7 @@ import (
 	"github.com/gdamore/tcell"
 	"github.com/go-enry/go-enry/v2"
 	"strings"
+	"log/slog"
 )
 
 var HighlighterGlobal = Highlighter{}
@@ -78,7 +78,7 @@ func (h *Highlighter) Colorize(code string, filename string) [][]int {
 	// get iterator for tokenizing the code
 	iterator, err := lexer.Tokenise(nil, code)
 	if err != nil {
-		Log.Info("tokenization error: " + err.Error())
+		slog.Info("tokenization error: ", "err", err.Error())
 		return [][]int{nil}
 	}
 

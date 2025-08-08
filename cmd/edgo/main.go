@@ -1,20 +1,21 @@
 package main
 
 import (
-	. "github.com/vipmax/edgo/internal/config"
-	. "github.com/vipmax/edgo/internal/highlighter"
-	. "github.com/vipmax/edgo/internal/logger"
-	. "github.com/vipmax/edgo/internal/ui"
+	config "github.com/vipmax/edgo/internal/config"
+	highlighter "github.com/vipmax/edgo/internal/highlighter"
+	logger "github.com/vipmax/edgo/internal/logger"
+	ui "github.com/vipmax/edgo/internal/ui"
 	"fmt"
 	"runtime"
 )
 
 func main() {
-	Log.Start()
-	Conf := GetConfig()
-	HighlighterGlobal.SetTheme(Conf.Theme)
-	editor := Editor{}
-	editor.Config = Conf
+	loghandler := logger.FileHandler{}
+	loghandler.SetLogger()
+	conf := config.GetConfig()
+	highlighter.HighlighterGlobal.SetTheme(conf.Theme)
+	editor := ui.Editor{}
+	editor.Config = conf
 
 	defer func() {
 		if r := recover(); r != nil {

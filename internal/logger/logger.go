@@ -1,72 +1,40 @@
 package logger
 
 import (
-	"log"
+	"log/slog"
 	"os"
-	"strings"
-	"time"
 )
-var Log = Logger{ }
 
-type Logger struct {
-	isEnabled bool
-	file   *os.File
-	stream chan string
-	logger *log.Logger
-	layout string
+type FileHandler struct {
+	file    *os.File
+	handler *slog.TextHandler
 }
 
-func (this *Logger) Start() {
-	logfilename, exists := os.LookupEnv("EDGO_LOG")
-	if !exists { this.isEnabled = false; return }
+func (h *FileHandler) newFileHandler(filePath string) (*FileHandler, error) {
+	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		return nil, err
+	}
 
-	this.isEnabled = true
-
-	file, err := os.OpenFile(logfilename, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-	if err != nil { log.Fatal(err) }
-	this.file = file
-
-	this.logger = log.New(file, "", log.LstdFlags)
-	this.logger.SetOutput(file)
-	this.logger.SetFlags(0)
-	this.layout = "2006-01-02 15:04:05.000"
-
-	this.stream = make(chan string)
-
-	go func() {
-		for message := range this.stream {
-			this.log(message)
-		}
-	}()
-
+	return &FileHandler{file: file}, nil
 }
 
-func (this *Logger) log(message string) {
-	if !this.isEnabled { return }
-	now := time.Now().Format(this.layout)
-	this.logger.Printf("%s %s", now, message)
+func (h *FileHandler) textHandler() *slog.TextHandler {
+	return slog.NewTextHandler(h.file, &slog.HandlerOptions{Level: slog.LevelInfo})
 }
 
-func (this *Logger) logint(message int) {
-	if !this.isEnabled { return }
-	now := time.Now().Format(this.layout)
-	this.logger.Printf("%s %d", now, message)
-}
+func (h *FileHandler) SetLogger() {
+	logFileName, exists := os.LookupEnv("EDGO_LOG")
+	if !exists { return }
 
-func (this *Logger) Info(args ...string) {
-	if !this.isEnabled { return }
-	message := strings.Join(args, " ")
-	this.stream <- message
-}
-func (this *Logger) Error(args ...string) {
-	if !this.isEnabled { return }
-	message :=  "[error]" + strings.Join(args, " ")
-	this.stream <- message
-}
+	// Initialize the custom file handler
+	fh, err := h.newFileHandler(logFileName)
+	if err != nil {
+		panic("Failed to open log file: " + err.Error())
+	} else {
+		h.file = fh.file
+	}
 
-func (this *Logger) stop() {
-	if !this.isEnabled { return }
-	close(this.stream)
-	err := this.file.Close()
-	if err != nil { return }
+	// Set the custom handler for the logger
+	slog.SetDefault(slog.New(h.textHandler()))
 }
