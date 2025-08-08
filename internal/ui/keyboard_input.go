@@ -103,7 +103,6 @@ func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 	if key == KeyPgUp { e.OnUp(true); e.Selection.CleanSelection() }
 	if key == KeyLeft { e.OnLeft(); e.Selection.CleanSelection() }
 	if key == KeyRight { e.OnRight(); e.Selection.CleanSelection() }
-	if key == KeyCtrlT { e.OnFilesTree(true) }
 	if key == KeyF18 { e.OnRename() }
 	if key == KeyF22 { e.OnProcessRun(true) }
 	if key == KeyCtrlZ { e.OnUndo() }

@@ -171,7 +171,7 @@ func (e *Editor) OnGlobalSearch() bool {
 		}
 
 		height := MinMany(5, len(options)+1) // depends on min option len or 5 at min or how many rows to the end of e.Screen
-		atx := 0 + e.FilesPanelWidth
+		atx := 0
 		aty := 0 // Define the window  position and dimensions
 		style := StyleDefault
 

@@ -2,7 +2,6 @@ package ui
 
 import (
 	. "github.com/vipmax/edgo/internal/highlighter"
-	. "github.com/vipmax/edgo/internal/io"
 	. "github.com/vipmax/edgo/internal/search"
 	. "github.com/vipmax/edgo/internal/utils"
 	"fmt"
@@ -19,20 +18,6 @@ func (e *Editor) DrawEverything() {
     
 	e.Screen.Clear()
 
-	// clean files panel and draw separator
-	if e.FilesPanelWidth != 0 {
-		for row := 0; row < e.ROWS; row++ {
-			for col := 0; col < e.FilesPanelWidth; col++ {
-				e.Screen.SetContent(col, row, ' ', nil, StyleDefault)
-			}
-			e.Screen.SetContent(e.FilesPanelWidth-2, row, '▕', nil, DimmedStyle)
-		}
-
-		var aty = 0
-		var fileindex = 0
-		e.DrawTree(e.Tree, 0, &fileindex, &aty)
-	}
-
 	if len(e.Lines) == 0 { e.DrawLogo(); return }
 	if e.Update == false { return }
 
@@ -40,8 +25,8 @@ func (e *Editor) DrawEverything() {
 	tabcor := countTabsTo * (e.langTabWidth - 1)
 
 	if e.Col < e.X { e.X = e.Col }
-	if e.Col + e.LINES_WIDTH + e.FilesPanelWidth + tabcor >= e.X + e.COLUMNS  {
-		e.X = e.Col - e.COLUMNS + 1 + e.LINES_WIDTH + e.FilesPanelWidth + tabcor
+	if e.Col + e.LINES_WIDTH + tabcor >= e.X + e.COLUMNS  {
+		e.X = e.Col - e.COLUMNS + 1 + e.LINES_WIDTH + tabcor
 	}
 
 	/*
@@ -81,7 +66,7 @@ func (e *Editor) DrawEverything() {
 			if col >= len(e.Lines[ry].Buf) { break }
 			ch := e.Lines[ry].Buf[col]
 
-			isOutside := col-e.X+e.LINES_WIDTH+tabsOffset+e.FilesPanelWidth > e.COLUMNS
+			isOutside := col-e.X+e.LINES_WIDTH+tabsOffset > e.COLUMNS
 			if isOutside || e.X > col { bytesCounter += utf8.RuneLen(ch); continue }
 
 			style := StyleDefault
@@ -102,12 +87,12 @@ func (e *Editor) DrawEverything() {
 					style = StyleDefault.Background(Color(AccentColor))
 				}
 				for i := 0; i < e.langTabWidth; i++ {
-					x := col - e.X + e.LINES_WIDTH + tabsOffset + e.FilesPanelWidth
+					x := col - e.X + e.LINES_WIDTH + tabsOffset
 					e.Screen.SetContent(x, row, ' ', nil, style)
 					if i != e.langTabWidth-1 { tabsOffset++ }
 				}
 			} else {
-				x := col - e.X + e.LINES_WIDTH + tabsOffset + e.FilesPanelWidth
+				x := col - e.X + e.LINES_WIDTH + tabsOffset
 				e.Screen.SetContent(x, row, ch, nil, style)
 			}
 			//e.Screen.Show()
@@ -120,7 +105,7 @@ func (e *Editor) DrawEverything() {
 				tabcorrection := tabs * (e.langTabWidth - 1)
 				skip := false
 				for i := helement.Ssx; !skip && i < helement.Sex; i++ {
-					x := i + e.LINES_WIDTH + e.FilesPanelWidth + tabcorrection
+					x := i + e.LINES_WIDTH + tabcorrection
 					mainc, _, stylec, _ := e.Screen.GetContent(x, row)
 					if e.Selection.IsUnderSelection(i, ry) {
 						skip = true
@@ -148,9 +133,9 @@ func (e *Editor) DrawEverything() {
 		e.Screen.HideCursor()
 	} else {
 		tabs := CountTabsTo(e.Lines[e.Row].Buf, e.Col) * (e.langTabWidth - 1)
-		e.Screen.ShowCursor(e.Col-e.X+e.LINES_WIDTH+tabs+e.FilesPanelWidth, e.Row-e.Y) // show cursor
+		e.Screen.ShowCursor(e.Col-e.X+e.LINES_WIDTH+tabs, e.Row-e.Y) // show cursor
 		if e.X != 0 {
-			e.Screen.ShowCursor(e.Col-e.X+e.LINES_WIDTH+e.FilesPanelWidth, e.Row-e.Y) // show cursor
+			e.Screen.ShowCursor(e.Col-e.X+e.LINES_WIDTH, e.Row-e.Y) // show cursor
 		}
 	}
 
@@ -259,7 +244,7 @@ func (e *Editor) DrawDiagnostic() {
 			tabs := CountTabs(e.Lines[dline].Buf, len(e.Lines[dline].Buf))
 			var shifty = 0
 			errorMessage := "error: " + diagnostic.Message
-			errorMessage = PadLeft(errorMessage, e.COLUMNS-len(e.Lines[dline].Buf)-tabs*e.langTabWidth-5-e.LINES_WIDTH-e.FilesPanelWidth)
+			errorMessage = PadLeft(errorMessage, e.COLUMNS-len(e.Lines[dline].Buf)-tabs*e.langTabWidth-5-e.LINES_WIDTH)
 
 			// iterate over message characters and draw it
 			for i, m := range errorMessage {
@@ -267,7 +252,7 @@ func (e *Editor) DrawDiagnostic() {
 				if ypos < 0 || ypos >= len(e.Lines) { break }
 
 				tabs = CountTabs(e.Lines[dline].Buf, len(e.Lines[dline].Buf))
-				xpos := i + e.LINES_WIDTH + e.FilesPanelWidth + len(e.Lines[dline+shifty].Buf) + tabs*e.langTabWidth + 5
+				xpos := i + e.LINES_WIDTH + len(e.Lines[dline+shifty].Buf) + tabs*e.langTabWidth + 5
 
 				e.Screen.SetContent(xpos, ypos, m, nil, style)
 			}
@@ -281,7 +266,7 @@ func (e *Editor) DrawLineNumber(brw int, row int) {
 
 	lineNumber := CenterNumber(brw+1, e.LINES_WIDTH)
 	for index, char := range lineNumber {
-		e.Screen.SetContent(index+e.FilesPanelWidth, row, char, nil, style)
+		e.Screen.SetContent(index, row, char, nil, style)
 	}
 }
 
@@ -357,18 +342,18 @@ func (e *Editor) DrawSearch(pattern []rune, patternx int) {
 	var prefix = []rune("search: ")
 
 	for i := 0; i < len(prefix); i++ {
-		e.Screen.SetContent(i+e.LINES_WIDTH+e.FilesPanelWidth, e.ROWS-1, prefix[i], nil, StyleDefault)
+		e.Screen.SetContent(i+e.LINES_WIDTH, e.ROWS-1, prefix[i], nil, StyleDefault)
 	}
 
-	e.Screen.SetContent(len(prefix)+e.LINES_WIDTH+e.FilesPanelWidth, e.ROWS-1, ' ', nil, StyleDefault)
+	e.Screen.SetContent(len(prefix)+e.LINES_WIDTH, e.ROWS-1, ' ', nil, StyleDefault)
 
 	for i := 0; i < len(pattern); i++ {
-		e.Screen.SetContent(len(prefix)+i+e.LINES_WIDTH+e.FilesPanelWidth, e.ROWS-1, pattern[i], nil, StyleDefault)
+		e.Screen.SetContent(len(prefix)+i+e.LINES_WIDTH, e.ROWS-1, pattern[i], nil, StyleDefault)
 	}
 
-	e.Screen.ShowCursor(len(prefix)+patternx+e.LINES_WIDTH+e.FilesPanelWidth, e.ROWS-1)
+	e.Screen.ShowCursor(len(prefix)+patternx+e.LINES_WIDTH, e.ROWS-1)
 
-	for i := len(prefix) + len(pattern) + e.LINES_WIDTH + e.FilesPanelWidth; i < e.COLUMNS; i++ {
+	for i := len(prefix) + len(pattern) + e.LINES_WIDTH; i < e.COLUMNS; i++ {
 		e.Screen.SetContent(i, e.ROWS-1, ' ', nil, StyleDefault)
 	}
 
@@ -376,16 +361,16 @@ func (e *Editor) DrawSearch(pattern []rune, patternx int) {
 		status := fmt.Sprintf("  %d/%d", e.SearchResultIndex+1, len(e.SearchResults))
 
 		for i := 0; i < len(status); i++ {
-			e.Screen.SetContent(e.FilesPanelWidth+e.LINES_WIDTH+len(prefix)+len(pattern)+i, e.ROWS-1,
+			e.Screen.SetContent(e.LINES_WIDTH+len(prefix)+len(pattern)+i, e.ROWS-1,
 				rune(status[i]), nil, StyleDefault)
 		}
 	}
 
-	e.Screen.ShowCursor(len(prefix)+patternx+e.LINES_WIDTH+e.FilesPanelWidth, e.ROWS-1)
+	e.Screen.ShowCursor(len(prefix)+patternx+e.LINES_WIDTH, e.ROWS-1)
 }
 
 func (e *Editor) CleanContentSearch() {
-	for i := e.LINES_WIDTH + e.FilesPanelWidth; i < e.COLUMNS; i++ {
+	for i := e.LINES_WIDTH; i < e.COLUMNS; i++ {
 		e.Screen.SetContent(i, e.ROWS-1, ' ', nil, StyleDefault)
 	}
 
@@ -451,7 +436,7 @@ func (e *Editor) DrawCodePreview(atx int, aty int, height int, options []string,
 
 			var lineNumberStyle = StyleDefault.Foreground(ColorDimGray)
 			for index, char := range CenterNumber(linenumber+1, e.LINES_WIDTH) {
-				e.Screen.SetContent(index+e.FilesPanelWidth, y, char, nil, lineNumberStyle)
+				e.Screen.SetContent(index, y, char, nil, lineNumberStyle)
 			}
 
 			for col := 0; col < len(previewContent[row].Buf); col++ {
@@ -487,78 +472,6 @@ func (e *Editor) DrawCodePreview(atx int, aty int, height int, options []string,
 		for i := 0; i < len(label); i++ {
 			e.Screen.SetContent(atx+i, e.ROWS-1, label[i], nil, StyleDefault)
 		}
-	}
-}
-
-func (e *Editor) DrawTree(fileInfo FileInfo, level int, fileindex *int, aty *int) {
-
-	isNeedToShow := *fileindex >= e.FileScrollingOffset
-
-	if isNeedToShow {
-		if *aty >= e.ROWS { return }
-
-		style := StyleDefault
-		isSelectedFile := e.IsFileSelection && e.FileSelectedIndex != -1 && *fileindex == e.FileSelectedIndex
-
-		if fileInfo.IsDir {
-			style = style.Foreground(Color(AccentColor2))
-		} else {
-			style = style.Foreground(Color(AccentColor3))
-		}
-
-		if isSelectedFile { style = style.Foreground(Color(AccentColor)) }
-
-		if e.InputFile != "" && e.InputFile == fileInfo.FullName {
-			style = style.Background(Color(AccentColor)).Foreground(ColorWhite)
-		}
-
-		for i := 0; i <= level; i++ {
-			if i+1 >= e.FilesPanelWidth-2 { break }
-			e.Screen.SetContent(i+1, *aty, ' ', nil, StyleDefault)
-		}
-
-		label := []rune(" " + fileInfo.Name + " ")
-		for i := 0; i < len(label); i++ {
-			if i+1+level >= e.FilesPanelWidth-2 { break }
-			e.Screen.SetContent(i+1+level, *aty, label[i], nil, style)
-		}
-
-		*aty++
-	}
-
-	*fileindex++
-
-	if fileInfo.IsDir && fileInfo.IsDirOpen {
-		for _, child := range fileInfo.Childs {
-			e.DrawTree(child, level+1, fileindex, aty)
-		}
-	}
-
-}
-
-func (e *Editor) DrawTreeSearch(filterPattern []rune, patternx int) {
-	e.Screen.HideCursor()
-
-	if e.IsFilesSearch {
-		pref := " search: "
-		e.Screen.ShowCursor(len(pref)+patternx, e.ROWS-1)
-		for i, ch := range pref { // draw prefix
-			e.Screen.SetContent(i, e.ROWS-1, ch, nil, StyleDefault)
-		}
-
-		for i, ch := range filterPattern { // draw pattern
-			e.Screen.SetContent(i+len(pref), e.ROWS-1, ch, nil, StyleDefault)
-		}
-		for col := len(pref) + len(filterPattern); col < e.FilesPanelWidth-1; col++ { // clean
-			e.Screen.SetContent(col, e.ROWS-1, ' ', nil, StyleDefault)
-		}
-	}
-}
-
-func (e *Editor) CleanFilesSearch() {
-	e.Screen.HideCursor()
-	for col := 0; col < e.FilesPanelWidth-1; col++ { // clean
-		e.Screen.SetContent(col, e.ROWS-1, ' ', nil, StyleDefault)
 	}
 }
 

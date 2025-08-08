@@ -115,22 +115,6 @@ func (e *Editor) HandleMouse(mx int, my int, buttons ButtonMask, modifiers ModMa
 
 	e.IsProcessPanelFocused = false
 
-	if !e.IsFilesPanelMoving && buttons&Button1 == 1 &&
-		(mx == e.FilesPanelWidth-2 || mx == e.FilesPanelWidth-1) &&
-		my < e.ROWS && len(e.Selection.GetSelectedLines(e.Lines)) == 0 {
-		e.IsFilesPanelMoving = true
-		return
-	}
-
-	if e.IsFilesPanelMoving && buttons&Button1 == 1 {
-		e.FilesPanelWidth = mx
-		return
-	}
-	if e.IsFilesPanelMoving && buttons&Button1 == 0 {
-		e.IsFilesPanelMoving = false
-		return
-	}
-
 	if e.Filename == "" { return }
 
 	if buttons&Button1 == 1 && mx == e.COLUMNS-2 { // test button
@@ -142,7 +126,7 @@ func (e *Editor) HandleMouse(mx int, my int, buttons ButtonMask, modifiers ModMa
 
 	}
 
-	mx -= e.LINES_WIDTH + e.FilesPanelWidth
+	mx -= e.LINES_WIDTH
 
 	if mx < 0 { return }
 	if my > e.ROWS { return }

@@ -2,7 +2,6 @@ package ui
 
 import (
 	. "github.com/vipmax/edgo/internal/highlighter"
-	. "github.com/vipmax/edgo/internal/io"
 	. "github.com/vipmax/edgo/internal/lsp"
 	. "github.com/vipmax/edgo/internal/operations"
 	"github.com/vipmax/edgo/internal/search"
@@ -29,7 +28,7 @@ func (e *Editor) OnDefinition() {
 		
 	if definition.Result[0].URI != "file://" + e.AbsoluteFilePath {
 		f := strings.Split(definition.Result[0].URI, "file://")[1]
-		if !IsFileExists(f) { return }
+		if !e.IsFileExists(f) { return }
 		e.InputFile = f
 		e.OpenFile(e.InputFile)
 	}
@@ -77,9 +76,9 @@ func (e *Editor) OnHover() {
 		if len(options) == 0 { return }
 
 		tabs := CountTabsTo(e.Lines[e.Row].Buf, e.Col)
-		width := Max(30, MaxString(options))                                                                             // width depends on max option len or 30 at min
-		height := MinMany(10, len(options))                                                                              // depends on min option len or 5 at min or how many rows to the end of e.Screen
-		atx := (e.Col - tabs) + e.LINES_WIDTH + tabs * (e.langTabWidth) + e.FilesPanelWidth; aty := e.Row - height - e.Y // Define the window  position and dimensions
+		width := Max(30, MaxString(options))                                                         // width depends on max option len or 30 at min
+		height := MinMany(10, len(options))                                                          // depends on min option len or 5 at min or how many rows to the end of e.Screen
+		atx := (e.Col - tabs) + e.LINES_WIDTH + tabs * (e.langTabWidth); aty := e.Row - height - e.Y // Define the window  position and dimensions
 		style := StyleDefault.Foreground(ColorWhite)
 		if len(options) > e.Row- e.Y { aty = e.Row + 1 }
 
@@ -144,9 +143,9 @@ func (e *Editor) OnSignatureHelp() {
 		if len(options) == 0 { return }
 
 		tabs := CountTabsTo(e.Lines[e.Row].Buf, e.Col)
-		width := Max(30, MaxString(options))                                                                           // width depends on max option len or 30 at min
-		height := MinMany(10, len(options))                                                                            // depends on min option len or 5 at min or how many rows to the end of e.Screen
-		atx := (e.Col - tabs) + e.LINES_WIDTH + tabs*(e.langTabWidth) + e.FilesPanelWidth; aty := e.Row - height - e.Y // Define the window  position and dimensions
+		width := Max(30, MaxString(options))                                                       // width depends on max option len or 30 at min
+		height := MinMany(10, len(options))                                                        // depends on min option len or 5 at min or how many rows to the end of e.Screen
+		atx := (e.Col - tabs) + e.LINES_WIDTH + tabs*(e.langTabWidth); aty := e.Row - height - e.Y // Define the window  position and dimensions
 		style := StyleDefault.Foreground(ColorWhite)
 		if len(options) > e.Row- e.Y { aty = e.Row + 1 }
 
@@ -226,8 +225,8 @@ func (e *Editor) OnReferences() {
 			return
 		}
 
-		height := MinMany(3, len(options))                                                                           // depends on min option len or 5 at min or how many rows to the end of e.Screen
-		atx := e.FilesPanelWidth;
+		height := MinMany(3, len(options)) // depends on min option len or 5 at min or how many rows to the end of e.Screen
+		atx := 0
 		aty := 0 // Define the window  position and dimensions
 		style := StyleDefault.Foreground(ColorWhite)
 
@@ -267,7 +266,7 @@ func (e *Editor) OnReferences() {
 func (e *Editor) applyReferences(referencesResult ReferencesRange) {
 	if referencesResult.URI != "file://"+ e.AbsoluteFilePath { // if another file
 		f := strings.Split(referencesResult.URI, "file://")[1]
-		if !IsFileExists(f) { return }
+		if !e.IsFileExists(f) { return }
 		e.InputFile = f
 		e.OpenFile(e.InputFile)
 	}
@@ -309,8 +308,8 @@ func (e *Editor) OnCompletion() {
 		if err != nil || len(options) == 0 { return }
 
 		tabs := CountTabsTo(e.Lines[e.Row].Buf, e.Col)
-		atx := (e.Col - tabs) + e.LINES_WIDTH + tabs*(e.langTabWidth) + e.FilesPanelWidth
-		if e.X != 0  { atx = (e.Col) + e.LINES_WIDTH + e.FilesPanelWidth - e.X }
+		atx := (e.Col - tabs) + e.LINES_WIDTH + tabs*(e.langTabWidth)
+		if e.X != 0  { atx = (e.Col) + e.LINES_WIDTH - e.X }
 		aty := e.Row + 1 - e.Y // Define the window  position and dimensions
 		width := Max(30, MaxString(options))                            // width depends on Max option len or 30 at min
 		height := MinMany(5, len(options), e.ROWS - (e.Row- e.Y)) // depends on min option len or 5 at min or how many rows to the end of e.Screen
@@ -476,18 +475,18 @@ func (e *Editor) OnRename() {
 	for !end {
 
 		for i := 0; i < len(prefix); i++ {
-			e.Screen.SetContent(e.FilesPanelWidth+ e.LINES_WIDTH+ i, e.ROWS-1, prefix[i], nil, StyleDefault)
+			e.Screen.SetContent(e.LINES_WIDTH + i, e.ROWS - 1, prefix[i], nil, StyleDefault)
 		}
 
-		e.Screen.SetContent(e.FilesPanelWidth+ e.LINES_WIDTH+ len(prefix), e.ROWS-1, ' ', nil, StyleDefault)
+		e.Screen.SetContent(e.LINES_WIDTH + len(prefix), e.ROWS - 1, ' ', nil, StyleDefault)
 
 		for i := 0; i < len(renameTo); i++ {
-			e.Screen.SetContent(e.FilesPanelWidth+ e.LINES_WIDTH+ len(prefix) + i, e.ROWS-1, renameTo[i], nil, StyleDefault)
+			e.Screen.SetContent(e.LINES_WIDTH + len(prefix) + i, e.ROWS - 1, renameTo[i], nil, StyleDefault)
 		}
 
-		e.Screen.ShowCursor(e.FilesPanelWidth+ e.LINES_WIDTH+ len(prefix) + patternx , e.ROWS-1)
+		e.Screen.ShowCursor(e.LINES_WIDTH + len(prefix) + patternx , e.ROWS - 1)
 
-		for i := e.FilesPanelWidth + e.LINES_WIDTH + len(prefix) + len(renameTo); i < e.COLUMNS; i++ {
+		for i := e.LINES_WIDTH + len(prefix) + len(renameTo); i < e.COLUMNS; i++ {
 			e.Screen.SetContent(i, e.ROWS-1, ' ', nil, StyleDefault)
 		}
 

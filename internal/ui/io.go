@@ -5,7 +5,6 @@ import (
 	. "github.com/vipmax/edgo/internal/utils"
 	"fmt"
 	"os"
-	"sort"
 )
 
 func (e *Editor) ReadFile(fileToRead string) string {
@@ -72,7 +71,6 @@ func (e *Editor) WriteFile(saveFile bool) {
 	if err := f.Close(); err != nil { panic(err) }
 
 	e.IsContentChanged = false
-	e.FileWatcher.UpdateStats()
 update:
 	e.UpdateLsp(true, ConvertLinesToString(e.Lines))
 }
@@ -129,20 +127,10 @@ func (e *Editor) ReadContent(filename string, fromline int, toline int) []Line {
 	return lines
 }
 
-func (e *Editor) UpdateFilesOpenStats(file string) {
-	if e.Files == nil || len(e.Files) == 0 { return }
-
-	for i := 0; i < len(e.Files); i++ {
-		ti := e.Files[i]
-		if file == ti.FullName {
-			ti.OpenCount += 1
-			e.Files[i] = ti
-			break
+func (e *Editor) IsFileExists(filename string) bool {
+		info, err := os.Stat(filename)
+		if os.IsNotExist(err) {
+			return false
 		}
-	}
-
-	sort.SliceStable(e.Files, func(i, j int) bool {
-		return e.Files[i].OpenCount > e.Files[j].OpenCount
-	})
+		return !info.IsDir()
 }
-
