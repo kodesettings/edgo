@@ -44,7 +44,6 @@ func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 	if key == KeyCtrlA { e.OnSelectAll(); return }
 	if key == KeyCtrlX { e.Cut(true) }
 	if key == KeyCtrlD { e.Duplicate() }
-	if key == KeyCtrlB { e.Breakpoint() }
 	if key == KeyCtrlK { e.GoBottom(); return }
 	if key == KeyCtrlJ { e.GoTop(); return }
 	if key == KeyCtrlL { e.GoToLine(); return }
@@ -107,11 +106,9 @@ func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 	if key == KeyCtrlT { e.OnFilesTree(true) }
 	if key == KeyF18 { e.OnRename() }
 	if key == KeyF22 { e.OnProcessRun(true) }
-	if key == KeyF23 { e.OnDebug() }
 	if key == KeyCtrlZ { e.OnUndo() }
 	if key == KeyCtrlY { e.OnRedo() }
 	if key == KeyCtrlO { e.OnCursorBack() }
 	if key == KeyCtrlRightSq { e.OnCursorBackUndo() }
 	if key == KeyCtrlSpace { e.OnCompletion() }
-
 }

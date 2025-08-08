@@ -4,8 +4,7 @@
 AVAILABLE ISSUES:
 
 == fixing all unit test cases
-  - failing test cases are: dap, io, lsp (for golang only, due to gopls timeout)
-  - do we have to support dap?
+  - failing test cases are: io, lsp (for golang only, due to gopls timeout)
   - why lsp is timing out after didOpen in test case?
 == UpdateCharsEdit() method has to be fixed with parameters at line 178, its buggy
 == the entire line buffer handling op has to be rewritten for better redo/undo

@@ -2,7 +2,6 @@ package ui
 
 import (
 	. "github.com/vipmax/edgo/internal/config"
-	"github.com/vipmax/edgo/internal/dap"
 	. "github.com/vipmax/edgo/internal/highlighter"
 	. "github.com/vipmax/edgo/internal/io"
 	. "github.com/vipmax/edgo/internal/logger"
@@ -103,9 +102,6 @@ type Editor struct {
 	lsp2lang map[string]*LspClient
 	lspver map[string]int // version number sequencing
 
-	Dap       dap.DapClient
-	DebugInfo DebugInfo
-
 	treeSitterHighlighter *TreeSitterHighlighter
 	code string // storing UTF-8 representation of buffer
 
@@ -193,13 +189,6 @@ func (e *Editor) HandleEvents() {
 	case *EventKey:
 		key := ev.Key()
 		modifiers := ev.Modifiers()
-		if e.Dap.IsStarted {
-			e.OnDebugKeyHandle(key, ev, 1)
-			return
-		}
-
-		//c := strconv.Itoa(int(key))
-		//Log.Info("EventKey", c)
 
 		e.HandleKeyboard(key, ev, modifiers)
 	}
@@ -232,14 +221,6 @@ func (e *Editor) OpenFile(fname string) error {
 			e.lsp2lang[newLang] = &lsp
 			go e.InitLsp(e.Lang)
 		}
-
-		if e.Dap.Port > 0 {
-			e.Dap = dap.DapClient{Lang: newLang, Conntype: "tcp", Port: e.Dap.Port + 1}
-		} else {
-			e.Dap = dap.DapClient{Lang: newLang, Conntype: "tcp", Port: 54752}
-		}
-
-		e.DebugInfo = DebugInfo{stopline: -1}
 	}
 
 	conf, found := e.Config.Langs[e.Lang]
@@ -302,7 +283,6 @@ func (e *Editor) Init() {
 	e.CursorHistory = []CursorMove{}
 	e.lsp2lang = map[string]*LspClient{}
 	e.lspver = map[string]int{}
-	e.DebugInfo = DebugInfo{}
 
 	e.treeSitterHighlighter = NewTreeSitter()
 	e.treeSitterHighlighter.SetTheme(e.Config.Theme)

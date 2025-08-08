@@ -96,9 +96,6 @@ func (e *Editor) DrawEverything() {
 			if e.Selection.IsUnderSelection(col, ry) {
 				style = style.Background(Color(SelectionColor))
 			}
-			if e.DebugInfo.stopline == ry {
-				style = style.Background(Color(SelectionColor))
-			}
 
 			if ch == '\t' && e.X == 0 { // draw big cursor for tab
 				if ry == e.Row && cx == e.Col {
@@ -163,12 +160,6 @@ func (e *Editor) DrawEverything() {
 
 	if e.IsContentSearch {
 		e.DrawSearch(e.SearchPattern, len(e.SearchPattern))
-	}
-	if e.IsFilesSearch && !e.Dap.IsStarted {
-		e.DrawTreeSearch(e.FilesSearchPattern, len(e.FilesSearchPattern))
-	}
-	if e.Dap.IsStarted {
-		e.DrawDebugPanel()
 	}
 }
 
@@ -287,13 +278,6 @@ func (e *Editor) DrawDiagnostic() {
 func (e *Editor) DrawLineNumber(brw int, row int) {
 	var style = StyleDefault.Foreground(247)
 	if brw == e.Row { style = StyleDefault }
-
-	bps, found := e.Dap.Breakpoints[e.AbsoluteFilePath]
-	if found && Contains(bps, brw+1) {
-		style = StyleDefault.Foreground(Color(AccentColor))
-		e.Screen.SetContent(e.FilesPanelWidth+e.LINES_WIDTH/2-1, row, '●', nil, style)
-		return
-	}
 
 	lineNumber := CenterNumber(brw+1, e.LINES_WIDTH)
 	for index, char := range lineNumber {

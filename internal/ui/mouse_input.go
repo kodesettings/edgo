@@ -130,10 +130,6 @@ func (e *Editor) HandleMouse(mx int, my int, buttons ButtonMask, modifiers ModMa
 		e.IsFilesPanelMoving = false
 		return
 	}
-	if mx < e.FilesPanelWidth-3 && buttons&Button1 == 0 && !e.Dap.IsStarted {
-		e.OnFilesTree(true)
-		return
-	}
 
 	if e.Filename == "" { return }
 

@@ -145,10 +145,6 @@ func (e *Editor) OnProcessStop() {
 		time.Sleep(time.Millisecond * 300) // give a time to show 'kill' message
 	}
 
-	if e.Dap.IsStarted {
-		e.OnDebugStop()
-	}
-
 	if len(e.ProcessContent) > e.ProcessPanelHeight { // focusing
 		e.ProcessPanelScroll = len(e.ProcessContent) - e.ProcessPanelHeight + 2
 	}
