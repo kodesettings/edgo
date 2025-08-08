@@ -6,10 +6,8 @@ import (
 )
 
 func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
-	if key == KeyCtrlF && !e.IsProcessPanelFocused { e.OnSearch() }
-	if ev.Rune() == 'Y' && modifiers&ModAlt != 0 { e.OnLangLinesCount() } // alt + shift + y
-
-	if e.Filename == "" && key != KeyCtrlQ { return }
+	if key == KeyCtrlQ { e.Screen.Fini(); os.Exit(1) }  // this keybinding registered here
+	if e.Filename == "" || e.IsStartupScreen { return } // exit from function on this condition
 
 	if e.IsProcessPanelFocused {
 		e.OnProcessKeyHandle(key, ev.Rune())
@@ -22,9 +20,10 @@ func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 		e.OnCommentLine()
 		return
 	}
-	if intrune == '¨' {
-		// '¨' is option + u on Mac
-		e.OnRedo()
+
+	if ev.Rune() == 'Y' && modifiers&ModAlt != 0 {
+		// alt + shift + y
+		e.OnLangLinesCount()
 		return
 	}
 
@@ -90,10 +89,9 @@ func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 			e.Screen.Show()
 			e.OnCompletion()
 		}
-		//if ev.Rune() == '(' { e.DrawEverything(); e.Screen.Show(); e.OnSignatureHelp(); e.Screen.Clear() }
 	}
 
-	if /*key == tcell.KeyEscape ||*/ key == KeyCtrlQ { e.Screen.Fini(); os.Exit(1) }
+	if key == KeyCtrlF && !e.IsProcessPanelFocused { e.OnSearch() }
 	if key == KeyCtrlS { e.WriteFile(true) }
 	if key == KeyEnter { e.OnEnter(); return }
 	if key == KeyBackspace || key == KeyBackspace2 { e.OnDelete() }

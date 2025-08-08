@@ -58,6 +58,7 @@ type Editor struct {
 	IsColorize       bool   // colorize text is true by default
 	Update           bool   // for Screen updates,  if false it will not draw
 	IsOverlay        bool   // true if overlay is active (completion, hover, errors...)
+	IsStartupScreen  bool   // true if no file was opened
 
 	IsContentSearch   bool
 	SearchPattern     []rune // pattern for search in a buffer
@@ -97,7 +98,6 @@ type Editor struct {
 	Test       Test
 
 	TreePath *Path
-
 	HighlightElements map[int][]NodeRange
 
 	// drawingWg sync.WaitGroup
@@ -116,6 +116,7 @@ func (e *Editor) Start() {
 	if len(os.Args) == 1 {
 		// if no args, open current dir
 		e.DrawLogo()
+		e.IsStartupScreen = true
 	} else {
 		e.Filename = os.Args[1]
 		e.InputFile = e.Filename
@@ -124,6 +125,9 @@ func (e *Editor) Start() {
 			// if arg is file, open file
 			err := e.OpenFile(e.InputFile)
 			if err != nil { slog.Error(err.Error()) }
+			e.IsStartupScreen = false
+		} else {
+			e.IsStartupScreen = true
 		}
 	}
 
