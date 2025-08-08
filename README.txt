@@ -16,7 +16,7 @@ Usage
 
     edgo [filename]
 
-    # with no args it will open current directory
+    # with no args it will open startup screen
     edgo
 
 Configuration
@@ -42,10 +42,9 @@ Syntax highlighting
 Extra features
 
     Edgo provides a seamless testing experience with the ability to execute tests using
-    a simple button click. Debugging is also possible via dap protocol for go (dlv) and
-    python (debugpy). Although both the testing capability and debugging capability is
-    currently experimental, there is no guarantee that they will be included in the
-    future releases of the editor.
+    a simple button click. Whenever a unit test case is detected, a marker will appear
+    on the right side of the pane to launch the test inside the editor. This is useful
+    for novice users who would like to write test cases and validate them right away.
 
 License
 
