@@ -72,11 +72,13 @@ repeat:
 		ops = append(ops, Operation{Insert, ch, e.Row, from})
 	}
 
+	e.code = ConvertLinesToString(e.Lines)
+
 	e.Undo = append(e.Undo, ops)
 	if e.Col < 0 { e.Col = 0 }
 	e.OnDown(false)
 	e.Update = true
-	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
+	e.UpdateLsp(false, e.code)
 	e.IsContentChanged = true
 }
 
