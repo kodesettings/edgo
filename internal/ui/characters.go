@@ -43,7 +43,10 @@ func (e *Editor) InsertString(line, pos int, linestring string) {
 		ops = append(ops, Operation{Insert, ch, line, pos})
 		pos++
 	}
+
 	e.Col = pos
+
+	e.code = ConvertLinesToString(e.Lines)
 	e.Undo = append(e.Undo, ops)
 }
 
@@ -67,6 +70,8 @@ func (e *Editor) InsertLines(line, pos int, lines []string) {
 	}
 
 	e.Row--
+
+	e.code = ConvertLinesToString(e.Lines)
 	e.Undo = append(e.Undo, ops)
 }
 
@@ -123,8 +128,8 @@ func (e *Editor) InsertEnter(line, pos int) {
 	newline := append(begining, after...)
 	e.Lines = InsertTo(e.Lines, e.Row, Line{newline})
 
-	contentToString := ConvertLinesToString(e.Lines)
-	e.treeSitterHighlighter.AddCharEdit(&contentToString, e.Row, max(e.Col,0), '\n')
+	e.code = ConvertLinesToString(e.Lines)
+	e.treeSitterHighlighter.AddCharEdit(&e.code, e.Row, max(e.Col,0), '\n')
 }
 
 func (e *Editor) ShiftWithTabsToRight(line, pos int, selectedLines []int) {
@@ -140,6 +145,8 @@ func (e *Editor) ShiftWithTabsToRight(line, pos int, selectedLines []int) {
 	}
 
 	e.Selection.Sex = pos
+
+	e.code = ConvertLinesToString(e.Lines)
 	e.Undo = append(e.Undo, ops)
 }
 

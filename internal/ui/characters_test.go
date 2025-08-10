@@ -82,8 +82,6 @@ func TestInsertLines(t *testing.T) {
 	line := []string{"new line", "another line"}
 	e.InsertLines(0, 2, line)
 
-	e.code = ConvertLinesToString(e.Lines)
-
 	text := "this is a sample text"
 	expected := "this is a snew line\nanother line\nthis is a sample text"
 	assert.Equal(t, expected, e.code, "insert lines error")
@@ -176,7 +174,6 @@ func TestShiftWithTabsToRight(t *testing.T) {
 	selectedLines := e.Selection.GetSelectedLines(e.Lines)
 	e.ShiftWithTabsToRight(0, 0, selectedLines)
 
-	e.code = ConvertLinesToString(e.Lines)
 	expected = "\tthis is a sample text\n\tone more line"
 	assert.Equal(t, expected, e.code, "shift with tabs error")
 

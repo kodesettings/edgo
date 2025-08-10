@@ -39,7 +39,6 @@ func TestCutAction(t *testing.T) {
 
 	e.Cut(true)
 
-	e.code = ConvertLinesToString(e.Lines)
 	expected = "this is a sample text\nne of text"
 	assert.Equal(t, expected, e.code, "cut lines mismatch")
 
@@ -72,7 +71,6 @@ func TestDuplicateAction(t *testing.T) {
 
 	e.Duplicate()
 
-	e.code = ConvertLinesToString(e.Lines)
 	expected = "this is a sample text\nthis is a sampland another line of text to cut\none more line of text"
 	assert.Equal(t, expected, e.code, "duplicate lines mismatch")
 
