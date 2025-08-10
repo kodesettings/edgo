@@ -24,6 +24,8 @@ func TestCutAction(t *testing.T) {
 		Line{Buf: []rune("one more line of text")},
 	}
 
+	text := ConvertLinesToString(e.Lines)
+
 	e.Selection.Ssx = 0
 	e.Selection.Ssy = 1
 	e.Selection.Sex = 11
@@ -38,7 +40,14 @@ func TestCutAction(t *testing.T) {
 	e.Cut(true)
 
 	e.code = ConvertLinesToString(e.Lines)
-	assert.Equal(t, "this is a sample text\nne of text", e.code, "cut lines mismatch")
+	expected = "this is a sample text\nne of text"
+	assert.Equal(t, expected, e.code, "cut lines mismatch")
+
+	e.OnUndo()
+	assert.Equal(t, text, e.code, "undo cut lines mismatch")
+
+	e.OnRedo()
+	assert.Equal(t, expected, e.code, "redo cut lines mismatch")
 }
 
 func TestDuplicateAction(t *testing.T) {
@@ -47,6 +56,8 @@ func TestDuplicateAction(t *testing.T) {
 		Line{Buf: []rune("and another line of text to cut")},
 		Line{Buf: []rune("one more line of text")},
 	}
+
+	text := ConvertLinesToString(e.Lines)
 
 	e.Selection.Ssx = 15
 	e.Selection.Ssy = 0
@@ -64,4 +75,10 @@ func TestDuplicateAction(t *testing.T) {
 	e.code = ConvertLinesToString(e.Lines)
 	expected = "this is a sample text\nthis is a sampland another line of text to cut\none more line of text"
 	assert.Equal(t, expected, e.code, "duplicate lines mismatch")
+
+	e.OnUndo()
+	assert.Equal(t, text, e.code, "undo duplicate lines mismatch")
+
+	e.OnRedo()
+	assert.Equal(t, expected, e.code, "redo duplicate lines mismatch")
 }
