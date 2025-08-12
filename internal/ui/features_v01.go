@@ -99,6 +99,8 @@ func (e *Editor) OnSwapLinesUp() {
 	e.Lines[e.Row].Buf = line2; e.Lines[e.Row-1].Buf = line1 // swap
 	e.Row--
 
+	e.code = ConvertLinesToString(e.Lines)
+
 	e.Undo = append(e.Undo, ops)
 	e.Selection.CleanSelection()
 	e.Update = true
@@ -123,6 +125,8 @@ func (e *Editor) OnSwapLinesDown() {
 
 	e.Lines[e.Row].Buf = line2; e.Lines[e.Row+1].Buf = line1 // swap
 	e.Row++
+
+	e.code = ConvertLinesToString(e.Lines)
 
 	e.Undo = append(e.Undo, ops)
 	e.Selection.CleanSelection()
@@ -177,7 +181,10 @@ func (e *Editor) HandleSmartMoveDown() {
 		e.Col++
 	}
 
-	e.Focus(); e.OnScrollDown()
+	e.code = ConvertLinesToString(e.Lines)
+
+	e.Focus();
+	e.OnScrollDown()
 	e.Undo = append(e.Undo, ops)
 	e.Update = true
 	e.IsContentChanged = true
@@ -202,6 +209,8 @@ func (e *Editor) HandleSmartMoveUp() {
 		ops = append(ops, Operation{Insert, characterToInsert, e.Row, e.Col})
 		e.Col++
 	}
+
+	e.code = ConvertLinesToString(e.Lines)
 
 	e.Undo = append(e.Undo, ops)
 	e.Update = true
