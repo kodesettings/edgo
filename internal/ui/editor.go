@@ -65,10 +65,6 @@ type Editor struct {
 	SearchResults     []SearchResult
 	SearchResultIndex int
 
-	//filesInfo []FileInfo
-	CursorHistory     []CursorMove
-	CursorHistoryUndo []CursorMove
-
 	// process panel vars
 	ProcessPanelHeight            int
 	ProcessPanelWidth             int
@@ -253,7 +249,6 @@ func (e *Editor) Init() {
 	e.LINES_WIDTH = 6
 	e.Update = true
 	e.IsColorize = true
-	e.CursorHistory = []CursorMove{}
 	e.lsp2lang = map[string]*LspClient{}
 	e.lspver = map[string]int{}
 

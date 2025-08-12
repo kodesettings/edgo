@@ -1,7 +1,6 @@
 package ui
 
 import (
-	. "github.com/vipmax/edgo/internal/operations"
 	. "github.com/vipmax/edgo/internal/utils"
 	"github.com/atotto/clipboard"
 	. "github.com/gdamore/tcell"
@@ -215,9 +214,6 @@ func (e *Editor) HandleMouse(mx int, my int, buttons ButtonMask, modifiers ModMa
 		}
 
 		e.Col = xPosition
-		e.CursorHistory = append(e.CursorHistory,
-			CursorMove{e.AbsoluteFilePath, e.Row, e.Col, e.Y, e.X},
-		)
 
 		if e.Col < 0 { e.Col = 0 }
 		if e.Selection.Ssx < 0 { e.Selection.Ssx, e.Selection.Ssy = e.Col, e.Row }

@@ -3,7 +3,6 @@ package ui
 import (
 	. "github.com/vipmax/edgo/internal/highlighter"
 	. "github.com/vipmax/edgo/internal/lsp"
-	. "github.com/vipmax/edgo/internal/operations"
 	"github.com/vipmax/edgo/internal/search"
 	. "github.com/vipmax/edgo/internal/utils"
 	"fmt"
@@ -21,10 +20,6 @@ func (e *Editor) OnDefinition() {
 	definition, err := Lsp.Definition(e.AbsoluteFilePath, e.Row, e.Col)
 
 	if err != nil || len(definition.Result) == 0 { return }
-
-	e.CursorHistory = append(e.CursorHistory,
-		 CursorMove{e.AbsoluteFilePath, e.Row, e.Col, e.Y, e.X},
-	)
 		
 	if definition.Result[0].URI != "file://" + e.AbsoluteFilePath {
 		f := strings.Split(definition.Result[0].URI, "file://")[1]
@@ -253,8 +248,6 @@ func (e *Editor) OnReferences() {
 				if key == KeyRune { e.AddChar(ev.Rune());  e.DrawEverything(); selectionEnd = true  }
 				if key == KeyEnter {
 					selectionEnd = true
-					
-					e.CursorHistory = append(e.CursorHistory,  CursorMove{e.AbsoluteFilePath, e.Row, e.Col, e.Y, e.X})
 					referencesResult := referencesResponse.Result[selected]
 					e.applyReferences(referencesResult)
 				}

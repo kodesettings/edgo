@@ -105,7 +105,5 @@ func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 	if key == KeyF22 { e.OnProcessRun(true) }
 	if key == KeyCtrlZ { e.OnUndo() }
 	if key == KeyCtrlY { e.OnRedo() }
-	if key == KeyCtrlO { e.OnCursorBack() }
-	if key == KeyCtrlRightSq { e.OnCursorBackUndo() }
 	if key == KeyCtrlSpace { e.OnCompletion() }
 }

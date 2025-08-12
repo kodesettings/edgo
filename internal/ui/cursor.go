@@ -1,9 +1,5 @@
 package ui
 
-import (
-	. "github.com/vipmax/edgo/internal/operations"
-)
-
 func (e *Editor) Focus() {
 	if e.Row > e.Y + e.ROWS { e.Y = e.Row + e.ROWS }
 	if e.Row < e.Y { e.Y = e.Row }
@@ -45,42 +41,4 @@ func (e *Editor) FocusProcessPanel() {
 	if e.ProcessPanelCursorY - e.ProcessPanelScroll > centerRow {
 		e.ProcessPanelScroll += e.ProcessPanelCursorY - e.ProcessPanelScroll - centerRow
 	}
-}
-
-func (e *Editor) OnCursorBackUndo() {
-	if len(e.CursorHistoryUndo) == 0 { return }
-
-	lastCursor := e.CursorHistoryUndo[len(e.CursorHistoryUndo)-1]
-	e.CursorHistoryUndo = e.CursorHistoryUndo[:len(e.CursorHistoryUndo)-1]
-
-
-	if lastCursor.Filename != e.Filename {
-		e.OpenFile(lastCursor.Filename)
-	}
-
-	e.Row = lastCursor.Row
-	e.Col = lastCursor.Col
-	e.Y = lastCursor.Y
-	e.X = lastCursor.X
-	e.Focus()
-	e.CursorHistory = append(e.CursorHistory, lastCursor)
-}
-func (e *Editor) OnCursorBack() {
-	if len(e.CursorHistory) == 0 { return }
-
-	lastCursor := e.CursorHistory[len(e.CursorHistory)-1]
-	e.CursorHistory = e.CursorHistory[:len(e.CursorHistory)-1]
-	e.CursorHistoryUndo = append(e.CursorHistoryUndo,
-		 CursorMove{e.AbsoluteFilePath, e.Row, e.Col, e.Y, e.X},
-	)
-
-	if lastCursor.Filename != e.Filename {
-		e.OpenFile(lastCursor.Filename)
-	}
-
-	e.Row = lastCursor.Row
-	e.Col = lastCursor.Col
-	e.Y = lastCursor.Y
-	e.X = lastCursor.X
-	e.Focus()
 }
