@@ -80,3 +80,39 @@ func TestDuplicateAction(t *testing.T) {
 	e.OnRedo()
 	assert.Equal(t, expected, e.code, "redo duplicate lines mismatch")
 }
+
+func TestUndoRedoStack(t *testing.T) {
+	e.Lines = []Line{Line{Buf: []rune{}}}
+
+	e.Row = 0
+	e.Col = 0
+
+	apply_highlighter(e.Lines, "", "")
+
+	e.AddChar('a')
+	e.AddChar('b')
+	e.AddChar('c')
+	e.AddChar('d')
+
+	expected := "abcd"
+	assert.Equal(t, expected, e.code, "added characters error")
+
+	e.OnUndo()
+	assert.Equal(t, "abc", e.code, "undo stack mismatch")
+	e.OnUndo()
+	assert.Equal(t, "ab", e.code, "undo stack mismatch")
+	e.OnUndo()
+	e.OnUndo()
+	e.OnUndo()
+	assert.Equal(t, "", e.code, "undo stack mismatch")
+
+	e.OnUndo()
+	e.OnRedo()
+	assert.Equal(t, "a", e.code, "redo stack mismatch")
+
+	e.OnRedo()
+	e.OnRedo()
+	e.OnRedo()
+	e.OnRedo()
+	assert.Equal(t, "abcd", e.code, "redo stack mismatch")
+}
