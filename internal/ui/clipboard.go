@@ -65,14 +65,13 @@ func (e *Editor) Cut(isCopySelected bool) {
 
 	// Sort selectedIndices in reverse order to delete characters from the end
 	index := len(selectedIndices) - 1
-repeat:
+cut:
 	indices := selectedIndices[index]
 	xd := indices[0]
 	yd := indices[1]
 	e.Col, e.Row = xd, yd
 
-	if len(e.Lines[yd].Buf) > 0 {
-		// Delete the character at index (x, j)
+	if len(e.Lines[yd].Buf) > 0 { // delete the character at index (x, j)
 		ch := e.Lines[yd].Buf[xd]
 		ops = append(ops, Operation{Delete, ch, yd, xd})
 		e.Lines[yd].Buf = append(e.Lines[yd].Buf[:xd], e.Lines[yd].Buf[xd+1:]...)
@@ -88,7 +87,7 @@ repeat:
 		e.Lines = append(e.Lines[:yd], e.Lines[yd+1:]...)
 	}
 
-	if index > 0 { index--; goto repeat; }
+	if index > 0 { index--; goto cut; }
 
 	e.code = ConvertLinesToString(e.Lines)
 	e.treeSitterHighlighter.UpdateCharsEdit(&e.code, fromRow, fromCol, e.Row, e.Col)
@@ -165,22 +164,24 @@ func (e *Editor) OnUndo() {
 	fromRow := e.Row
 
 	index := len(lastOperation) - 1
-repeat:
+undo:
 	o := lastOperation[index]
 
-	if o.Action == Insert {
+	switch o.Action {
+	case Insert:
 		e.Row = o.Line; e.Col = o.Column
 		e.Lines[e.Row].Buf = append(e.Lines[e.Row].Buf[:e.Col], e.Lines[e.Row].Buf[e.Col+1:]...)
-	} else if o.Action == Delete {
+	break;
+	case Delete:
 		e.Row = o.Line; e.Col = o.Column
 		e.Lines[e.Row].Buf = InsertTo(e.Lines[e.Row].Buf, e.Col, o.Char)
-	} else if o.Action == Enter {
-		// Merge lines
+	break;
+	case Enter: // Merge lines
 		e.Lines[o.Line].Buf = append(e.Lines[o.Line].Buf, e.Lines[o.Line+1].Buf...)
 		e.Lines = append(e.Lines[:o.Line+1], e.Lines[o.Line+2:]...)
 		e.Row = o.Line; e.Col = o.Column
-	} else if o.Action == DeleteLine {
-		// Insert enter
+	break;
+	case DeleteLine: // Insert enter
 		e.Row = o.Line; e.Col = o.Column
 		after := e.Lines[e.Row].Buf[e.Col:]
 		before := e.Lines[e.Row].Buf[:e.Col]
@@ -188,11 +189,13 @@ repeat:
 		e.Row++; e.Col = 0
 		newline := append([]rune{}, after...)
 		e.Lines = InsertTo(e.Lines, e.Row, Line{newline})
-	} else if o.Action == MoveCursor {
+	break;
+	case MoveCursor:
 		e.Row = o.Line; e.Col = o.Column
+	break;
 	}
 
-	if index > 0 { index--; goto repeat; }
+	if index > 0 { index--; goto undo; }
 
 	e.code = ConvertLinesToString(e.Lines)
 	e.treeSitterHighlighter.UpdateCharsEdit(&e.code, fromRow, fromCol, e.Row, e.Col)
@@ -212,17 +215,20 @@ func (e *Editor) OnRedo() {
 	fromRow := e.Row
 
 	index := 0
-repeat:
+redo:
 	o := lastRedoOperation[index]
 
-	if o.Action == Insert {
+	switch o.Action {
+	case Insert:
 		e.Row = o.Line; e.Col = o.Column
 		e.Lines[e.Row].Buf = InsertTo(e.Lines[e.Row].Buf, e.Col, o.Char)
 		e.Col++
-	} else if o.Action == Delete {
+	break;
+	case Delete:
 		e.Row = o.Line; e.Col = o.Column
 		e.Lines[e.Row].Buf = append(e.Lines[e.Row].Buf[:e.Col], e.Lines[e.Row].Buf[e.Col+1:]...)
-	} else if o.Action == Enter {
+	break;
+	case Enter:
 		e.Row = o.Line; e.Col = o.Column
 		after := e.Lines[e.Row].Buf[e.Col:]
 		before := e.Lines[e.Row].Buf[:e.Col]
@@ -230,16 +236,18 @@ repeat:
 		e.Row++; e.Col = 0
 		newline := append([]rune{}, after...)
 		e.Lines = InsertTo(e.Lines, e.Row, Line{newline})
-	} else if o.Action == DeleteLine {
-		// Merge lines
+	break;
+	case DeleteLine: // Merge lines
 		e.Lines[o.Line].Buf = append(e.Lines[o.Line].Buf, e.Lines[o.Line+1].Buf...)
 		e.Lines = append(e.Lines[:o.Line+1], e.Lines[o.Line+2:]...)
 		e.Row = o.Line; e.Col = o.Column
-	} else if o.Action == MoveCursor {
+	break;
+	case MoveCursor:
 		e.Row = o.Line; e.Col = o.Column
+	break;
 	}
 
-	if index < len(lastRedoOperation) - 1 { index++; goto repeat; }
+	if index < len(lastRedoOperation) - 1 { index++; goto redo; }
 
 	e.code = ConvertLinesToString(e.Lines)
 	e.treeSitterHighlighter.UpdateCharsEdit(&e.code, fromRow, fromCol, e.Row, e.Col)
