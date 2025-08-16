@@ -17,7 +17,7 @@ func apply_highlighter(lines []Line, theme string, lang string) {
 	e.treeSitterHighlighter.Parse(&e.code)
 }
 
-func TestCutAction(t *testing.T) {
+func TestCutActionPosition(t *testing.T) {
 	e.Lines = []Line{
 		Line{Buf: []rune("this is a sample text")},
 		Line{Buf: []rune("and another line of text to cut")},
@@ -40,6 +40,38 @@ func TestCutAction(t *testing.T) {
 	e.Cut(true)
 
 	expected = "this is a sample text\nne of text"
+	assert.Equal(t, expected, e.code, "cut lines mismatch")
+
+	e.OnUndo()
+	assert.Equal(t, text, e.code, "undo cut lines mismatch")
+
+	e.OnRedo()
+	assert.Equal(t, expected, e.code, "redo cut lines mismatch")
+}
+
+func TestCutActionLinesOnly(t *testing.T) {
+	e.Lines = []Line{
+		Line{Buf: []rune("this is a sample text")},
+		Line{Buf: []rune("and another line of text to cut")},
+		Line{Buf: []rune("one more line of text")},
+	}
+
+	text := ConvertLinesToString(e.Lines)
+
+	e.Selection.Ssx = 0
+	e.Selection.Ssy = 1
+	e.Selection.Sex = 0
+	e.Selection.Sey = 3
+
+	got := e.Selection.GetSelectionString(e.Lines)
+	expected := "and another line of text to cut\none more line of text"
+	assert.Equal(t, expected, got, "selection of string error")
+
+	apply_highlighter(e.Lines, "", "")
+
+	e.Cut(true)
+
+	expected = "this is a sample text"
 	assert.Equal(t, expected, e.code, "cut lines mismatch")
 
 	e.OnUndo()

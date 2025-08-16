@@ -15,7 +15,6 @@ func TestAddChar(t *testing.T) {
 	e.Col = 11
 
 	apply_highlighter(e.Lines, "", "")
-
 	e.AddChar('g')
 
 	text := "this is a sample text"
@@ -35,8 +34,9 @@ func TestInsertCharacter(t *testing.T) {
 	}
 
 	e.Row = 0
-	e.Col = 11
+	e.Col = 2
 
+	apply_highlighter(e.Lines, "", "")
 	e.InsertCharacter(0, 2, 'f')
 
 	text := "this is a sample text"
@@ -58,6 +58,7 @@ func TestInsertString(t *testing.T) {
 	e.Row = 0
 	e.Col = 11
 
+	apply_highlighter(e.Lines, "", "")
 	e.InsertString(0, 2, "some")
 
 	text := "this is a sample text"
@@ -78,6 +79,8 @@ func TestInsertLines(t *testing.T) {
 
 	e.Row = 0
 	e.Col = 11
+
+	apply_highlighter(e.Lines, "", "")
 
 	line := []string{"new line", "another line"}
 	e.InsertLines(0, 2, line)
@@ -101,6 +104,7 @@ func TestDeleteCharacter(t *testing.T) {
 	e.Row = 0
 	e.Col = 11
 
+	apply_highlighter(e.Lines, "", "")
 	e.DeleteCharacter(0, 2)
 
 	text := "this is a sample text"
@@ -117,11 +121,13 @@ func TestDeleteCharacter(t *testing.T) {
 func TestDeleteLine(t *testing.T) {
 	e.Lines = []Line{
 		Line{Buf: []rune("this is a sample text")},
-		Line{Buf: []rune("\n")},
+		Line{Buf: []rune("")},
 	}
 
 	text := "this is a sample text\n"
 	expected := "this is a sample text"
+
+	apply_highlighter(e.Lines, "", "")
 
 	assert.Equal(t, 2, len(e.Lines), "delete line error")
 	e.DeleteLine(1, 0)
@@ -137,11 +143,13 @@ func TestDeleteLine(t *testing.T) {
 func TestInsertEnter(t *testing.T) {
 	e.Lines = []Line{
 		Line{Buf: []rune("this is a sample text")},
-		Line{Buf: []rune("\n")},
+		Line{Buf: []rune("")},
 	}
 
 	text := "this is a sample text\n"
 	expected := "this is a sample text\n\n"
+
+	apply_highlighter(e.Lines, "", "")
 
 	assert.Equal(t, 2, len(e.Lines), "insert enter error")
 	e.InsertEnter(1, 0)
@@ -160,21 +168,21 @@ func TestShiftWithTabsToRight(t *testing.T) {
 		Line{Buf: []rune("one more line")},
 	}
 
-	text := ConvertLinesToString(e.Lines)
-
 	e.Selection.Ssx = 0
 	e.Selection.Ssy = 0
 	e.Selection.Sex = 0
 	e.Selection.Sey = 2
 
 	got := e.Selection.GetSelectionString(e.Lines)
-	expected := "this is a sample text\none more line"
-	assert.Equal(t, expected, got, "selection of string error")
+	text := "this is a sample text\none more line"
+	assert.Equal(t, text, got, "selection of string error")
+
+	apply_highlighter(e.Lines, "", "")
 
 	selectedLines := e.Selection.GetSelectedLines(e.Lines)
 	e.ShiftWithTabsToRight(0, 0, selectedLines)
 
-	expected = "\tthis is a sample text\n\tone more line"
+	expected := "\tthis is a sample text\n\tone more line"
 	assert.Equal(t, expected, e.code, "shift with tabs error")
 
 	e.OnUndo()
