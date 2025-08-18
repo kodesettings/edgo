@@ -48,7 +48,6 @@ func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 	if key == KeyCtrlL { e.GoToLine(); return }
 
 	if modifiers&ModShift != 0 && (key == KeyRight || key == KeyLeft || key == KeyUp || key == KeyDown) {
-
 		if e.Selection.Ssx < 0 { e.Selection.Ssx, e.Selection.Ssy = e.Col, e.Row }
 		if key == KeyRight { e.OnRight() }
 		if key == KeyLeft { e.OnLeft() }
@@ -61,24 +60,12 @@ func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 		return
 	}
 
-	if key == KeyRune && modifiers&ModAlt != 0 && len(e.Lines) > 0 {
-		e.HandleSmartMove(ev.Rune())
-		return
-	}
-
-	if modifiers&ModAlt != 0 && (int(ev.Key()) == 259 || int(ev.Key()) == 260) && len(e.Lines) > 0 {
-		e.HandleSmartMoveAlac(int(ev.Key()))
-		return
-	}
-
 	if key == KeyDown && modifiers&ModAlt != 0 {
 		e.OnSelectLessAtCursor()
-		//e.HandleSmartMoveDown();
 		return
 	}
 	if key == KeyUp && modifiers&ModAlt != 0 {
 		e.OnSelectMoreAtCursor()
-		//e.HandleSmartMoveUp();
 		return
 	}
 
