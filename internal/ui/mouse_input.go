@@ -2,7 +2,6 @@ package ui
 
 import (
 	. "github.com/vipmax/edgo/internal/utils"
-	"github.com/atotto/clipboard"
 	. "github.com/gdamore/tcell"
 )
 
@@ -41,10 +40,7 @@ func (e *Editor) HandleMouse(mx int, my int, buttons ButtonMask, modifiers ModMa
 	}
 
 	// detect process panel drag start event
-	if !e.IsProcessPanelMoving && buttons&Button1 == 1 &&
-		my == e.ROWS && e.ProcessPanelHeight > 0 &&
-		len(e.ProcessPanelSelection.GetSelectedLines(e.ProcessContent)) == 0 {
-
+	if !e.IsProcessPanelMoving && buttons&Button1 == 1 && my == e.ROWS && e.ProcessPanelHeight > 0 {
 		e.ROWS = my
 		e.ProcessPanelHeight = screenRows - e.ROWS
 		e.IsProcessPanelMoving = true
@@ -73,40 +69,6 @@ func (e *Editor) HandleMouse(mx int, my int, buttons ButtonMask, modifiers ModMa
 		}
 		if buttons&WheelUp != 0 && e.ProcessPanelScroll > 0 {
 			e.ProcessPanelScroll--
-		}
-
-		if buttons&Button1 == 1 {
-			if mx < e.ProcessPanelSpacing { return }
-			e.ProcessPanelCursorX = mx + e.ProcessPanelHScroll - e.ProcessPanelSpacing
-			e.ProcessPanelCursorY = my + e.ProcessPanelScroll - e.ROWS - 1
-
-			if e.ProcessPanelCursorY < 0 { e.ProcessPanelCursorY = 0 }
-			// fit cursor
-			if e.ProcessPanelCursorY >= len(e.ProcessContent) {
-				e.ProcessPanelCursorY = len(e.ProcessContent) - 1
-			}
-			if e.ProcessPanelCursorY < len(e.ProcessContent) && e.ProcessPanelCursorX > len(e.ProcessContent[e.ProcessPanelCursorY].Buf) {
-				e.ProcessPanelCursorX = len(e.ProcessContent[e.ProcessPanelCursorY].Buf)
-			}
-
-			if e.ProcessPanelSelection.Ssx < 0 {
-				e.ProcessPanelSelection.Ssx, e.ProcessPanelSelection.Ssy =
-					e.ProcessPanelCursorX, e.ProcessPanelCursorY
-			}
-			if e.ProcessPanelSelection.Ssx >= 0 {
-				e.ProcessPanelSelection.Sex, e.ProcessPanelSelection.Sey =
-					e.ProcessPanelCursorX, e.ProcessPanelCursorY
-			}
-			return
-		}
-
-		if buttons&Button1 == 0 {
-			if e.ProcessPanelSelection.IsSelectionNonEmpty() {
-				selectionString := e.ProcessPanelSelection.GetSelectionString(e.ProcessContent)
-				clipboard.WriteAll(selectionString)
-			}
-
-			e.ProcessPanelSelection.CleanSelection()
 		}
 
 		return
