@@ -9,19 +9,21 @@ import (
 	"strings"
 	"time"
 	"unicode/utf8"
+	"log/slog"
 )
 
 func (e *Editor) DrawEverything() {
-	 // Lock the mutex to ensure exclusive access to the method
-    e.mu.Lock()
+    e.mu.Lock()  // Lock the mutex to ensure exclusive access to the method
     defer e.mu.Unlock() // Ensure the mutex is unlocked when the method exits
-    
-	e.Screen.Clear()
+    e.Screen.Clear() // Clearing the terminal screen before opening anything
 
+	if e.code != nil { e.Lines = GetLinesArrayFromData(e.code.Value(), 0) }
 	if len(e.Lines) == 0 { e.DrawLogo(); return }
 	if e.Update == false { return }
 
-	countTabsTo := CountTabsTo(e.Lines[e.Row].Buf, e.Col)
+	slog.Info("get", "datalen", e.code.Len(), "lines", len(e.Lines))
+
+	countTabsTo := CountTabsTo(e.code.Value(), e.Row + e.Col)
 	tabcor := countTabsTo * (e.langTabWidth - 1)
 
 	if e.Col < e.X { e.X = e.Col }
@@ -37,14 +39,14 @@ func (e *Editor) DrawEverything() {
 	*/
 
 	start := time.Now()
-	coloredByteRanges := e.treeSitterHighlighter.ColorRanges(e.Y, e.Y+e.TERMINAL_HEIGHT, []byte(e.code))
+	coloredByteRanges := e.treeSitterHighlighter.ColorRanges(e.Y, e.Y+e.TERMINAL_HEIGHT, e.code.Value())
 
 	bytesCounter := 0
 
 	if e.Y > 0 { //  if scrolling needs to recalculate bytesCounter offset
 		newlineCount := 0
-		for _, c := range e.code {
-			bytesCounter += utf8.RuneLen(c)
+		for _, c := range e.code.Value() {
+			bytesCounter += utf8.RuneLen(rune(c))
 			if c == '\n' { newlineCount++ }
 			if newlineCount == e.Y { break }
 		}
@@ -101,7 +103,7 @@ func (e *Editor) DrawEverything() {
 
 		if hightlightElements, found := e.HighlightElements[ry]; found && e.X == 0 {
 			for _, helement := range hightlightElements {
-				tabs := CountTabsTo(e.Lines[helement.Ssy].Buf, helement.Ssx)
+				tabs := CountTabsTo(e.code.Value(), helement.Ssy + helement.Ssx)
 				tabcorrection := tabs * (e.langTabWidth - 1)
 				skip := false
 				for i := helement.Ssx; !skip && i < helement.Sex; i++ {
@@ -132,7 +134,7 @@ func (e *Editor) DrawEverything() {
 	if e.Row < len(e.Lines) && e.Col < len(e.Lines[e.Row].Buf) && e.Lines[e.Row].Buf[e.Col] == '\t' {
 		e.Screen.HideCursor()
 	} else {
-		tabs := CountTabsTo(e.Lines[e.Row].Buf, e.Col) * (e.langTabWidth - 1)
+		tabs := CountTabsTo(e.code.Value(), e.Row + e.Col) * (e.langTabWidth - 1)
 		e.Screen.ShowCursor(e.Col-e.X+e.LINES_WIDTH+tabs, e.Row-e.Y) // show cursor
 		if e.X != 0 {
 			e.Screen.ShowCursor(e.Col-e.X+e.LINES_WIDTH, e.Row-e.Y) // show cursor
@@ -241,7 +243,7 @@ func (e *Editor) DrawDiagnostic() {
 			if dline >= len(e.Lines) { continue } // sometimes it out of e.Content
 			if dline-e.Y > e.ROWS { continue } // sometimes it out of e.Content
 
-			tabs := CountTabs(e.Lines[dline].Buf, len(e.Lines[dline].Buf))
+			tabs := CountTabs(e.code.Value(), dline + len(e.Lines[dline].Buf))
 			var shifty = 0
 			errorMessage := "error: " + diagnostic.Message
 			errorMessage = PadLeft(errorMessage, e.COLUMNS-len(e.Lines[dline].Buf)-tabs*e.langTabWidth-5-e.LINES_WIDTH)
@@ -251,7 +253,7 @@ func (e *Editor) DrawDiagnostic() {
 				ypos := dline - e.Y
 				if ypos < 0 || ypos >= len(e.Lines) { break }
 
-				tabs = CountTabs(e.Lines[dline].Buf, len(e.Lines[dline].Buf))
+				tabs = CountTabs(e.code.Value(), dline + len(e.Lines[dline].Buf))
 				xpos := i + e.LINES_WIDTH + len(e.Lines[dline+shifty].Buf) + tabs*e.langTabWidth + 5
 
 				e.Screen.SetContent(xpos, ypos, m, nil, style)

@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
-	"strings"
+	"bytes"
 )
 
 func Max(x, y int) int {
@@ -157,16 +157,24 @@ func ReadFileToString(filePath string) (string, error) {
 	return string(filecontent), nil
 }
 
-func ConvertLinesToString(lines []Line) string {
-	var result strings.Builder
-	for i, line := range lines {
-		for _, ch := range line.Buf { result.WriteRune(ch) }
-		if i != len(lines) - 1 { result.WriteByte('\n') }
+func GetLinesArrayFromData(data []byte, lineNum int) []Line {
+	if lineNum == 0 { lineNum = CountNewLines(data) }
+	var lines []Line = make([]Line, lineNum)
+	var row int = 0
+	for _, b := range data {
+		if b == '\n' {
+			row++
+			continue
+		} else if row == lineNum {
+			break
+		} else {
+			lines[row].Buf = append(lines[row].Buf, rune(b))
+		}
 	}
-	return result.String()
+	return lines
 }
 
-func CountNewlines(data []byte) int {
+func CountNewLines(data []byte) int {
 	newlineCount := 0
 	for _, b := range data {
 		if b == '\n' {
@@ -176,7 +184,7 @@ func CountNewlines(data []byte) int {
 	return newlineCount
 }
 
-func CountTabs(str []rune, stopIndex int) int {
+func CountTabs(str []byte, stopIndex int) int {
 	if stopIndex == 0 { return 0 }
 
 	count := 0
@@ -187,7 +195,7 @@ func CountTabs(str []rune, stopIndex int) int {
 	return count
 }
 
-func CountTabsTo(str []rune, stopIndex int) int {
+func CountTabsTo(str []byte, stopIndex int) int {
 	if stopIndex == 0 { return 0 }
 
 	count := 0
@@ -198,7 +206,7 @@ func CountTabsTo(str []rune, stopIndex int) int {
 	return count
 }
 
-func CountSpaces(str []rune, stopIndex int) int {
+func CountSpaces(str []byte, stopIndex int) int {
 	if stopIndex == 0 { return 0 }
 
 	count := 0
@@ -273,13 +281,13 @@ func PadLeft(str string, length int) string {
 	return fmt.Sprintf(format, str)
 }
 
-func GetFirstLines(s string, lineNum int) (string, error) {
-	scanner := bufio.NewScanner(strings.NewReader(s))
+func GetFirstLines(s []byte, lineNum int) ([]byte, error) {
+	scanner := bufio.NewScanner(bytes.NewReader(s))
 	count := 0
-	var builder strings.Builder
+	var buffer bytes.Buffer
 	for scanner.Scan() {
-		builder.WriteString(scanner.Text())
-		builder.WriteString("\n")
+		buffer.WriteString(scanner.Text())
+		buffer.WriteString("\n")
 		count++
 		if count == lineNum {
 			break
@@ -288,10 +296,25 @@ func GetFirstLines(s string, lineNum int) (string, error) {
 
 	if scanner.Err() != nil {
 		// handle error.
-		return "", scanner.Err()
+		return []byte{}, scanner.Err()
 	}
 
-	return builder.String(), nil
+	return buffer.Bytes(), nil
+}
+
+func LineOffset(text []byte, lineNum int) int {
+	index := 0
+	for i, ch := range text {
+		if ch == '\n' {
+			index++
+		}
+
+		if index == lineNum {
+			return i // start of next line
+		}
+	}
+
+	return len(text) // end of text
 }
 
 func IsIgnored(path string, ignorePatterns []string) bool {

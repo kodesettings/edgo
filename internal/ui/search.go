@@ -18,7 +18,7 @@ func (e *Editor) OnSearch() {
 	var end = false
 	if e.SearchPattern == nil { e.SearchPattern = []rune{} }
 	if e.Selection.IsSelectionNonEmpty() {
-		e.SearchPattern = []rune(e.Selection.GetSelectionString(e.Lines))
+		e.SearchPattern = []rune(e.Selection.GetSelectionString(e.code.Value()))
 		e.SearchResults = Search(e.Lines, string(e.SearchPattern))
 		e.SearchResultIndex = 0
 	}

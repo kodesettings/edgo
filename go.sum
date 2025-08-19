@@ -81,6 +81,8 @@ github.com/tree-sitter/tree-sitter-ruby v0.23.1 h1:T/NKHUA+iVbHM440hFx+lzVOzS4dV
 github.com/tree-sitter/tree-sitter-ruby v0.23.1/go.mod h1:kUS4kCCQloFcdX6sdpr8p6r2rogbM6ZjTox5ZOQy8cA=
 github.com/tree-sitter/tree-sitter-rust v0.24.0 h1:nr3ga5ThXyPR5n/DiMq4Zh3e8pMR+sfzk088QE809+g=
 github.com/tree-sitter/tree-sitter-rust v0.24.0/go.mod h1:hfeGWic9BAfgTrc7Xf6FaOAguCFJRo3RBbs7QJ6D7MI=
+github.com/zyedidia/rope v0.0.0-20210616205215-37fbf22eab3a h1:+VbuFCNAjzVffErUlm0TIAZClFxFZwJ1il6qtWrnIg8=
+github.com/zyedidia/rope v0.0.0-20210616205215-37fbf22eab3a/go.mod h1:IKo1js3O2gdESAUH9F3B33wlrRBnpJMJR/gXyY0a3ho=
 golang.org/x/sys v0.0.0-20190626150813-e07cf5db2756/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.13.0 h1:Af8nKPmuFypiUBjVoU9V20FiaFXOcuZI21p0ycVYYGE=
 golang.org/x/sys v0.13.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=

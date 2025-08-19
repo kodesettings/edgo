@@ -142,8 +142,8 @@ func (h *TreeSitterHighlighter) matchExpression(expression string, fullexpressio
 	The StartPosition, OldEndPosition, and NewEndPosition parameters indicate the range of positions (line, column) affected by the edit.
 */
 
-func (h *TreeSitterHighlighter) AddCharEdit(code *string, row int, col int, ch rune) {
-	StartIndex := GetStartIndex(code, row, col)
+func (h *TreeSitterHighlighter) AddCharEdit(code []byte, row int, col int, ch rune) {
+	StartIndex := GetStartIndex(&code, row, col)
 	runeLen := uint(utf8.RuneLen(ch))
 
 	editInput := sitter.InputEdit{
@@ -155,11 +155,11 @@ func (h *TreeSitterHighlighter) AddCharEdit(code *string, row int, col int, ch r
 		NewEndPosition: sitter.Point{Row: 0, Column: 0},
 	}
 	if h.tree != nil { h.tree.Edit(&editInput) }
-	h.tree = h.parser.ParseCtx(context.Background(), []byte(*code), h.tree)
+	h.tree = h.parser.ParseCtx(context.Background(), code, h.tree)
 }
 
-func (h *TreeSitterHighlighter) RemoveCharEdit(code *string, row int, col int, ch rune) {
-	StartIndex := GetStartIndex(code, row, col)
+func (h *TreeSitterHighlighter) RemoveCharEdit(code []byte, row int, col int, ch rune) {
+	StartIndex := GetStartIndex(&code, row, col)
 	Row := uint(row); Column := uint(col)
 	runeLen := uint(utf8.RuneLen(ch))
 
@@ -172,12 +172,12 @@ func (h *TreeSitterHighlighter) RemoveCharEdit(code *string, row int, col int, c
 		NewEndPosition: sitter.Point{Row: Row, Column: Column},
 	}
 	if h.tree != nil { h.tree.Edit(&editInput) }
-	h.tree = h.parser.ParseCtx(context.Background(), []byte(*code), h.tree)
+	h.tree = h.parser.ParseCtx(context.Background(), code, h.tree)
 }
 
-func (h *TreeSitterHighlighter) UpdateCharsEdit(code *string, row int, col int, nrow int, ncol int) {
-	StartIndex1 := GetStartIndex(code, row, col)
-	StartIndex2 := GetStartIndex(code, nrow, ncol)
+func (h *TreeSitterHighlighter) UpdateCharsEdit(code []byte, row int, col int, nrow int, ncol int) {
+	StartIndex1 := GetStartIndex(&code, row, col)
+	StartIndex2 := GetStartIndex(&code, nrow, ncol)
 	Row1 := uint(row); Column1 := uint(col)
 	Row2 := uint(nrow); Column2 := uint(ncol)
 
@@ -191,13 +191,13 @@ func (h *TreeSitterHighlighter) UpdateCharsEdit(code *string, row int, col int, 
 		NewEndPosition: sitter.Point{Row: Row1, Column: Column1},
 	}
 	if h.tree != nil { h.tree.Edit(&editInput) }
-	h.tree = h.parser.ParseCtx(context.Background(), []byte(*code), nil)
+	h.tree = h.parser.ParseCtx(context.Background(), code, nil)
 }
 
-func GetStartIndex(code *string, row int, col int) uint {
+func GetStartIndex(code *[]byte, row int, col int) uint {
 	r, c, startIndex := 0, 0, 0
 	for _, char := range *code {
-		runeLen := utf8.RuneLen(char)
+		runeLen := utf8.RuneLen(rune(char))
 
 		if r == row && c == col {
 			break
@@ -216,8 +216,8 @@ func GetStartIndex(code *string, row int, col int) uint {
 
 func Use(vals ...interface{}) { }
 
-func (h *TreeSitterHighlighter) Parse(code *string) {
-	tree := h.parser.ParseCtx(context.Background(), []byte(*code), h.tree)
+func (h *TreeSitterHighlighter) Parse(code []byte) {
+	tree := h.parser.ParseCtx(context.Background(), code, h.tree)
 	h.tree = tree
 }
 

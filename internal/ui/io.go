@@ -5,14 +5,15 @@ import (
 	. "github.com/vipmax/edgo/internal/utils"
 	"fmt"
 	"os"
+	"bytes"
 )
 
-func (e *Editor) ReadFile(fileToRead string) string {
+func (e *Editor) ReadFile(fileToRead string) []byte {
 	/// if file is big, read only first 1000 lines and read rest async
 	fileSize := GetFileSize(fileToRead)
 	fileSizeMB := fileSize / (1024 * 1024) // Convert size to megabytes
 
-	var code string
+	var code []byte
 	if fileSizeMB >= 1 {
 		//colorize = false
 		code = e.BuildContent(fileToRead, 1000)
@@ -23,7 +24,6 @@ func (e *Editor) ReadFile(fileToRead string) string {
 			e.DrawEverything()
 			e.Screen.Show()
 		}()
-
 	} else {
 		code = e.BuildContent(fileToRead, 1000000)
 	}
@@ -57,13 +57,8 @@ func (e *Editor) WriteFile(saveFile bool) {
 
 	if !saveFile { f.Close(); goto update }
 
-	for _, line := range e.Lines {
-		for j := 0; j < len(line.Buf); {
-			if _, err := w.WriteRune(line.Buf[j]); err != nil { panic(err) }
-			j++
-		}
-
-		if _, err := w.WriteRune('\n'); err != nil { panic(err) }
+	for _, ch := range e.code.Value() {
+		if err := w.WriteByte(ch); err != nil { panic(err) }
 	}
 
 	// Don't forget to flush the buffered writer to ensure all data is written
@@ -72,10 +67,10 @@ func (e *Editor) WriteFile(saveFile bool) {
 
 	e.IsContentChanged = false
 update:
-	e.UpdateLsp(true, ConvertLinesToString(e.Lines))
+	e.UpdateLsp(true, string(e.code.Value()))
 }
 
-func (e *Editor) BuildContent(filename string, limit int) string {
+func (e *Editor) BuildContent(filename string, limit int) []byte {
 	file, err := os.Open(filename)
 	if err != nil {
 		filec, err2 := os.Create(filename)
@@ -85,23 +80,17 @@ func (e *Editor) BuildContent(filename string, limit int) string {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
+	lines := 0
 
-	e.Lines = make([]Line, 0)
-
+	var buffer bytes.Buffer
 	for scanner.Scan() {
 		var line = scanner.Text()
-		var lineChars = []rune{}
-		for _, char := range line { lineChars = append(lineChars, char) }
-		e.Lines = append(e.Lines, Line{lineChars})
-		if len(e.Lines) > limit { break }
+		buffer.WriteString(line + "\n")
+		if lines > limit { break }
+		lines++
 	}
 
-	// if no e.Content, consider it like one Line for next editing
-	if e.Lines == nil || len(e.Lines) == 0 {
-		e.Lines = make([]Line, 1)
-	}
-
-	return ConvertLinesToString(e.Lines)
+	return buffer.Bytes()
 }
 
 func (e *Editor) ReadContent(filename string, fromline int, toline int) []Line {

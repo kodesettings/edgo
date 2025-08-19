@@ -2,204 +2,174 @@ package ui
 
 import (
 	"testing"
-	. "github.com/vipmax/edgo/internal/utils"
+	"github.com/zyedidia/rope"
 	assert "github.com/stretchr/testify/assert"
 )
 
 func TestAddChar(t *testing.T) {
-	e.Lines = []Line{
-		Line{Buf: []rune("this is a sample text")},
-	}
+	e.code = rope.New([]byte("this is a sample text"))
 
 	e.Row = 0
 	e.Col = 11
 
-	apply_highlighter(e.Lines, "", "")
+	apply_highlighter(e.code.Value(), "", "")
 	e.AddChar('g')
 
 	text := "this is a sample text"
 	expected := "this is a sgample text"
-	assert.Equal(t, expected, e.code, "add char error")
+	assert.Equal(t, expected, string(e.code.Value()), "add char error")
 
 	e.OnUndo()
-	assert.Equal(t, text, e.code, "undo add char mismatch")
+	assert.Equal(t, text, string(e.code.Value()), "undo add char mismatch")
 
 	e.OnRedo()
-	assert.Equal(t, expected, e.code, "redo add char mismatch")
+	assert.Equal(t, expected, string(e.code.Value()), "redo add char mismatch")
 }
 
 func TestInsertCharacter(t *testing.T) {
-	e.Lines = []Line{
-		Line{Buf: []rune("this is a sample text")},
-	}
+	e.code = rope.New([]byte("this is a sample text"))
 
 	e.Row = 0
 	e.Col = 2
 
-	apply_highlighter(e.Lines, "", "")
+	apply_highlighter(e.code.Value(), "", "")
 	e.InsertCharacter(0, 2, 'f')
 
 	text := "this is a sample text"
 	expected := "thfis is a sample text"
-	assert.Equal(t, expected, e.code, "insert character error")
+	assert.Equal(t, expected, string(e.code.Value()), "insert character error")
 
 	e.OnUndo()
-	assert.Equal(t, text, e.code, "undo insert character mismatch")
+	assert.Equal(t, text, string(e.code.Value()), "undo insert character mismatch")
 
 	e.OnRedo()
-	assert.Equal(t, expected, e.code, "redo insert character mismatch")
+	assert.Equal(t, expected, string(e.code.Value()), "redo insert character mismatch")
 }
 
 func TestInsertString(t *testing.T) {
-	e.Lines = []Line{
-		Line{Buf: []rune("this is a sample text")},
-	}
+	e.code = rope.New([]byte("this is a sample text"))
 
 	e.Row = 0
 	e.Col = 11
 
-	apply_highlighter(e.Lines, "", "")
+	apply_highlighter(e.code.Value(), "", "")
 	e.InsertString(0, 2, "some")
 
 	text := "this is a sample text"
 	expected := "thsomeis is a sample text"
-	assert.Equal(t, expected, e.code, "insert string error")
+	assert.Equal(t, expected, string(e.code.Value()), "insert string error")
 
 	e.OnUndo()
-	assert.Equal(t, text, e.code, "undo insert string mismatch")
+	assert.Equal(t, text, string(e.code.Value()), "undo insert string mismatch")
 
 	e.OnRedo()
-	assert.Equal(t, expected, e.code, "redo insert string mismatch")
+	assert.Equal(t, expected, string(e.code.Value()), "redo insert string mismatch")
 }
 
 func TestInsertLines(t *testing.T) {
-	e.Lines = []Line{
-		Line{Buf: []rune("this is a sample text")},
-	}
+	e.code = rope.New([]byte("this is a sample text"))
 
 	e.Row = 0
 	e.Col = 11
 
-	apply_highlighter(e.Lines, "", "")
-
-	line := []string{"new line", "another line"}
-	e.InsertLines(0, 2, line)
+	apply_highlighter(e.code.Value(), "", "")
+	e.InsertString(0, 11, "new line\nanother line\n")
 
 	text := "this is a sample text"
-	expected := "this is a snew line\nanother line\nthis is a sample text"
-	assert.Equal(t, expected, e.code, "insert lines error")
+	expected := "this is a snew line\nanother line\nample text"
+	assert.Equal(t, expected, string(e.code.Value()), "insert lines error")
 
 	e.OnUndo()
-	assert.Equal(t, text, e.code, "undo insert lines mismatch")
+	assert.Equal(t, text, string(e.code.Value()), "undo insert lines mismatch")
 
 	e.OnRedo()
-	assert.Equal(t, expected, e.code, "redo insert lines mismatch")
+	assert.Equal(t, expected, string(e.code.Value()), "redo insert lines mismatch")
 }
 
 func TestDeleteCharacter(t *testing.T) {
-	e.Lines = []Line{
-		Line{Buf: []rune("this is a sample text")},
-	}
+	e.code = rope.New([]byte("this is a sample text"))
 
 	e.Row = 0
-	e.Col = 11
+	e.Col = 2
 
-	apply_highlighter(e.Lines, "", "")
+	apply_highlighter(e.code.Value(), "", "")
 	e.DeleteCharacter(0, 2)
 
 	text := "this is a sample text"
 	expected := "ths is a sample text"
-	assert.Equal(t, expected, e.code, "delete character error")
+	assert.Equal(t, expected, string(e.code.Value()), "delete character error")
 
 	e.OnUndo()
-	assert.Equal(t, text, e.code, "undo delete character mismatch")
+	assert.Equal(t, text, string(e.code.Value()), "undo delete character mismatch")
 
 	e.OnRedo()
-	assert.Equal(t, expected, e.code, "redo delete character mismatch")
+	assert.Equal(t, expected, string(e.code.Value()), "redo delete character mismatch")
 }
 
 func TestDeleteLine(t *testing.T) {
-	e.Lines = []Line{
-		Line{Buf: []rune("this is a sample text")},
-		Line{Buf: []rune("")},
-	}
+	e.code = rope.New([]byte("this is a sample text\n"))
 
 	text := "this is a sample text\n"
 	expected := "this is a sample text"
 
-	apply_highlighter(e.Lines, "", "")
-
-	assert.Equal(t, 2, len(e.Lines), "delete line error")
-	e.DeleteLine(1, 0)
-	assert.Equal(t, 1, len(e.Lines), "delete line error")
+	apply_highlighter(e.code.Value(), "", "")
+	e.DeleteCharacter(0, len(text) - 1)
 
 	e.OnUndo()
-	assert.Equal(t, text, e.code, "undo delete line mismatch")
+	assert.Equal(t, text, string(e.code.Value()), "undo delete line mismatch")
 
 	e.OnRedo()
-	assert.Equal(t, expected, e.code, "redo delete line mismatch")
+	assert.Equal(t, expected, string(e.code.Value()), "redo delete line mismatch")
 }
 
 func TestInsertEnter(t *testing.T) {
-	e.Lines = []Line{
-		Line{Buf: []rune("this is a sample text")},
-		Line{Buf: []rune("")},
-	}
+	e.code = rope.New([]byte("this is a sample text\n"))
 
 	text := "this is a sample text\n"
 	expected := "this is a sample text\n\n"
 
-	apply_highlighter(e.Lines, "", "")
-
-	assert.Equal(t, 2, len(e.Lines), "insert enter error")
-	e.InsertEnter(1, 0)
-	assert.Equal(t, 3, len(e.Lines), "insert enter error")
+	apply_highlighter(e.code.Value(), "", "")
+	e.InsertCharacter(0, len(text), '\n')
 
 	e.OnUndo()
-	assert.Equal(t, text, e.code, "undo insert enter mismatch")
+	assert.Equal(t, text, string(e.code.Value()), "undo insert enter mismatch")
 
 	e.OnRedo()
-	assert.Equal(t, expected, e.code, "redo insert enter mismatch")
+	assert.Equal(t, expected, string(e.code.Value()), "redo insert enter mismatch")
 }
 
 func TestShiftWithTabsToRight(t *testing.T) {
-	e.Lines = []Line{
-		Line{Buf: []rune("this is a sample text")},
-		Line{Buf: []rune("one more line")},
-	}
+	e.code = rope.New([]byte("this is a sample text\none more line"))
 
 	e.Selection.Ssx = 0
 	e.Selection.Ssy = 0
 	e.Selection.Sex = 0
 	e.Selection.Sey = 2
 
-	got := e.Selection.GetSelectionString(e.Lines)
+	got := e.Selection.GetSelectionString(e.code.Value())
 	text := "this is a sample text\none more line"
 	assert.Equal(t, text, got, "selection of string error")
 
-	apply_highlighter(e.Lines, "", "")
+	apply_highlighter(e.code.Value(), "", "")
 
-	selectedLines := e.Selection.GetSelectedLines(e.Lines)
+	selectedLines := e.Selection.GetSelectedLines(e.code.Value())
 	e.ShiftWithTabsToRight(0, 0, selectedLines)
 
-	expected := "\tthis is a sample text\n\tone more line"
-	assert.Equal(t, expected, e.code, "shift with tabs error")
+	expected := "\tthis is a sample text\t\none more line"
+	assert.Equal(t, expected, string(e.code.Value()), "shift with tabs error")
 
 	e.OnUndo()
-	assert.Equal(t, text, e.code, "undo shift with tabs mismatch")
+	assert.Equal(t, text, string(e.code.Value()), "undo shift with tabs mismatch")
 
 	e.OnRedo()
-	assert.Equal(t, expected, e.code, "redo shift with tabs mismatch")
+	assert.Equal(t, expected, string(e.code.Value()), "redo shift with tabs mismatch")
 }
 
 func TestMaybeAddPair(t *testing.T) {
-	e.Lines = []Line{
-		Line{Buf: []rune("")},
-	}
+	e.code = rope.New([]byte("test["))
 
-	e.Row = 0
-	e.Col = 0
+	val, found := e.MaybeAddPair(0, 4, '[')
 
-	e.MaybeAddPair('[')
-	assert.Equal(t, "]", e.code, "maybeaddpair error")
+	assert.Equal(t, ']', val, "maybeaddpair error")
+	assert.Equal(t, true, found, "maybeaddpair error")
 }

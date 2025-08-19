@@ -100,7 +100,7 @@ func (e *Editor) HandleMouse(mx int, my int, buttons ButtonMask, modifiers ModMa
 
 		e.Col = e.FindCursorXPosition(mx)
 
-		if len(e.Selection.GetSelectedLines(e.Lines)) > 0 { // if text selected
+		if len(e.Selection.GetSelectedLines(e.code.Value())) > 0 { // if text selected
 			e.Selection.Sey = e.Row
 			e.Selection.Sex = e.Col
 			return
@@ -119,7 +119,7 @@ func (e *Editor) HandleMouse(mx int, my int, buttons ButtonMask, modifiers ModMa
 		xPosition := e.FindCursorXPosition(mx)
 
 		isTripleClick := e.Selection.IsUnderSelection(xPosition, e.Row) &&
-			len(e.Selection.GetSelectedLines(e.Lines)) == 1
+			len(e.Selection.GetSelectedLines(e.code.Value())) == 1
 
 		if isTripleClick {
 			e.Row = my + e.Y
@@ -159,7 +159,7 @@ func (e *Editor) HandleMouse(mx int, my int, buttons ButtonMask, modifiers ModMa
 
 		xPosition := e.FindCursorXPosition(mx)
 
-		if prevRow == e.Row && e.Col == xPosition && len(e.Selection.GetSelectedLines(e.Lines)) == 0 {
+		if prevRow == e.Row && e.Col == xPosition && len(e.Selection.GetSelectedLines(e.code.Value())) == 0 {
 			// double click
 			lastChar := len(e.Lines[e.Row].Buf) == e.Col
 			if lastChar {

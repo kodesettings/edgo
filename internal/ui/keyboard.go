@@ -2,7 +2,6 @@ package ui
 
 import (
 	. "github.com/vipmax/edgo/internal/operations"
-	. "github.com/vipmax/edgo/internal/utils"
 )
 
 func (e *Editor) OnDown(isPaging bool) {
@@ -119,14 +118,14 @@ func (e *Editor) OnEnter() {
 		// TODO: remove extra line
 	}
 
-	e.InsertEnter(e.Row, e.Col)
+	e.InsertCharacter(e.Row, e.Col, '\n')
 	e.Focus();
 
 	if e.Row - e.Y == e.ROWS { e.OnScrollDown() }
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
 
 	e.Update = true
-	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
+	e.UpdateLsp(false, string(e.code.Value()))
 	e.IsContentChanged = true
 	e.FindTests()
 }
@@ -138,18 +137,13 @@ func (e *Editor) OnDelete() {
 		return
 	}
 
-	if e.Col > 0 {
-		e.Col--
-		e.DeleteCharacter(e.Row, e.Col)
-	} else if e.Row > 0 { // delete line
-		e.DeleteLine(e.Row, e.Col)
-		e.Row--
-	}
+	e.DeleteCharacter(e.Row, e.Col)
+	if e.Col > 0 { e.Col-- } else if e.Row > 0 { e.Row-- }
 
 	e.Focus()
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
 	e.Update = true
-	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
+	e.UpdateLsp(false, string(e.code.Value()))
 	e.IsContentChanged = true
 	e.FindTests()
 }
@@ -157,16 +151,16 @@ func (e *Editor) OnDelete() {
 func (e *Editor) OnTab() {
 	e.Focus()
 
-	selectedLines := e.Selection.GetSelectedLines(e.Lines)
+	selectedLines := e.Selection.GetSelectedLines(e.code.Value())
 
 	if len(selectedLines) == 0 {
 		ch := '\t'
 		e.InsertCharacter(e.Row, e.Col, ch)
 		e.Col++
-		e.UpdateLsp(false, ConvertLinesToString(e.Lines))
+		e.UpdateLsp(false, string(e.code.Value()))
 	} else  {
 		e.ShiftWithTabsToRight(e.Row, e.Col, selectedLines)
-		e.UpdateLsp(false, ConvertLinesToString(e.Lines))
+		e.UpdateLsp(false, string(e.code.Value()))
 	}
 
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
@@ -178,7 +172,7 @@ func (e *Editor) OnTab() {
 func (e *Editor) OnBackTab() {
 	e.Focus()
 
-	selectedLines := e.Selection.GetSelectedLines(e.Lines)
+	selectedLines := e.Selection.GetSelectedLines(e.code.Value())
 
 	// deleting tabs from beginning
 	if len(selectedLines) == 0 {
@@ -199,7 +193,7 @@ func (e *Editor) OnBackTab() {
 
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
 	e.Update = true
-	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
+	e.UpdateLsp(false, string(e.code.Value()))
 	e.IsContentChanged = true
 	e.FindTests()
 }

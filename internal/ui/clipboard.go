@@ -4,7 +4,6 @@ import (
 	. "github.com/vipmax/edgo/internal/operations"
 	. "github.com/vipmax/edgo/internal/utils"
 	"github.com/atotto/clipboard"
-	"strings"
 )
 
 // this function sets the required parameters to validate updates
@@ -15,7 +14,7 @@ func (e *Editor) set_update_parameters(changed bool) {
 }
 
 func (e *Editor) OnCopy() {
-	selectionString := e.Selection.GetSelectionString(e.Lines)
+	selectionString := e.Selection.GetSelectionString(e.code.Value())
 	clipboard.WriteAll(selectionString)
 }
 
@@ -26,135 +25,66 @@ func (e *Editor) OnPaste() {
 	}
 
 	text, _ := clipboard.ReadAll()
-	lines := strings.Split(text, "\n")
 
-	if len(lines) == 0 { return }
-
-	if len(lines) == 1 { // single Line paste
-		e.InsertString(e.Row, e.Col, lines[0])
-	}
-
-	if len(lines) > 1 { // multiple Line paste
-		e.InsertLines(e.Row, e.Col, lines)
-	}
-	
+	if len(text) == 0 { return }
+	e.InsertString(e.Row, e.Col, text)
 	e.set_update_parameters(true)
 }
 
 func (e *Editor) Cut(isCopySelected bool) {
 	e.Focus()
 
-	if len(e.Lines) < 1 {
-		e.Lines[0].Buf = []rune{};
-		e.Row, e.Col = 0, 0
-		return
-	}
-
-	var ops = EditOperation{}
+	if (e.code.Len() < 0) { e.Row, e.Col = 0, 0; return }
 
 	if isCopySelected {
-		selectionString := e.Selection.GetSelectionString(e.Lines)
+		selectionString := e.Selection.GetSelectionString(e.code.Value())
 		clipboard.WriteAll(selectionString)
 	}
 
-	ops = append(ops, Operation{MoveCursor, ' ', e.Row, e.Col})
-	selectedIndices := e.Selection.GetSelectedIndices(e.Lines)
+	selectedIndices := e.Selection.GetSelectedIndices(e.code.Value())
+	lastElement := len(selectedIndices) - 1
 
-	fromCol := e.Col
-	fromRow := e.Row
+	exd := selectedIndices[lastElement][0]
+	eyd := selectedIndices[lastElement][1]
+	sxd := selectedIndices[0][0]
+	syd := selectedIndices[0][1]
 
-	// Sort selectedIndices in reverse order to delete characters from the end
-	index := len(selectedIndices) - 1
-cut:
-	indices := selectedIndices[index]
-	xd := indices[0]
-	yd := indices[1]
-	e.Col, e.Row = xd, yd
+	sxd += LineOffset(e.code.Value(), syd)
+	exd += LineOffset(e.code.Value(), eyd)
+	e.code.Remove(sxd, exd + 2)
 
-	if len(e.Lines[yd].Buf) > 0 { // delete the character at index (x, j)
-		ch := e.Lines[yd].Buf[xd]
-		ops = append(ops, Operation{Delete, ch, yd, xd})
-		e.Lines[yd].Buf = append(e.Lines[yd].Buf[:xd], e.Lines[yd].Buf[xd+1:]...)
-	}
+	e.Col, e.Row = exd, eyd
 
-	if len(e.Lines[yd].Buf) == 0 { // delete Line
-		if e.Row == 0 {
-			ops = append(ops, Operation{DeleteLine, '\n', 0, 0})
-		} else {
-			ops = append(ops, Operation{DeleteLine, '\n', e.Row -1, len(e.Lines[e.Row-1].Buf)})
-		}
-
-		e.Lines = append(e.Lines[:yd], e.Lines[yd+1:]...)
-	}
-
-	if index > 0 { index--; goto cut; }
-
-	e.code = ConvertLinesToString(e.Lines)
-	e.treeSitterHighlighter.UpdateCharsEdit(&e.code, fromRow, fromCol, e.Row, e.Col)
-
-	if len(e.Lines) == 0 {
-		e.Lines = make([]Line, 1)
-	}
-
-	if e.Row >= len(e.Lines)  {
-		e.Row = len(e.Lines) - 1
-		if e.Col >= len(e.Lines[e.Row].Buf) { e.Col = len(e.Lines[e.Row].Buf) - 1 }
-	}
-
-	if e.Row < 0 { e.Row = 0 }
-	if e.Col < 0 { e.Col = 0 }
-
-	e.Undo = append(e.Undo, ops)
+	e.treeSitterHighlighter.UpdateCharsEdit(e.code.Value(), syd, sxd, eyd, exd)
+	e.Undo = append(e.Undo, EditOperation{}) // TODO: refactor this
 	e.Selection.CleanSelection()
 
-	e.UpdateLsp(false, ConvertLinesToString(e.Lines))
+	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)
 }
 
 func (e *Editor) Duplicate() {
 	e.Focus()
 
-	if len(e.Lines) == 0 { return }
+	if e.code.Len() == 0 { return }
+	syd := LineOffset(e.code.Value(), e.Row)
+	eyd := LineOffset(e.code.Value(), e.Row + 1)
+	duplicatedSlice := e.code.Slice(syd, eyd)
 
-	if e.Selection.Ssx == -1 && e.Selection.Ssy == -1 ||
-		e.Selection.Ssx == e.Selection.Sex && e.Selection.Ssy == e.Selection.Sey {
-		var ops = EditOperation{}
-		ops = append(ops, Operation{MoveCursor, ' ', e.Row, e.Col})
-		ops = append(ops, Operation{Enter, '\n', e.Row, len(e.Lines[e.Row].Buf)})
+	e.code.Insert(eyd, []byte("\n"))
+	e.code.Insert(eyd + 1, duplicatedSlice)
+	e.Row++
 
-		duplicatedSlice := make([]rune, len(e.Lines[e.Row].Buf))
-		copy(duplicatedSlice, e.Lines[e.Row].Buf)
-		for i, ch := range duplicatedSlice {
-			ops = append(ops, Operation{Insert, ch, e.Row, i})
-		}
-		e.Row++
-		e.Lines = InsertTo(e.Lines, e.Row, Line{duplicatedSlice})
+	eyd = LineOffset(e.code.Value(), e.Row)
+	e.treeSitterHighlighter.UpdateCharsEdit(e.code.Value(), syd, 0, eyd, 0)
+	e.Undo = append(e.Undo, EditOperation{}) // TODO: refactor this
 
-		e.Undo = append(e.Undo, ops)
-		e.set_update_parameters(true)
-	} else {
-		selection := e.Selection.GetSelectionString(e.Lines)
-		if len(selection) == 0 { return }
-		lines := strings.Split(selection, "\n")
-
-		if len(lines) == 0 { return }
-
-		if len(lines) == 1 { // single Line
-			lines[0] = " " + lines[0]// add space before
-			e.InsertString(e.Row, e.Col, lines[0])
-		}
-
-		if len(lines) > 1 { // multiple Line
-			e.InsertLines(e.Row, e.Col, lines)
-		}
-
-		e.Selection.CleanSelection()
-		e.set_update_parameters(true)
-	}
+	e.UpdateLsp(false, string(e.code.Value()))
+	e.set_update_parameters(true)
 }
 
 func (e *Editor) OnUndo() {
-	if len(e.Undo) == 0 { e.UpdateLsp(true, ConvertLinesToString(e.Lines)); return }
+	if len(e.Undo) == 0 { e.UpdateLsp(true, string(e.code.Value())); return }
 
 	lastOperation := e.Undo[len(e.Undo)-1]
 	e.Undo = e.Undo[:len(e.Undo)-1]
@@ -168,27 +98,11 @@ undo:
 	o := lastOperation[index]
 
 	switch o.Action {
-	case Insert:
-		e.Row = o.Line; e.Col = o.Column
-		e.Lines[e.Row].Buf = append(e.Lines[e.Row].Buf[:e.Col], e.Lines[e.Row].Buf[e.Col+1:]...)
+	case Insert, Enter:
+		e.code.Remove(o.Line + o.Column, o.Line + o.Column + 1)
 	break;
 	case Delete:
-		e.Row = o.Line; e.Col = o.Column
-		e.Lines[e.Row].Buf = InsertTo(e.Lines[e.Row].Buf, e.Col, o.Char)
-	break;
-	case Enter: // Merge lines
-		e.Lines[o.Line].Buf = append(e.Lines[o.Line].Buf, e.Lines[o.Line+1].Buf...)
-		e.Lines = append(e.Lines[:o.Line+1], e.Lines[o.Line+2:]...)
-		e.Row = o.Line; e.Col = o.Column
-	break;
-	case DeleteLine: // Insert enter
-		e.Row = o.Line; e.Col = o.Column
-		after := e.Lines[e.Row].Buf[e.Col:]
-		before := e.Lines[e.Row].Buf[:e.Col]
-		e.Lines[e.Row].Buf = before
-		e.Row++; e.Col = 0
-		newline := append([]rune{}, after...)
-		e.Lines = InsertTo(e.Lines, e.Row, Line{newline})
+		e.code.Insert(o.Line + o.Column, []byte(string(o.Char)))
 	break;
 	case MoveCursor:
 		e.Row = o.Line; e.Col = o.Column
@@ -197,11 +111,10 @@ undo:
 
 	if index > 0 { index--; goto undo; }
 
-	e.code = ConvertLinesToString(e.Lines)
-	e.treeSitterHighlighter.UpdateCharsEdit(&e.code, fromRow, fromCol, e.Row, e.Col)
+	e.treeSitterHighlighter.UpdateCharsEdit(e.code.Value(), fromRow, fromCol, e.Row, e.Col)
 
 	e.Redo = append(e.Redo, lastOperation)
-	e.UpdateLsp(false, e.code)
+	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)
 }
 
@@ -219,28 +132,11 @@ redo:
 	o := lastRedoOperation[index]
 
 	switch o.Action {
-	case Insert:
-		e.Row = o.Line; e.Col = o.Column
-		e.Lines[e.Row].Buf = InsertTo(e.Lines[e.Row].Buf, e.Col, o.Char)
-		e.Col++
+	case Insert, Enter:
+		e.code.Insert(o.Line + o.Column, []byte(string(o.Char)))
 	break;
 	case Delete:
-		e.Row = o.Line; e.Col = o.Column
-		e.Lines[e.Row].Buf = append(e.Lines[e.Row].Buf[:e.Col], e.Lines[e.Row].Buf[e.Col+1:]...)
-	break;
-	case Enter:
-		e.Row = o.Line; e.Col = o.Column
-		after := e.Lines[e.Row].Buf[e.Col:]
-		before := e.Lines[e.Row].Buf[:e.Col]
-		e.Lines[e.Row].Buf = before
-		e.Row++; e.Col = 0
-		newline := append([]rune{}, after...)
-		e.Lines = InsertTo(e.Lines, e.Row, Line{newline})
-	break;
-	case DeleteLine: // Merge lines
-		e.Lines[o.Line].Buf = append(e.Lines[o.Line].Buf, e.Lines[o.Line+1].Buf...)
-		e.Lines = append(e.Lines[:o.Line+1], e.Lines[o.Line+2:]...)
-		e.Row = o.Line; e.Col = o.Column
+		e.code.Remove(o.Line + o.Column, o.Line + o.Column + 1)
 	break;
 	case MoveCursor:
 		e.Row = o.Line; e.Col = o.Column
@@ -249,10 +145,9 @@ redo:
 
 	if index < len(lastRedoOperation) - 1 { index++; goto redo; }
 
-	e.code = ConvertLinesToString(e.Lines)
-	e.treeSitterHighlighter.UpdateCharsEdit(&e.code, fromRow, fromCol, e.Row, e.Col)
+	e.treeSitterHighlighter.UpdateCharsEdit(e.code.Value(), fromRow, fromCol, e.Row, e.Col)
 
 	e.Undo = append(e.Undo, lastRedoOperation)
-	e.UpdateLsp(false, e.code)
+	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)
 }

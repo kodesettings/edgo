@@ -1,6 +1,7 @@
 package selection
 
 import . "github.com/vipmax/edgo/internal/utils"
+import "bytes"
 
 type Selection struct {
 	Ssx        int  // selection Start x
@@ -68,7 +69,7 @@ func Equal(x, y, x1, y1 int) bool {
 	return x == x1 && y == y1
 }
 
-func (this *Selection) GetSelectedIndices(lines []Line) [][]int {
+func (this *Selection) GetSelectedIndices(text []byte) [][]int {
 	var selectedIndices = [][]int{}
 
 	// check for empty selection
@@ -86,14 +87,17 @@ func (this *Selection) GetSelectedIndices(lines []Line) [][]int {
 		starty, endy = endy, starty
 	}
 
+
+	lines := bytes.Split(text, []byte("\n"))
 	var inside = false
+
 	// iterate over lines, starting from selection Start point until out ouf selection
 	for j := starty; j < len(lines); j++ {
-		if len(lines[j].Buf) == 0 && this.IsUnderSelection(0, j) {
+		if len(lines[j]) == 0 && this.IsUnderSelection(0, j) {
 			selectedIndices = append(selectedIndices, []int{0, j})
 			inside = true
 		}
-		for i := 0; i < len(lines[j].Buf); i++ {
+		for i := 0; i < len(lines[j]); i++ {
 			if this.IsUnderSelection(i, j) {
 				selectedIndices = append(selectedIndices, []int{i, j})
 				inside = true
@@ -107,7 +111,7 @@ func (this *Selection) GetSelectedIndices(lines []Line) [][]int {
 	return selectedIndices
 }
 
-func (this *Selection) GetSelectionString(lines []Line) string {
+func (this *Selection) GetSelectionString(text []byte) string {
 	var ret = []rune {}
 	var in = false
 
@@ -123,12 +127,13 @@ func (this *Selection) GetSelectionString(lines []Line) string {
 		starty, endy = endy, starty
 	}
 
+	lines := bytes.Split(text, []byte("\n"))
 	for j := starty; j < len(lines); j++ {
-		line := lines[j].Buf
+		line := lines[j]
 		for i, char := range line {
 			// if inside selection
 			if GreaterEqual(i, j, startx, starty) && LessThan(i, j, endx, endy) {
-				ret = append(ret, char)
+				ret = append(ret, rune(char))
 				in = true
 			} else {
 				in = false
@@ -150,7 +155,7 @@ func (this *Selection) GetSelectionString(lines []Line) string {
 }
 
 
-func (this *Selection) GetSelectedLines(lines []Line)  []int {
+func (this *Selection) GetSelectedLines(text []byte)  []int {
 	var lineNumbers = make(Set)
 	var in = false
 
@@ -166,8 +171,9 @@ func (this *Selection) GetSelectedLines(lines []Line)  []int {
 		starty, endy = endy, starty
 	}
 
+	lines := bytes.Split(text, []byte("\n"))
 	for j := starty; j < len(lines); j++ {
-		line := lines[j].Buf
+		line := lines[j]
 		for i, _ := range line {
 			// if inside selection
 			if GreaterEqual(i, j, startx, starty) && LessThan(i, j, endx, endy) {

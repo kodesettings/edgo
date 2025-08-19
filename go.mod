@@ -39,6 +39,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
+	github.com/zyedidia/rope v0.0.0-20210616205215-37fbf22eab3a // indirect
 	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
