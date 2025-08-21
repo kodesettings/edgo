@@ -9,45 +9,31 @@ func (e *Editor) OnCommentLine() {
 	e.Focus()
 
 	var found bool
-	pos := LineOffset(e.code.Value(), e.Row)
-	ch_1 := e.code.At(pos)
-	ch_2 := e.code.At(pos + 1)
+	offset := LineOffset(e.code.Value(), e.Row)
+	ch_1 := e.code.At(offset)
+	ch_2 := e.code.At(offset + 1)
 
 	if len(e.langConf.Comment) == 1 && ch_1 == e.langConf.Comment[0] {
-		e.code.Remove(pos, pos + 1)
-		e.Undo = append(e.Undo, EditOperation{
-			{MoveCursor, rune(ch_1), e.Row, pos+1},
-			{Delete, rune(ch_1), e.Row, pos},
-		})
+		e.code.Remove(offset, offset + 1)
+		e.Undo = append(e.Undo, EditOperation{{Delete, []byte{ch_1}, offset, CursorMove{offset, 0}}})
 		found = true
 	} else if len(e.langConf.Comment) == 2 && ch_1 == e.langConf.Comment[0] && ch_2 == e.langConf.Comment[1] {
-		e.code.Remove(pos, pos + 1)
-		e.code.Remove(pos, pos + 1)
-		e.Undo = append(e.Undo, EditOperation{
-			{MoveCursor, rune(ch_1), e.Row, pos + 1},
-			{Delete, rune(ch_1), e.Row, pos},
-			{MoveCursor, rune(ch_2), e.Row, pos + 1},
-			{Delete, rune(ch_2), e.Row, pos},
-		})
+		e.code.Remove(offset, offset + 2)
+		e.Undo = append(e.Undo, EditOperation{{Delete, []byte{ch_1, ch_2}, offset, CursorMove{offset, 0}}})
 		found = true
 	}
 
-	tabs := CountTabs(e.code.Value(), e.Row + e.Col)
-	spaces := CountSpaces(e.code.Value(), e.Row + e.Col)
-
+	tabs := CountTabs(e.code.Value(), offset)
+	spaces := CountSpaces(e.code.Value(), offset)
 	from := tabs
-	ops := EditOperation{}
 
 	if found { goto exit }
 	if tabs == 0 && spaces != 0 { from = spaces }
 
 	e.code.Insert(from, []byte(e.langConf.Comment))
-	for _, ch := range e.langConf.Comment {
-		ops = append(ops, Operation{Insert, ch, e.Row, from})
-	}
-	e.Undo = append(e.Undo, ops)
+	e.Undo = append(e.Undo, EditOperation{{Insert, []byte(e.langConf.Comment), from, CursorMove{e.Row, from}}})
 exit:
-	e.treeSitterHighlighter.UpdateCharsEdit(e.code.Value(), pos, 0, pos + 1, 0)
+	e.treeSitterHighlighter.UpdateCharsEdit(e.code.Value(), offset, 0, offset + 1, 0)
 	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)
 }
@@ -69,7 +55,7 @@ func (e *Editor) OnSwapLinesUp() {
 
 	// TOOD: record undo/redo operations here
 
-	e.code.Remove(to, offset)  // remove line_2 from current position
+	e.code.Remove(to, offset) // remove line_2 from current position
 	e.code.Insert(from, line_2) // add line_2 to top
 	offset = LineOffset(e.code.Value(), e.Row + 1)
 
@@ -97,7 +83,7 @@ func (e *Editor) OnSwapLinesDown() {
 
 	// TOOD: record undo/redo operations here
 
-	e.code.Remove(from, to)  // remove line_1 from current position
+	e.code.Remove(from, to) // remove line_1 from current position
 	offset = LineOffset(e.code.Value(), e.Row + 1)
 	e.code.Insert(offset, line_1) // add line_1 to bottom
 

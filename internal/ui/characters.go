@@ -17,8 +17,6 @@ func (e *Editor) AddChar(ch rune) {
 		e.InsertCharacter(e.Row, e.Col, val)
 	}
 
-	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }
-
 	e.Update = true
 	e.UpdateLsp(false, string(e.code.Value()))
 	e.IsContentChanged = true
@@ -26,39 +24,34 @@ func (e *Editor) AddChar(ch rune) {
 }
 
 func (e *Editor) InsertCharacter(line, pos int, ch rune) {
-	pos += LineOffset(e.code.Value(), line)
-	e.code.Insert(pos, []byte(string(ch)))
-	e.Undo = append(e.Undo, EditOperation{{Insert, ch, line, pos}})
+	offset := LineOffset(e.code.Value(), line) + pos
+	e.code.Insert(offset, []byte(string(ch)))
+	e.Undo = append(e.Undo, EditOperation{{Insert, []byte(string(ch)), offset, CursorMove{line, pos}}})
+	if len(e.Redo) > 0 { e.Redo = make([]EditOperation, 0) }
 	e.treeSitterHighlighter.AddCharEdit(e.code.Value(), line, pos, ch)
 }
 
 func (e *Editor) InsertString(line, pos int, linestring string) {
-	// Convert the string to insert to a slice of runes
+	// modify string to remove tabs and space from beginning
 	l := RemoveLeadingTabsSpaces(linestring)
-	pos += LineOffset(e.code.Value(), line)
+	offset := LineOffset(e.code.Value(), line) + pos
 
-	// Record the operation on the undo stack. Note that we're creating a new EditOperation
+	// record the operation on the undo stack. Note that we're creating a new EditOperation
 	// and adding all the Operations to it
-	var ops = EditOperation{}
-	for _, ch := range l {
-		e.code.Insert(pos, []byte(string(ch)))
-		ops = append(ops, Operation{Insert, ch, line, pos})
-		pos++
-	}
+	e.Undo = append(e.Undo, EditOperation{{Insert, []byte(l), offset, CursorMove{line, pos}}})
+	if len(e.Redo) > 0 { e.Redo = make([]EditOperation, 0) }
 
-	e.Col = pos
-	e.Undo = append(e.Undo, ops)
+	e.code.Insert(offset, []byte(l))
+	e.Col++
 }
 
 func (e *Editor) DeleteCharacter(line, pos int) {
-	pos += LineOffset(e.code.Value(), line)
-	ch := rune(e.code.At(pos))
-	e.Undo = append(e.Undo, EditOperation{
-		{MoveCursor, ch, line, pos + 1},
-		{Delete, ch, line, pos},
-	})
+	offset := LineOffset(e.code.Value(), line) + pos
+	ch := rune(e.code.At(offset))
+	e.Undo = append(e.Undo, EditOperation{{Delete, []byte(string(ch)), offset, CursorMove{line, pos + 1}}})
+	if len(e.Redo) > 0 { e.Redo = make([]EditOperation, 0) }
 
-	e.code.Remove(pos, pos + 1)
+	e.code.Remove(offset, offset + 1)
 	e.treeSitterHighlighter.RemoveCharEdit(e.code.Value(), line, pos, ch)
 }
 
@@ -67,13 +60,14 @@ func (e *Editor) ShiftWithTabsToRight(line, pos int, selectedLines []int) {
 
 	var ops = EditOperation{}
 	for _, linenumber := range selectedLines {
-		line = LineOffset(e.code.Value(), linenumber)
-		e.code.Insert(line, []byte(string('\t')))
-		ops = append(ops, Operation{Insert, '\t', line, 0})
+		offset := LineOffset(e.code.Value(), linenumber)
+		e.code.Insert(offset, []byte("\t"))
+		ops = append(ops, Operation{Insert, []byte("\t"), offset, CursorMove{line, pos}})
 	}
 
 	e.Selection.Sex = pos
 	e.Undo = append(e.Undo, ops)
+	if len(e.Redo) > 0 { e.Redo = make([]EditOperation, 0) }
 }
 
 func (e *Editor) MaybeAddPair(line, pos int, ch rune) (rune, bool) {

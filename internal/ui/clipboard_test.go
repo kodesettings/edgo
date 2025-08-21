@@ -3,6 +3,7 @@ package ui
 import (
 	"testing"
 	. "github.com/vipmax/edgo/internal/highlighter"
+	. "github.com/vipmax/edgo/internal/operations"
 	"github.com/zyedidia/rope"
 	assert "github.com/stretchr/testify/assert"
 )
@@ -69,22 +70,16 @@ func TestCutActionLinesOnly(t *testing.T) {
 }
 
 func TestDuplicateAction(t *testing.T) {
+	e.Row = 0
+	e.Col = 0
+
 	e.code = rope.New([]byte("this is a sample text\nand another line of text to cut\none more line of text"))
-
-	e.Selection.Ssx = 0
-	e.Selection.Ssy = 0
-	e.Selection.Sex = 15
-	e.Selection.Sey = 0
-
-	got := e.Selection.GetSelectionString(e.code.Value())
-	expected := "this is a sampl"
-	assert.Equal(t, expected, got, "selection of string error")
 
 	text := string(e.code.Value())
 	apply_highlighter(e.code.Value(), "", "")
 	e.Duplicate()
 
-	expected = "this is a sample text\nthis is a sample text\nand another line of text to cut\none more line of text"
+	expected := "this is a sample text\nthis is a sample text\nand another line of text to cut\none more line of text"
 	assert.Equal(t, expected, string(e.code.Value()), "duplicate lines mismatch")
 
 	e.OnUndo()
@@ -100,6 +95,9 @@ func TestUndoRedoStack(t *testing.T) {
 
 	e.code = rope.New([]byte(""))
 	apply_highlighter(e.code.Value(), "", "")
+
+	e.Undo = make([]EditOperation, 0)
+	e.Redo = make([]EditOperation, 0)
 
 	e.AddChar('a')
 	e.AddChar('b')

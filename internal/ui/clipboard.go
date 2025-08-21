@@ -51,14 +51,16 @@ func (e *Editor) Cut(isCopySelected bool) {
 
 	sxd += LineOffset(e.code.Value(), syd)
 	exd += LineOffset(e.code.Value(), eyd)
-	e.code.Remove(sxd, exd + 2)
 
+	text := make([]byte, exd - sxd + 2)
+	copy(text, e.code.Slice(sxd, exd + 2))
+
+	e.code.Remove(sxd, exd + 2)
 	e.Col, e.Row = exd, eyd
 
 	e.treeSitterHighlighter.UpdateCharsEdit(e.code.Value(), syd, sxd, eyd, exd)
-	e.Undo = append(e.Undo, EditOperation{}) // TODO: refactor this
+	e.Undo = append(e.Undo, EditOperation{{Delete, text, sxd, CursorMove{syd, sxd}}})
 	e.Selection.CleanSelection()
-
 	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)
 }
@@ -69,16 +71,15 @@ func (e *Editor) Duplicate() {
 	if e.code.Len() == 0 { return }
 	syd := LineOffset(e.code.Value(), e.Row)
 	eyd := LineOffset(e.code.Value(), e.Row + 1)
-	duplicatedSlice := e.code.Slice(syd, eyd)
+	duplicatedSlice := e.code.Slice(syd, eyd + 1)
 
-	e.code.Insert(eyd, []byte("\n"))
 	e.code.Insert(eyd + 1, duplicatedSlice)
 	e.Row++
 
-	eyd = LineOffset(e.code.Value(), e.Row)
-	e.treeSitterHighlighter.UpdateCharsEdit(e.code.Value(), syd, 0, eyd, 0)
-	e.Undo = append(e.Undo, EditOperation{}) // TODO: refactor this
+	eyd = LineOffset(e.code.Value(), e.Row) + 1
 
+	e.treeSitterHighlighter.UpdateCharsEdit(e.code.Value(), syd, 0, eyd, 0)
+	e.Undo = append(e.Undo, EditOperation{{Insert, duplicatedSlice, eyd, CursorMove{eyd, 0}}})
 	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)
 }
@@ -94,25 +95,24 @@ func (e *Editor) OnUndo() {
 	fromRow := e.Row
 
 	index := len(lastOperation) - 1
+	var o Operation
 undo:
-	o := lastOperation[index]
+	if len(lastOperation) > 0 { o = lastOperation[index] } else { goto exit }
 
 	switch o.Action {
-	case Insert, Enter:
-		e.code.Remove(o.Line + o.Column, o.Line + o.Column + 1)
+	case Insert:
+		e.code.Remove(o.Offset, o.Offset + len(o.Text))
+		e.Row = o.Cursor.Line; e.Col = o.Cursor.Column
 	break;
 	case Delete:
-		e.code.Insert(o.Line + o.Column, []byte(string(o.Char)))
-	break;
-	case MoveCursor:
-		e.Row = o.Line; e.Col = o.Column
+		e.code.Insert(o.Offset, o.Text)
+		e.Row = o.Cursor.Line; e.Col = o.Cursor.Column
 	break;
 	}
 
 	if index > 0 { index--; goto undo; }
-
+exit:
 	e.treeSitterHighlighter.UpdateCharsEdit(e.code.Value(), fromRow, fromCol, e.Row, e.Col)
-
 	e.Redo = append(e.Redo, lastOperation)
 	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)
@@ -128,25 +128,24 @@ func (e *Editor) OnRedo() {
 	fromRow := e.Row
 
 	index := 0
+	var o Operation
 redo:
-	o := lastRedoOperation[index]
+	if len(lastRedoOperation) > 0 { o = lastRedoOperation[index] } else { goto exit }
 
 	switch o.Action {
-	case Insert, Enter:
-		e.code.Insert(o.Line + o.Column, []byte(string(o.Char)))
+	case Insert:
+		e.code.Insert(o.Offset, o.Text)
+		e.Row = o.Cursor.Line; e.Col = o.Cursor.Column
 	break;
 	case Delete:
-		e.code.Remove(o.Line + o.Column, o.Line + o.Column + 1)
-	break;
-	case MoveCursor:
-		e.Row = o.Line; e.Col = o.Column
+		e.code.Remove(o.Offset, o.Offset + len(o.Text))
+		e.Row = o.Cursor.Line; e.Col = o.Cursor.Column
 	break;
 	}
 
 	if index < len(lastRedoOperation) - 1 { index++; goto redo; }
-
+exit:
 	e.treeSitterHighlighter.UpdateCharsEdit(e.code.Value(), fromRow, fromCol, e.Row, e.Col)
-
 	e.Undo = append(e.Undo, lastRedoOperation)
 	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)
