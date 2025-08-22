@@ -6,11 +6,12 @@ AVAILABLE ISSUES:
 == fixing all unit test cases
   - failing test cases are: process, lsp (for golang only, due to gopls timeout)
   - why lsp is timing out after didOpen in test case?
-== UpdateCharsEdit() method has to be fixed with parameters at line 178, its buggy
-== the entire line buffer handling op has to be rewritten for better redo/undo
+== update screen level rendering
 
 SOLVED ISSUES:
 
+== fixed and optimized tree sitter highlighter operations
+== updated and refactored line buffer and redo/undo stack
 == removed files tree codes and io module achieving significant speedup
 == removed dap support from the project entirely as it was not maintained
 == updated internal logging to use builtin slog feature
