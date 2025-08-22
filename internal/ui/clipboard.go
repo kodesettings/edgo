@@ -58,7 +58,7 @@ func (e *Editor) Cut(isCopySelected bool) {
 	e.code.Remove(sxd, exd + 2)
 	e.Col, e.Row = exd, eyd
 
-	e.treeSitterHighlighter.UpdateCharsEdit(e.code.Value(), syd, sxd, eyd, exd)
+	e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), sxd, len(text))
 	e.Undo = append(e.Undo, EditOperation{{Delete, text, sxd, CursorMove{syd, sxd}}})
 	e.Selection.CleanSelection()
 	e.UpdateLsp(false, string(e.code.Value()))
@@ -78,7 +78,7 @@ func (e *Editor) Duplicate() {
 
 	eyd = LineOffset(e.code.Value(), e.Row) + 1
 
-	e.treeSitterHighlighter.UpdateCharsEdit(e.code.Value(), syd, 0, eyd, 0)
+	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), syd, len(duplicatedSlice))
 	e.Undo = append(e.Undo, EditOperation{{Insert, duplicatedSlice, eyd, CursorMove{eyd, 0}}})
 	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)
@@ -91,9 +91,6 @@ func (e *Editor) OnUndo() {
 	e.Undo = e.Undo[:len(e.Undo)-1]
 	e.Focus()
 
-	fromCol := e.Col
-	fromRow := e.Row
-
 	index := len(lastOperation) - 1
 	var o Operation
 undo:
@@ -102,17 +99,18 @@ undo:
 	switch o.Action {
 	case Insert:
 		e.code.Remove(o.Offset, o.Offset + len(o.Text))
+		e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), o.Offset, len(o.Text))
 		e.Row = o.Cursor.Line; e.Col = o.Cursor.Column
 	break;
 	case Delete:
 		e.code.Insert(o.Offset, o.Text)
+		e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), o.Offset, len(o.Text))
 		e.Row = o.Cursor.Line; e.Col = o.Cursor.Column
 	break;
 	}
 
 	if index > 0 { index--; goto undo; }
 exit:
-	e.treeSitterHighlighter.UpdateCharsEdit(e.code.Value(), fromRow, fromCol, e.Row, e.Col)
 	e.Redo = append(e.Redo, lastOperation)
 	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)
@@ -124,9 +122,6 @@ func (e *Editor) OnRedo() {
 	lastRedoOperation := e.Redo[len(e.Redo)-1]
 	e.Redo = e.Redo[:len(e.Redo)-1]
 
-	fromCol := e.Col
-	fromRow := e.Row
-
 	index := 0
 	var o Operation
 redo:
@@ -135,17 +130,18 @@ redo:
 	switch o.Action {
 	case Insert:
 		e.code.Insert(o.Offset, o.Text)
+		e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), o.Offset, len(o.Text))
 		e.Row = o.Cursor.Line; e.Col = o.Cursor.Column
 	break;
 	case Delete:
 		e.code.Remove(o.Offset, o.Offset + len(o.Text))
+		e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), o.Offset, len(o.Text))
 		e.Row = o.Cursor.Line; e.Col = o.Cursor.Column
 	break;
 	}
 
 	if index < len(lastRedoOperation) - 1 { index++; goto redo; }
 exit:
-	e.treeSitterHighlighter.UpdateCharsEdit(e.code.Value(), fromRow, fromCol, e.Row, e.Col)
 	e.Undo = append(e.Undo, lastRedoOperation)
 	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)

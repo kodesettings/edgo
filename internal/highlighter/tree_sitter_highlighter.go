@@ -16,10 +16,9 @@ import (
 	python "github.com/tree-sitter/tree-sitter-python/bindings/go"
 	rust "github.com/tree-sitter/tree-sitter-rust/bindings/go"
 	. "gopkg.in/yaml.v2"
-	"log"
+	"log/slog"
 	"os"
 	"strings"
-	"unicode/utf8"
 )
 
 type TreeSitterHighlighter struct {
@@ -86,7 +85,7 @@ func (h *TreeSitterHighlighter) SetTheme(themePath string) {
 
 	err = Unmarshal(yamlFile, &h.colorsMap)
 	if err != nil {
-		log.Fatalf("Error unmarshaling YAML: %v", err)
+		slog.Error("Error unmarshaling YAML: %v", "err", err.Error())
 	}
 
 	if value, ok := h.colorsMap["accent_color"]; ok {
@@ -142,76 +141,32 @@ func (h *TreeSitterHighlighter) matchExpression(expression string, fullexpressio
 	The StartPosition, OldEndPosition, and NewEndPosition parameters indicate the range of positions (line, column) affected by the edit.
 */
 
-func (h *TreeSitterHighlighter) AddCharEdit(code []byte, row int, col int, ch rune) {
-	StartIndex := GetStartIndex(&code, row, col)
-	runeLen := uint(utf8.RuneLen(ch))
-
+func (h *TreeSitterHighlighter) InsertTextEdit(code []byte, offset, length int) {
 	editInput := sitter.InputEdit{
-		StartByte: StartIndex,
-		OldEndByte: StartIndex,
-		NewEndByte: StartIndex + runeLen,
+		StartByte: uint(offset),
+		OldEndByte: uint(offset),
+		NewEndByte: uint(offset) + uint(length),
 		StartPosition:  sitter.Point{Row: 0, Column: 0},
 		OldEndPosition: sitter.Point{Row: 0, Column: 0},
 		NewEndPosition: sitter.Point{Row: 0, Column: 0},
 	}
 	if h.tree != nil { h.tree.Edit(&editInput) }
 	h.tree = h.parser.ParseCtx(context.Background(), code, h.tree)
+	slog.Info("inserttextedit", "offset", offset, "len", length)
 }
 
-func (h *TreeSitterHighlighter) RemoveCharEdit(code []byte, row int, col int, ch rune) {
-	StartIndex := GetStartIndex(&code, row, col)
-	Row := uint(row); Column := uint(col)
-	runeLen := uint(utf8.RuneLen(ch))
-
+func (h *TreeSitterHighlighter) RemoveTextEdit(code []byte, offset, length int) {
 	editInput := sitter.InputEdit{
-		StartByte: StartIndex,
-		OldEndByte: StartIndex + runeLen,
-		NewEndByte: StartIndex,
-		StartPosition:  sitter.Point{Row: Row, Column: Column},
-		OldEndPosition: sitter.Point{Row: Row, Column: Column + runeLen},
-		NewEndPosition: sitter.Point{Row: Row, Column: Column},
+		StartByte: uint(offset),
+		OldEndByte: uint(offset) + uint(length),
+		NewEndByte: uint(offset),
+		StartPosition:  sitter.Point{Row: 0, Column: 0},
+		OldEndPosition: sitter.Point{Row: 0, Column: 0},
+		NewEndPosition: sitter.Point{Row: 0, Column: 0},
 	}
 	if h.tree != nil { h.tree.Edit(&editInput) }
 	h.tree = h.parser.ParseCtx(context.Background(), code, h.tree)
-}
-
-func (h *TreeSitterHighlighter) UpdateCharsEdit(code []byte, row int, col int, nrow int, ncol int) {
-	StartIndex1 := GetStartIndex(&code, row, col)
-	StartIndex2 := GetStartIndex(&code, nrow, ncol)
-	Row1 := uint(row); Column1 := uint(col)
-	Row2 := uint(nrow); Column2 := uint(ncol)
-
-	// TODO: fixing this
-	editInput := sitter.InputEdit{
-		StartByte: StartIndex1,
-		OldEndByte: StartIndex2,
-		NewEndByte: StartIndex1,
-		StartPosition:  sitter.Point{Row: Row1, Column: Column1},
-		OldEndPosition: sitter.Point{Row: Row2, Column: Column2},
-		NewEndPosition: sitter.Point{Row: Row1, Column: Column1},
-	}
-	if h.tree != nil { h.tree.Edit(&editInput) }
-	h.tree = h.parser.ParseCtx(context.Background(), code, nil)
-}
-
-func GetStartIndex(code *[]byte, row int, col int) uint {
-	r, c, startIndex := 0, 0, 0
-	for _, char := range *code {
-		runeLen := utf8.RuneLen(rune(char))
-
-		if r == row && c == col {
-			break
-		}
-		startIndex += runeLen
-
-		if char == '\n' {
-			r++
-			c = 0
-		} else {
-			c++
-		}
-	}
-	return uint(startIndex)
+	slog.Info("removetextedit", "offset", offset, "len", length)
 }
 
 func Use(vals ...interface{}) { }

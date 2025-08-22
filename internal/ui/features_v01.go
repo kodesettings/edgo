@@ -15,10 +15,12 @@ func (e *Editor) OnCommentLine() {
 
 	if len(e.langConf.Comment) == 1 && ch_1 == e.langConf.Comment[0] {
 		e.code.Remove(offset, offset + 1)
+		e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), offset, 1)
 		e.Undo = append(e.Undo, EditOperation{{Delete, []byte{ch_1}, offset, CursorMove{offset, 0}}})
 		found = true
 	} else if len(e.langConf.Comment) == 2 && ch_1 == e.langConf.Comment[0] && ch_2 == e.langConf.Comment[1] {
 		e.code.Remove(offset, offset + 2)
+		e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), offset, 2)
 		e.Undo = append(e.Undo, EditOperation{{Delete, []byte{ch_1, ch_2}, offset, CursorMove{offset, 0}}})
 		found = true
 	}
@@ -31,9 +33,9 @@ func (e *Editor) OnCommentLine() {
 	if tabs == 0 && spaces != 0 { from = spaces }
 
 	e.code.Insert(from, []byte(e.langConf.Comment))
+	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), offset, len(e.langConf.Comment))
 	e.Undo = append(e.Undo, EditOperation{{Insert, []byte(e.langConf.Comment), from, CursorMove{e.Row, from}}})
 exit:
-	e.treeSitterHighlighter.UpdateCharsEdit(e.code.Value(), offset, 0, offset + 1, 0)
 	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)
 }
@@ -63,7 +65,8 @@ func (e *Editor) OnSwapLinesUp() {
 	offset = LineOffset(e.code.Value(), e.Row + 1)
 
 	e.Row--
-	e.treeSitterHighlighter.UpdateCharsEdit(e.code.Value(), from, 0, offset, 0)
+	text_len := len(append(line_1, line_2...))
+	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), from, text_len)
 	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)
 }
@@ -93,7 +96,8 @@ func (e *Editor) OnSwapLinesDown() {
 	e.code.Insert(offset, line_1) // add line_1 to bottom
 
 	e.Row--
-	e.treeSitterHighlighter.UpdateCharsEdit(e.code.Value(), from, 0, offset, 0)
+	text_len := len(append(line_1, line_2...))
+	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), from, text_len)
 	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)
 }

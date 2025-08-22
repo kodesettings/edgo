@@ -26,9 +26,9 @@ func (e *Editor) AddChar(ch rune) {
 func (e *Editor) InsertCharacter(line, pos int, ch rune) {
 	offset := LineOffset(e.code.Value(), line) + pos
 	e.code.Insert(offset, []byte(string(ch)))
+	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), offset, len(string(ch)))
 	e.Undo = append(e.Undo, EditOperation{{Insert, []byte(string(ch)), offset, CursorMove{line, pos}}})
 	if len(e.Redo) > 0 { e.Redo = make([]EditOperation, 0) }
-	e.treeSitterHighlighter.AddCharEdit(e.code.Value(), line, pos, ch)
 }
 
 func (e *Editor) InsertString(line, pos int, linestring string) {
@@ -47,12 +47,11 @@ func (e *Editor) InsertString(line, pos int, linestring string) {
 
 func (e *Editor) DeleteCharacter(line, pos int) {
 	offset := LineOffset(e.code.Value(), line) + pos
-	ch := rune(e.code.At(offset))
-	e.Undo = append(e.Undo, EditOperation{{Delete, []byte(string(ch)), offset, CursorMove{line, pos + 1}}})
-	if len(e.Redo) > 0 { e.Redo = make([]EditOperation, 0) }
-
+	ch := e.code.At(offset)
 	e.code.Remove(offset, offset + 1)
-	e.treeSitterHighlighter.RemoveCharEdit(e.code.Value(), line, pos, ch)
+	e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), offset, len(string(ch)))
+	e.Undo = append(e.Undo, EditOperation{{Delete, []byte{ch}, offset, CursorMove{line, pos + 1}}})
+	if len(e.Redo) > 0 { e.Redo = make([]EditOperation, 0) }
 }
 
 func (e *Editor) ShiftWithTabsToRight(line, pos int, selectedLines []int) {
