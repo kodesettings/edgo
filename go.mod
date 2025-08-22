@@ -13,9 +13,9 @@ require (
 	github.com/go-enry/go-enry/v2 v2.8.6
 	github.com/goccy/go-json v0.10.2
 	github.com/stretchr/testify v1.10.0
-	github.com/tree-sitter/go-tree-sitter v0.25.0
+	github.com/tree-sitter/go-tree-sitter v0.24.0
 	github.com/tree-sitter/tree-sitter-bash v0.25.0
-	github.com/tree-sitter/tree-sitter-c v0.24.1
+	github.com/tree-sitter/tree-sitter-c v0.24.0
 	github.com/tree-sitter/tree-sitter-cpp v0.23.4
 	github.com/tree-sitter/tree-sitter-css v0.23.2
 	github.com/tree-sitter/tree-sitter-go v0.23.4
