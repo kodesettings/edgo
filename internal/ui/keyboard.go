@@ -115,11 +115,12 @@ func (e *Editor) OnScrollDown() {
 func (e *Editor) OnEnter() {
 	if e.Selection.IsSelectionNonEmpty() {
 		e.Cut(false)
-		// TODO: remove extra line
 	}
 
 	e.InsertCharacter(e.Row, e.Col, '\n')
 	e.Focus();
+	e.Row++
+	e.Col = 0
 
 	if e.Row - e.Y == e.ROWS { e.OnScrollDown() }
 	if len(e.Redo) > 0 { e.Redo = []EditOperation{} }

@@ -38,6 +38,7 @@ func (e *Editor) Cut(isCopySelected bool) {
 
 	if isCopySelected {
 		selectionString := e.Selection.GetSelectionString(e.code.Value())
+		if len(selectionString) == 0 { return } // skipping function if selection is empty
 		clipboard.WriteAll(selectionString)
 	}
 
@@ -56,10 +57,10 @@ func (e *Editor) Cut(isCopySelected bool) {
 	copy(text, e.code.Slice(sxd, exd + 2))
 
 	e.code.Remove(sxd, exd + 2)
-	e.Col, e.Row = exd, eyd
+	e.Row = eyd - 1
 
 	e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), sxd, len(text))
-	e.Undo = append(e.Undo, EditOperation{{Delete, text, sxd, CursorMove{syd, sxd}}})
+	e.Undo = append(e.Undo, EditOperation{{Delete, text, sxd, CursorMove{eyd - 1, 0}}})
 	e.Selection.CleanSelection()
 	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)
