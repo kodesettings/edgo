@@ -31,6 +31,9 @@ func (e *Editor) InsertCharacter(line, pos int, ch rune) {
 
 	e.code.Insert(offset, []byte(string(ch)))
 	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), offset, len(string(ch)))
+
+	// record the operation on the undo stack. Note that we're creating a new EditOperation
+	// and adding all the Operations to it
 	e.Undo = append(e.Undo, EditOperation{{Insert, []byte(string(ch)), offset, CursorMove{line, pos}}})
 	if len(e.Redo) > 0 { e.Redo = make([]EditOperation, 0) }
 }
@@ -39,14 +42,12 @@ func (e *Editor) InsertString(line, pos int, linestring string) {
 	// modify string to remove tabs and space from beginning
 	l := RemoveLeadingTabsSpaces(linestring)
 	offset := LineOffset(e.code.Value(), line) + pos + 1
+	e.code.Insert(offset, []byte(l))
 
 	// record the operation on the undo stack. Note that we're creating a new EditOperation
 	// and adding all the Operations to it
 	e.Undo = append(e.Undo, EditOperation{{Insert, []byte(l), offset, CursorMove{line, pos}}})
 	if len(e.Redo) > 0 { e.Redo = make([]EditOperation, 0) }
-
-	e.code.Insert(offset, []byte(l))
-	e.Col++
 }
 
 func (e *Editor) DeleteCharacter(line, pos int) {
@@ -54,6 +55,9 @@ func (e *Editor) DeleteCharacter(line, pos int) {
 	ch := e.code.At(offset)
 	e.code.Remove(offset, offset + 1)
 	e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), offset, len(string(ch)))
+
+	// record the operation on the undo stack. Note that we're creating a new EditOperation
+	// and adding all the Operations to it
 	e.Undo = append(e.Undo, EditOperation{{Delete, []byte{ch}, offset, CursorMove{line, pos}}})
 	if len(e.Redo) > 0 { e.Redo = make([]EditOperation, 0) }
 }
