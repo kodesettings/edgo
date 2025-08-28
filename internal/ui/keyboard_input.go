@@ -26,7 +26,7 @@ func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 	if key == KeyCtrlE { e.OnErrors(); return }
 	if key == KeyCtrlC { e.OnCopy(); return }
 	if key == KeyCtrlV { e.OnPaste(); return }
-	if key == KeyCtrlM { e.OnCommentLine(); return }
+	if key == KeyCtrlB { e.OnCommentLine(); return }
 	if key == KeyCtrlO { e.OnLangLinesCount(); return }
 	if key == KeyEscape { e.Selection.CleanSelection(); return }
 	if key == KeyCtrlA { e.OnSelectAll(); return }
