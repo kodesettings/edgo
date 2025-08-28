@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"github.com/atotto/clipboard"
 	. "github.com/gdamore/tcell"
+	"github.com/zyedidia/rope"
 	"github.com/gdamore/tcell/encoding"
 	"log/slog"
 	"os"
@@ -87,7 +88,7 @@ type Editor struct {
 	lspver map[string]int // version number sequencing
 
 	treeSitterHighlighter *TreeSitterHighlighter
-	code string // storing UTF-8 representation of buffer
+	code *rope.Node // storing a rope node element
 
 	Tests      map[int]TestData
 	TestFinder TestFinder
@@ -203,11 +204,11 @@ func (e *Editor) OpenFile(fname string) error {
 	e.langConf = conf
 	e.langTabWidth = conf.TabWidth
 
-	e.code = e.ReadFile(e.AbsoluteFilePath)
+	e.code = rope.New(e.ReadFile(e.AbsoluteFilePath))
 	e.treeSitterHighlighter = NewTreeSitter()
 	e.treeSitterHighlighter.SetTheme(e.Config.Theme)
 	e.treeSitterHighlighter.SetLang(e.Lang)
-	e.treeSitterHighlighter.Parse(&e.code)
+	e.treeSitterHighlighter.Parse(e.code.Value())
 	clear(e.HighlightElements)
 
 	e.Undo = []EditOperation{}
@@ -218,7 +219,7 @@ func (e *Editor) OpenFile(fname string) error {
 	e.SearchResults = []SearchResult{}
 
 	// Opening file for LSP
-	e.UpdateLsp(true, ConvertLinesToString(e.Lines))
+	e.UpdateLsp(true, string(e.code.Value()))
 
 	e.FindTests()
 
@@ -289,7 +290,7 @@ func (e *Editor) InitLsp(lang string) {
 	currentDir, _ := os.Getwd()
 
 	lsp.Init(currentDir)
-	e.UpdateLsp(true, ConvertLinesToString(e.Lines))
+	e.UpdateLsp(true, string(e.code.Value()))
 
 	go func() {
 		// diagnostic updates

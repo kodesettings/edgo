@@ -24,9 +24,8 @@ func (e *Editor) FindTests() {
 	}
 
 	if e.Test == nil { return }
-	codeBytes := []byte(ConvertLinesToString(e.Lines))
 	rootNode := e.treeSitterHighlighter.GetTree().RootNode()
-	e.Tests = e.Test.Find(&e.TestFinder, rootNode, e.AbsoluteFilePath, codeBytes)
+	e.Tests = e.Test.Find(&e.TestFinder, rootNode, e.AbsoluteFilePath, e.code.Value())
 }
 
 func (e *Editor) RunTest(test TestData) {

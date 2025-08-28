@@ -24,3 +24,9 @@ func TestDetectPythonLang(t *testing.T) {
 	fmt.Println(language)
 	assert.Equal(t, "python", language, "language must be python, got %s", language)
 }
+
+func TestGetLinesArrayFromData(t *testing.T) {
+	bytes := []byte("some bytes text\none line\nand another line of text")
+	lines := GetLinesArrayFromData(bytes, 3)
+	assert.Equal(t, 3, len(lines), "loading lines memory error")
+}

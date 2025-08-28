@@ -8,129 +8,96 @@ import (
 func (e *Editor) OnCommentLine() {
 	e.Focus()
 
-	found := false
-	index := 0
-repeat:
-	if len(e.Lines[e.Row].Buf) == 0 { return } // exit this function if useless
-	ch := e.Lines[e.Row].Buf[index]
+	var found bool
+	offset := LineOffset(e.code.Value(), e.Row)
+	ch_1 := e.code.At(offset)
+	ch_2 := e.code.At(offset + 1)
 
-	if len(e.langConf.Comment) == 1 && ch == rune(e.langConf.Comment[0]) {
-		// found 1 char comment, uncomment
-		e.Col = index
-		e.Undo = append(e.Undo, EditOperation{
-			{MoveCursor, ch, e.Row, index+1},
-			{Delete, ch, e.Row, index},
-		})
-		e.Lines[e.Row].Buf = Remove(e.Lines[e.Row].Buf, index)
-
-		code := ConvertLinesToString(e.Lines)
-		e.treeSitterHighlighter.RemoveCharEdit(&code, e.Row, index, ch)
-
+	if len(e.langConf.Comment) == 1 && ch_1 == e.langConf.Comment[0] {
+		e.code.Remove(offset, offset + 1)
+		e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), offset, 1)
+		e.Undo = append(e.Undo, EditOperation{{Delete, []byte{ch_1}, offset, CursorMove{offset, 0}}})
 		found = true
-	} else if len(e.langConf.Comment) == 2 && ch == rune(e.langConf.Comment[0]) &&
-			e.Lines[e.Row].Buf[index+1] == rune(e.langConf.Comment[1]) {
-		// found 2 char comment, uncomment
-		e.Col = index
-		e.Undo = append(e.Undo, EditOperation{
-			{MoveCursor, ch, e.Row, index+1},
-			{Delete, ch, e.Row, index},
-			{MoveCursor, e.Lines[e.Row].Buf[index+1], e.Row, index+1},
-			{Delete, ch, e.Row, index},
-		})
-		e.Lines[e.Row].Buf = Remove(e.Lines[e.Row].Buf, index)
-		e.Lines[e.Row].Buf = Remove(e.Lines[e.Row].Buf, index)
-
-		code := ConvertLinesToString(e.Lines)
-		e.treeSitterHighlighter.RemoveCharEdit(&code, e.Row, index, ch)
-		e.treeSitterHighlighter.RemoveCharEdit(&code, e.Row, index, ch)
-
+	} else if len(e.langConf.Comment) == 2 && ch_1 == e.langConf.Comment[0] && ch_2 == e.langConf.Comment[1] {
+		e.code.Remove(offset, offset + 2)
+		e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), offset, 2)
+		e.Undo = append(e.Undo, EditOperation{{Delete, []byte{ch_1, ch_2}, offset, CursorMove{offset, 0}}})
 		found = true
 	}
 
-	if index < len(e.Lines[e.Row].Buf) - 1 { index++; goto repeat; }
-
-	if found {
-		if e.Col < 0 { e.Col = 0 }
-		e.OnDown(false)
-		e.Update = true
-		e.IsContentChanged = true
-		return
-	}
-
-	tabs := CountTabs(e.Lines[e.Row].Buf, e.Col)
-	spaces := CountSpaces(e.Lines[e.Row].Buf, e.Col)
-
+	tabs := CountTabs(e.code.Value(), offset)
+	spaces := CountSpaces(e.code.Value(), offset)
 	from := tabs
+
+	if found { goto exit }
 	if tabs == 0 && spaces != 0 { from = spaces }
 
-	e.Col = from
-	ops := EditOperation{}
-	for _, ch := range e.langConf.Comment {
-		e.Lines[e.Row].Buf = InsertTo(e.Lines[e.Row].Buf, from, ch)
-		code := ConvertLinesToString(e.Lines)
-		e.treeSitterHighlighter.AddCharEdit(&code, e.Row, from, ch)
-		ops = append(ops, Operation{Insert, ch, e.Row, from})
-	}
-
-	e.code = ConvertLinesToString(e.Lines)
-
-	e.Undo = append(e.Undo, ops)
-	if e.Col < 0 { e.Col = 0 }
-	e.OnDown(false)
-	e.Update = true
-	e.UpdateLsp(false, e.code)
-	e.IsContentChanged = true
+	e.code.Insert(from, []byte(e.langConf.Comment))
+	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), offset, len(e.langConf.Comment))
+	e.Undo = append(e.Undo, EditOperation{{Insert, []byte(e.langConf.Comment), from, CursorMove{e.Row, from}}})
+exit:
+	e.UpdateLsp(false, string(e.code.Value()))
+	e.set_update_parameters(true)
 }
 
 func (e *Editor) OnSwapLinesUp() {
 	e.Focus()
 
 	if e.Row == 0 { return }
-	var ops = EditOperation{}
-	ops = append(ops, Operation{MoveCursor, ' ', e.Row, e.Col})
 
-	line1 := e.Lines[e.Row].Buf; line2 := e.Lines[e.Row-1].Buf
+	from := LineOffset(e.code.Value(), e.Row - 1)
+	to := LineOffset(e.code.Value(), e.Row)
+	offset := LineOffset(e.code.Value(), e.Row + 1)
 
-	for i := len(line1)-1; i >= 0; i-- { ops = append(ops, Operation{Delete, line1[i], e.Row, i}) }
-	for i := len(line2)-1; i >= 0; i-- { ops = append(ops, Operation{Delete, line2[i], e.Row -1, i}) }
-	for i, ch := range line1 { ops = append(ops, Operation{Insert, ch, e.Row -1, i}) }
-	for i, ch := range line2 { ops = append(ops, Operation{Insert, ch, e.Row, i}) }
+	line_1 := make([]byte, to - from)
+	copy(line_1, e.code.Slice(from, to + 1))
 
-	e.Lines[e.Row].Buf = line2; e.Lines[e.Row-1].Buf = line1 // swap
+	line_2 := make([]byte, offset - to)
+	copy(line_2, e.code.Slice(to + 1, offset + 1))
+
+	e.Undo = append(e.Undo, EditOperation{
+		{Delete, line_2, to + 1, CursorMove{e.Row, 0}},
+		{Insert, line_2, from, CursorMove{e.Row, 0}},
+	})
+
+	e.code.Remove(to, offset) // remove line_2 from current position
+	e.code.Insert(from, line_2) // add line_2 to top
+	offset = LineOffset(e.code.Value(), e.Row + 1)
+
 	e.Row--
-
-	e.code = ConvertLinesToString(e.Lines)
-
-	e.Undo = append(e.Undo, ops)
-	e.Selection.CleanSelection()
-	e.Update = true
-	e.IsContentChanged = true
-	e.FindTests()
+	text_len := len(append(line_1, line_2...))
+	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), from, text_len)
+	e.UpdateLsp(false, string(e.code.Value()))
+	e.set_update_parameters(true)
 }
 
 func (e *Editor) OnSwapLinesDown() {
 	e.Focus()
 
-	if e.Row+1 == len(e.Lines) { return }
+	if e.Row < 1 { return }
 
-	var ops = EditOperation{}
-	ops = append(ops, Operation{MoveCursor, ' ', e.Row, e.Col})
+	from := LineOffset(e.code.Value(), e.Row)
+	to := LineOffset(e.code.Value(), e.Row + 1)
+	offset := LineOffset(e.code.Value(), e.Row + 2)
 
-	line1 := e.Lines[e.Row].Buf; line2 := e.Lines[e.Row+1].Buf
+	line_1 := make([]byte, to - from)
+	copy(line_1, e.code.Slice(from, to + 1))
 
-	for i := len(line1)-1; i >= 0; i-- { ops = append(ops, Operation{Delete, line1[i], e.Row, i}) }
-	for i := len(line2)-1; i >= 0; i-- { ops = append(ops, Operation{Delete, line2[i], e.Row +1, i}) }
-	for i, ch := range line1 { ops = append(ops, Operation{Insert, ch, e.Row +1, i}) }
-	for i, ch := range line2 { ops = append(ops, Operation{Insert, ch, e.Row, i}) }
+	line_2 := make([]byte, offset - to)
+	copy(line_2, e.code.Slice(to + 1, offset))
 
-	e.Lines[e.Row].Buf = line2; e.Lines[e.Row+1].Buf = line1 // swap
-	e.Row++
+	e.Undo = append(e.Undo, EditOperation{
+		{Delete, line_1, from, CursorMove{e.Row, 0}},
+		{Insert, line_1, to - 1, CursorMove{e.Row, 0}},
+	})
 
-	e.code = ConvertLinesToString(e.Lines)
+	e.code.Remove(from, to) // remove line_1 from current position
+	offset = LineOffset(e.code.Value(), e.Row + 1)
+	e.code.Insert(offset, line_1) // add line_1 to bottom
 
-	e.Undo = append(e.Undo, ops)
-	e.Selection.CleanSelection()
-	e.Update = true
-	e.IsContentChanged = true
-	e.FindTests()
+	e.Row--
+	text_len := len(append(line_1, line_2...))
+	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), from, text_len)
+	e.UpdateLsp(false, string(e.code.Value()))
+	e.set_update_parameters(true)
 }

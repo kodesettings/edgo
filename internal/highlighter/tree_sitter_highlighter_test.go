@@ -14,12 +14,10 @@ func TestTreeSitterHighlighterColors(t *testing.T) {
 	treeSitterHighlighter.SetLang("go")
 
 	filecode, _ := ReadFileToString("../../internal/ui/editor.go")
-	code := filecode
-
-	treeSitterHighlighter.Parse(&code)
+	treeSitterHighlighter.Parse([]byte(filecode))
 
 	start := time.Now()
-	colors := treeSitterHighlighter.ColorRanges(1, 2, []byte(code))
+	colors := treeSitterHighlighter.ColorRanges(1, 2, []byte(filecode))
 	fmt.Println("colorized, elapsed", time.Since(start).Nanoseconds())
 
 	for i, colorsLine := range colors {
