@@ -50,10 +50,10 @@ func TestInsertString(t *testing.T) {
 	e.code = rope.New([]byte("this is a sample text"))
 
 	e.Row = 0
-	e.Col = 11
+	e.Col = 1
 
 	apply_highlighter(e.code.Value(), "", "")
-	e.InsertString(0, 2, "some")
+	e.InsertString(0, 1, "some")
 
 	text := "this is a sample text"
 	expected := "thsomeis is a sample text"
@@ -70,10 +70,10 @@ func TestInsertLines(t *testing.T) {
 	e.code = rope.New([]byte("this is a sample text"))
 
 	e.Row = 0
-	e.Col = 11
+	e.Col = 10
 
 	apply_highlighter(e.code.Value(), "", "")
-	e.InsertString(0, 11, "new line\nanother line\n")
+	e.InsertString(0, 10, "new line\nanother line\n")
 
 	text := "this is a sample text"
 	expected := "this is a snew line\nanother line\nample text"
@@ -129,7 +129,7 @@ func TestInsertEnter(t *testing.T) {
 	expected := "this is a sample text\n\n"
 
 	apply_highlighter(e.code.Value(), "", "")
-	e.InsertCharacter(0, len(text), '\n')
+	e.InsertCharacter(0, len(text) - 1, '\n')
 
 	e.OnUndo()
 	assert.Equal(t, text, string(e.code.Value()), "undo insert enter mismatch")

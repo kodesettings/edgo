@@ -25,6 +25,10 @@ func (e *Editor) AddChar(ch rune) {
 
 func (e *Editor) InsertCharacter(line, pos int, ch rune) {
 	offset := LineOffset(e.code.Value(), line) + pos
+
+	// this is required for insert only when there are no lines in the buffer
+	if e.code.Count(0, offset, []byte("\n")) > 0 { offset += 1 }
+
 	e.code.Insert(offset, []byte(string(ch)))
 	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), offset, len(string(ch)))
 	e.Undo = append(e.Undo, EditOperation{{Insert, []byte(string(ch)), offset, CursorMove{line, pos}}})
@@ -34,7 +38,7 @@ func (e *Editor) InsertCharacter(line, pos int, ch rune) {
 func (e *Editor) InsertString(line, pos int, linestring string) {
 	// modify string to remove tabs and space from beginning
 	l := RemoveLeadingTabsSpaces(linestring)
-	offset := LineOffset(e.code.Value(), line) + pos
+	offset := LineOffset(e.code.Value(), line) + pos + 1
 
 	// record the operation on the undo stack. Note that we're creating a new EditOperation
 	// and adding all the Operations to it
@@ -50,7 +54,7 @@ func (e *Editor) DeleteCharacter(line, pos int) {
 	ch := e.code.At(offset)
 	e.code.Remove(offset, offset + 1)
 	e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), offset, len(string(ch)))
-	e.Undo = append(e.Undo, EditOperation{{Delete, []byte{ch}, offset, CursorMove{line, pos + 1}}})
+	e.Undo = append(e.Undo, EditOperation{{Delete, []byte{ch}, offset, CursorMove{line, pos}}})
 	if len(e.Redo) > 0 { e.Redo = make([]EditOperation, 0) }
 }
 
@@ -79,8 +83,8 @@ func (e *Editor) MaybeAddPair(line, pos int, ch rune) (rune, bool) {
 
 	offset_start := LineOffset(e.code.Value(), line)
 	offset_end := LineOffset(e.code.Value(), line + 1)
-	line_str := e.code.Slice(offset_start, offset_end)
-	current_char := e.code.At(offset_start + pos - 1)
+	line_str := e.code.Slice(offset_start + 1, offset_end)
+	current_char := e.code.At(offset_start + 1 + pos - 2)
 
 	if closeChar, found := pairMap[ch]; found {
 		noMoreChars := pos >= len(line_str) - 1

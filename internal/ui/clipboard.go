@@ -57,7 +57,7 @@ func (e *Editor) Cut(isCopySelected bool) {
 	copy(text, e.code.Slice(sxd, exd + 2))
 
 	e.code.Remove(sxd, exd + 2)
-	e.Row = eyd - 1
+	e.Row = syd
 
 	e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), sxd, len(text))
 	e.Undo = append(e.Undo, EditOperation{{Delete, text, sxd, CursorMove{eyd - 1, 0}}})
@@ -106,7 +106,7 @@ undo:
 	case Delete:
 		e.code.Insert(o.Offset, o.Text)
 		e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), o.Offset, len(o.Text))
-		e.Row = o.Cursor.Line; e.Col = o.Cursor.Column
+		e.Row = o.Cursor.Line; e.Col = o.Cursor.Column + 1
 	break;
 	}
 
@@ -132,7 +132,7 @@ redo:
 	case Insert:
 		e.code.Insert(o.Offset, o.Text)
 		e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), o.Offset, len(o.Text))
-		e.Row = o.Cursor.Line; e.Col = o.Cursor.Column
+		e.Row = o.Cursor.Line; e.Col = o.Cursor.Column + 1
 	break;
 	case Delete:
 		e.code.Remove(o.Offset, o.Offset + len(o.Text))
