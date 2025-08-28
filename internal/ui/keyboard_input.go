@@ -14,19 +14,6 @@ func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 		return
 	}
 
-	intrune := int(ev.Rune())
-	if ev.Rune() == '/' && modifiers&ModAlt != 0 || intrune == '÷' {
-		// '÷' is option + '/' on Mac
-		e.OnCommentLine()
-		return
-	}
-
-	if ev.Rune() == 'Y' && modifiers&ModAlt != 0 {
-		// alt + shift + y
-		e.OnLangLinesCount()
-		return
-	}
-
 	if key == KeyUp && modifiers == 3 { e.OnSwapLinesUp(); return } // control + shift + up
 	if key == KeyDown && modifiers == 3 { e.OnSwapLinesDown(); return } // control + shift + down
 	if key == KeyBacktab { e.OnBackTab(); return }
@@ -39,6 +26,8 @@ func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 	if key == KeyCtrlE { e.OnErrors(); return }
 	if key == KeyCtrlC { e.OnCopy(); return }
 	if key == KeyCtrlV { e.OnPaste(); return }
+	if key == KeyCtrlM { e.OnCommentLine(); return }
+	if key == KeyCtrlO { e.OnLangLinesCount(); return }
 	if key == KeyEscape { e.Selection.CleanSelection(); return }
 	if key == KeyCtrlA { e.OnSelectAll(); return }
 	if key == KeyCtrlX { e.Cut(true) }

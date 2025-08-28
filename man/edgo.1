@@ -1,4 +1,4 @@
-.TH edgo 1 "2025-05-01"
+.TH edgo 1 "2025-08-28"
 .SH NAME
 edgo \- Yet another console text editor, but with native lsp support
 .SH SYNOPSIS
@@ -28,9 +28,9 @@ L L.
 Key#Description of function
 Arrows#move the cursor around
 Shift + arrows#move and select text
-Shift + Alt + y#lines count report
 PageUp#move cursor up one page
 PageDown#move cursor down one page
+Control + Shift + down/up#lines swap
 
 Control + q#quit
 Control + d#duplicate line
@@ -41,15 +41,11 @@ Control + z#undo
 Control + y#redo
 Control + f#find
 Control + t#files selection tree
-Option + /#comment line
+Control + m#comment line
+Control + o#lines count report
 Control + j#cursor to the top
 Control + k#cursor to the bottom
 Control + l#line number - cursor to the line
-
-Shift + arrow#select text
-Option + right/left#smart horizontal movement by words
-Option + down/up#smart selection
-Control + Shift + down/up#lines swap
 
 mouse selection#select text
 mouse double click#select word
