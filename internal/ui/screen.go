@@ -17,11 +17,12 @@ func (e *Editor) DrawEverything() {
     defer e.mu.Unlock() // Ensure the mutex is unlocked when the method exits
     e.Screen.Clear() // Clearing the terminal screen before opening anything
 
-	if e.code != nil { e.Lines = GetLinesArrayFromData(e.code.Value(), 0) }
+	nlines := e.code.Count(0, e.code.Len(), []byte{'\n'})
+	if e.code != nil { e.Lines = GetLinesArrayFromData(e.code.Value(), nlines) }
 	if len(e.Lines) == 0 { e.DrawLogo(); return }
 	if e.Update == false { return }
 
-	slog.Info("get", "datalen", e.code.Len(), "lines", len(e.Lines))
+	slog.Info("get", "datalen", e.code.Len(), "lines", len(e.Lines), "nlines", nlines)
 
 	countTabsTo := CountTabsTo(e.code.Value(), e.Row + e.Col)
 	tabcor := countTabsTo * (e.langTabWidth - 1)

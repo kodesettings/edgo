@@ -141,7 +141,6 @@ func ReadFileToString(filePath string) (string, error) {
 }
 
 func GetLinesArrayFromData(data []byte, lineNum int) []Line {
-	if lineNum == 0 { lineNum = CountNewLines(data) }
 	var lines []Line = make([]Line, lineNum)
 	var row int = 0
 	for _, b := range data {
@@ -155,16 +154,6 @@ func GetLinesArrayFromData(data []byte, lineNum int) []Line {
 		}
 	}
 	return lines
-}
-
-func CountNewLines(data []byte) int {
-	newlineCount := 0
-	for _, b := range data {
-		if b == '\n' {
-			newlineCount++
-		}
-	}
-	return newlineCount
 }
 
 func CountTabs(str []byte, stopIndex int) int {
