@@ -124,23 +124,6 @@ func Remove[T any](slice []T, s int) []T {
 	return append(slice[:s], slice[s+1:]...)
 }
 
-func FindAndRemove[T comparable](slice []T, element T) []T {
-	// Find the index of the element
-	index := -1
-	for i, value := range slice {
-		if value == element {
-			index = i
-			break
-		}
-	}
-
-	// Check if the element was found
-	if index == -1 { return slice }
-
-	// Remove the element by slicing the original slice
-	return append(slice[:index], slice[index+1:]...)
-}
-
 func MaxString(arr []string) int {
 	maxLength := 0
 	for _, str := range arr {
@@ -260,21 +243,6 @@ func (this Set) GetKeys() []int {
 	sort.Ints(keys) // Sort the keys
 	return keys
 }
-func (this Set) Print() {
-	for _, lineNum := range this.GetKeys() {
-		fmt.Println(lineNum)
-	}
-}
-
-func Intersect(set1, set2 Set) Set {
-	intersection := make(Set)
-	for value := range set1 {
-		if _, exists := set2[value]; exists {
-			intersection.Add(value)
-		}
-	}
-	return intersection
-}
 
 func PadLeft(str string, length int) string {
 	format := fmt.Sprintf("%%%ds", length)
@@ -339,14 +307,6 @@ func IsMatchExt(path string, ignoreExts []string) bool {
 // Inner struct to contain a line of text
 type Line struct {
 	Buf []rune
-}
-
-const Phi = 1.61803398875 // The Golden Ratio
-
-func goldenRatioPartition(totalSize int) (a int, b int) {
-	b = int(float64(totalSize) / (Phi + 1))
-	a = totalSize - b
-	return
 }
 
 // Function to remove leading tabs and spaces
