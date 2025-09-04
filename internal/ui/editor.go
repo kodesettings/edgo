@@ -95,7 +95,6 @@ type Editor struct {
 	Test       Test
 
 	TreePath *Path
-	HighlightElements map[int][]NodeRange
 
 	// drawingWg sync.WaitGroup
 	mu sync.Mutex
@@ -209,7 +208,6 @@ func (e *Editor) OpenFile(fname string) error {
 	e.treeSitterHighlighter.SetTheme(e.Config.Theme)
 	e.treeSitterHighlighter.SetLang(e.Lang)
 	e.treeSitterHighlighter.Parse(e.code.Value())
-	clear(e.HighlightElements)
 
 	e.Undo = []EditOperation{}
 	e.Redo = []EditOperation{}

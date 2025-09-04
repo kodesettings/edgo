@@ -11,8 +11,6 @@ import (
 )
 
 func (e *Editor) OnSearch() {
-	clear(e.HighlightElements)
-
 	e.IsContentSearch = true
 
 	var end = false
@@ -136,8 +134,6 @@ func (e *Editor) OnSearch() {
 }
 
 func (e *Editor) OnGlobalSearch() bool {
-	clear(e.HighlightElements)
-
 	dir, _ := os.Getwd()
 
 	start := time.Now()

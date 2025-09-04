@@ -13,9 +13,9 @@ import (
 )
 
 func (e *Editor) DrawEverything() {
-    e.mu.Lock()  // Lock the mutex to ensure exclusive access to the method
-    defer e.mu.Unlock() // Ensure the mutex is unlocked when the method exits
-    e.Screen.Clear() // Clearing the terminal screen before opening anything
+	e.mu.Lock()  // Lock the mutex to ensure exclusive access to the method
+	defer e.mu.Unlock() // Ensure the mutex is unlocked when the method exits
+	e.Screen.Clear() // Clearing the terminal screen before opening anything
 
 	var nlines int = 0
 	if e.code != nil { nlines := e.code.Count(0, e.code.Len(), []byte{'\n'})
@@ -99,26 +99,7 @@ func (e *Editor) DrawEverything() {
 				x := col - e.X + e.LINES_WIDTH + tabsOffset
 				e.Screen.SetContent(x, row, ch, nil, style)
 			}
-			//e.Screen.Show()
 			bytesCounter += utf8.RuneLen(ch)
-		}
-
-		if hightlightElements, found := e.HighlightElements[ry]; found && e.X == 0 {
-			for _, helement := range hightlightElements {
-				tabs := CountTabsTo(e.Lines[helement.Ssy].Buf, helement.Ssx)
-				tabcorrection := tabs * (e.langTabWidth - 1)
-				skip := false
-				for i := helement.Ssx; !skip && i < helement.Sex; i++ {
-					x := i + e.LINES_WIDTH + tabcorrection
-					mainc, _, stylec, _ := e.Screen.GetContent(x, row)
-					if e.Selection.IsUnderSelection(i, ry) {
-						skip = true
-					} else {
-						e.Screen.SetContent(x, row, mainc, nil, stylec.Background(Color(HighlightColor)))
-					}
-				}
-			}
-
 		}
 
 		bytesCounter += 1 // for '/n'
