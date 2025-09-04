@@ -28,7 +28,6 @@ func (e *Editor) OnDown(isPaging bool) {
 	if e.Row >= e.Y + e.ROWS { e.Y = e.Row - e.ROWS + 1  }
 
 	e.Update = true
-	clear(e.HighlightElements)
 }
 
 func (e *Editor) OnUp(isPaging bool) {
@@ -46,7 +45,6 @@ func (e *Editor) OnUp(isPaging bool) {
 	if e.Row > e.Y + e.ROWS { e.Y = e.Row - e.ROWS + 1  }
 
 	e.Update = true
-	clear(e.HighlightElements)
 }
 
 func (e *Editor) OnLeft() {
@@ -62,7 +60,6 @@ func (e *Editor) OnLeft() {
 		if e.Row < e.Y { e.Y = e.Row }
 		e.Update = true
 	}
-	clear(e.HighlightElements)
 }
 
 func (e *Editor) OnRight() {
@@ -78,7 +75,6 @@ func (e *Editor) OnRight() {
 		if e.Row > e.Y+ e.ROWS { e.Y++  }
 		e.Update = true
 	}
-	clear(e.HighlightElements)
 }
 
 func (e *Editor) GoTop() {
