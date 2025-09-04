@@ -10,6 +10,7 @@ func (e *Editor) OnCommentLine() {
 
 	var found bool
 	offset := LineOffset(e.code.Value(), e.Row)
+	if e.Row > 0 { offset++ } // due to newline character
 	ch_1 := e.code.At(offset)
 	ch_2 := e.code.At(offset + 1)
 
@@ -25,16 +26,11 @@ func (e *Editor) OnCommentLine() {
 		found = true
 	}
 
-	tabs := CountTabs(e.Lines[e.Row].Buf, e.Col)
-	spaces := CountSpaces(e.Lines[e.Row].Buf, e.Col)
-	from := tabs
-
 	if found { goto exit }
-	if tabs == 0 && spaces != 0 { from = spaces }
 
-	e.code.Insert(from, []byte(e.langConf.Comment))
+	e.code.Insert(offset, []byte(e.langConf.Comment))
 	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), offset, len(e.langConf.Comment))
-	e.Undo = append(e.Undo, EditOperation{{Insert, []byte(e.langConf.Comment), from, CursorMove{e.Row, from}}})
+	e.Undo = append(e.Undo, EditOperation{{Insert, []byte(e.langConf.Comment), offset, CursorMove{e.Row, 0}}})
 exit:
 	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)
