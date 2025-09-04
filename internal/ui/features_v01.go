@@ -25,8 +25,8 @@ func (e *Editor) OnCommentLine() {
 		found = true
 	}
 
-	tabs := CountTabs(e.code.Value(), offset)
-	spaces := CountSpaces(e.code.Value(), offset)
+	tabs := CountTabs(e.Lines[e.Row].Buf, e.Col)
+	spaces := CountSpaces(e.Lines[e.Row].Buf, e.Col)
 	from := tabs
 
 	if found { goto exit }

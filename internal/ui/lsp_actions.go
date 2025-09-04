@@ -70,7 +70,7 @@ func (e *Editor) OnHover() {
 		options := strings.Split(hover.Result.Contents.Value, "\n")
 		if len(options) == 0 { return }
 
-		tabs := CountTabsTo(e.code.Value(), e.Row + e.Col)
+		tabs := CountTabsTo(e.Lines[e.Row].Buf, e.Col)
 		width := Max(30, MaxString(options))                                                         // width depends on max option len or 30 at min
 		height := MinMany(10, len(options))                                                          // depends on min option len or 5 at min or how many rows to the end of e.Screen
 		atx := (e.Col - tabs) + e.LINES_WIDTH + tabs * (e.langTabWidth); aty := e.Row - height - e.Y // Define the window  position and dimensions
@@ -137,7 +137,7 @@ func (e *Editor) OnSignatureHelp() {
 
 		if len(options) == 0 { return }
 
-		tabs := CountTabsTo(e.code.Value(), e.Row + e.Col)
+		tabs := CountTabsTo(e.Lines[e.Row].Buf, e.Col)
 		width := Max(30, MaxString(options))                                                       // width depends on max option len or 30 at min
 		height := MinMany(10, len(options))                                                        // depends on min option len or 5 at min or how many rows to the end of e.Screen
 		atx := (e.Col - tabs) + e.LINES_WIDTH + tabs*(e.langTabWidth); aty := e.Row - height - e.Y // Define the window  position and dimensions
@@ -300,7 +300,7 @@ func (e *Editor) OnCompletion() {
 		options := e.buildCompletionOptions(completion)
 		if err != nil || len(options) == 0 { return }
 
-		tabs := CountTabsTo(e.code.Value(), e.Row + e.Col)
+		tabs := CountTabsTo(e.Lines[e.Row].Buf, e.Col)
 		atx := (e.Col - tabs) + e.LINES_WIDTH + tabs*(e.langTabWidth)
 		if e.X != 0  { atx = (e.Col) + e.LINES_WIDTH - e.X }
 		aty := e.Row + 1 - e.Y // Define the window  position and dimensions

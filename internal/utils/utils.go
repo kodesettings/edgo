@@ -156,7 +156,7 @@ func GetLinesArrayFromData(data []byte, lineNum int) []Line {
 	return lines
 }
 
-func CountTabs(str []byte, stopIndex int) int {
+func CountTabs(str []rune, stopIndex int) int {
 	if stopIndex == 0 { return 0 }
 
 	count := 0
@@ -167,7 +167,7 @@ func CountTabs(str []byte, stopIndex int) int {
 	return count
 }
 
-func CountTabsTo(str []byte, stopIndex int) int {
+func CountTabsTo(str []rune, stopIndex int) int {
 	if stopIndex == 0 { return 0 }
 
 	count := 0
@@ -178,7 +178,7 @@ func CountTabsTo(str []byte, stopIndex int) int {
 	return count
 }
 
-func CountSpaces(str []byte, stopIndex int) int {
+func CountSpaces(str []rune, stopIndex int) int {
 	if stopIndex == 0 { return 0 }
 
 	count := 0
