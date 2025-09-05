@@ -35,7 +35,6 @@ func (e *Editor) InsertCharacter(line, pos int, ch rune) {
 	// record the operation on the undo stack. Note that we're creating a new EditOperation
 	// and adding all the Operations to it
 	e.Undo = append(e.Undo, EditOperation{{Insert, []byte(string(ch)), offset, CursorMove{line, pos}}})
-	if len(e.Redo) > 0 { e.Redo = make([]EditOperation, 0) }
 }
 
 func (e *Editor) InsertString(line, pos int, linestring string) {
@@ -47,7 +46,6 @@ func (e *Editor) InsertString(line, pos int, linestring string) {
 	// record the operation on the undo stack. Note that we're creating a new EditOperation
 	// and adding all the Operations to it
 	e.Undo = append(e.Undo, EditOperation{{Insert, []byte(l), offset, CursorMove{line, pos}}})
-	if len(e.Redo) > 0 { e.Redo = make([]EditOperation, 0) }
 }
 
 func (e *Editor) DeleteCharacter(line, pos int) {
@@ -59,7 +57,6 @@ func (e *Editor) DeleteCharacter(line, pos int) {
 	// record the operation on the undo stack. Note that we're creating a new EditOperation
 	// and adding all the Operations to it
 	e.Undo = append(e.Undo, EditOperation{{Delete, []byte{ch}, offset, CursorMove{line, pos}}})
-	if len(e.Redo) > 0 { e.Redo = make([]EditOperation, 0) }
 }
 
 func (e *Editor) ShiftWithTabsToRight(line, pos int, selectedLines []int) {
@@ -74,7 +71,6 @@ func (e *Editor) ShiftWithTabsToRight(line, pos int, selectedLines []int) {
 
 	e.Selection.Sex = pos
 	e.Undo = append(e.Undo, ops)
-	if len(e.Redo) > 0 { e.Redo = make([]EditOperation, 0) }
 }
 
 func (e *Editor) MaybeAddPair(line, pos int, ch rune) (rune, bool) {

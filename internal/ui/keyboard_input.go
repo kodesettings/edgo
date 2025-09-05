@@ -2,6 +2,7 @@ package ui
 
 import (
 	. "github.com/gdamore/tcell"
+	. "github.com/vipmax/edgo/internal/operations"
 	"os"
 )
 
@@ -12,6 +13,10 @@ func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 	if e.IsProcessPanelFocused {
 		e.OnProcessKeyHandle(key, ev.Rune())
 		return
+	}
+
+	if key != KeyCtrlZ && key != KeyCtrlY {
+		if len(e.Redo) > 0 { e.Redo = make([]EditOperation, 0) } // resetting redo stack
 	}
 
 	if key == KeyUp && modifiers == 3 { e.OnSwapLinesUp(); return } // control + shift + up
