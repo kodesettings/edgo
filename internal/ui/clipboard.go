@@ -50,6 +50,9 @@ func (e *Editor) Cut(isCopySelected bool) {
 	sxd := selectedIndices[0][0]
 	syd := selectedIndices[0][1]
 
+	e.Row = syd
+	e.Col = sxd
+
 	sxd += LineOffset(e.code.Value(), syd)
 	exd += LineOffset(e.code.Value(), eyd)
 
@@ -57,10 +60,9 @@ func (e *Editor) Cut(isCopySelected bool) {
 	copy(text, e.code.Slice(sxd, exd + 2))
 
 	e.code.Remove(sxd, exd + 2)
-	e.Row = syd
-
 	e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), sxd, len(text))
-	e.Undo = append(e.Undo, EditOperation{{Delete, text, sxd, CursorMove{eyd - 1, 0}}})
+
+	e.Undo = append(e.Undo, EditOperation{{Delete, text, sxd, CursorMove{e.Row, e.Col}}})
 	e.Selection.CleanSelection()
 	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)
@@ -80,7 +82,7 @@ func (e *Editor) Duplicate() {
 	eyd = LineOffset(e.code.Value(), e.Row) + 1
 
 	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), syd, len(duplicatedSlice))
-	e.Undo = append(e.Undo, EditOperation{{Insert, duplicatedSlice, eyd, CursorMove{eyd, 0}}})
+	e.Undo = append(e.Undo, EditOperation{{Insert, duplicatedSlice, eyd, CursorMove{e.Row, e.Col}}})
 	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)
 }
