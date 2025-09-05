@@ -52,8 +52,11 @@ func (e *Editor) OnSwapLinesUp() {
 	copy(line_2, e.code.Slice(to + 1, offset + 1))
 
 	e.code.Remove(to, offset) // remove line_2 from current position
+	e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), to, len(line_2))
+
 	if e.Row > 1 { offset = from + 1 } else { offset = from }
 	e.code.Insert(offset, line_2) // add line_2 to top
+	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), offset, len(line_2))
 
 	e.Undo = append(e.Undo, EditOperation{
 		{Delete, line_2, to + 1, CursorMove{e.Row, -1}},
@@ -61,8 +64,6 @@ func (e *Editor) OnSwapLinesUp() {
 	})
 
 	e.Row--
-	e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), to + 1, len(line_2))
-	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), offset, len(line_2))
 	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)
 }
@@ -86,8 +87,11 @@ func (e *Editor) OnSwapLinesDown() {
 	// TODO: fix moving from first line
 
 	e.code.Remove(from, to) // remove line_1 from current position
+	e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), from, len(line_1))
+
 	offset = LineOffset(e.code.Value(), e.Row + 1)
 	e.code.Insert(offset, line_1) // add line_1 to bottom
+	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), offset, len(line_1))
 
 	e.Undo = append(e.Undo, EditOperation{
 		{Delete, line_1, from, CursorMove{e.Row, -1}},
@@ -95,8 +99,6 @@ func (e *Editor) OnSwapLinesDown() {
 	})
 
 	e.Row++
-	e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), from, len(line_1))
-	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), offset, len(line_1))
 	e.UpdateLsp(false, string(e.code.Value()))
 	e.set_update_parameters(true)
 }
