@@ -26,7 +26,7 @@ func TestOnCommentLine(t *testing.T) {
 }
 
 func TestOnSwapLinesUp(t *testing.T) {
-	e.code = rope.New([]byte("first line of text\nsecond line of text\nthird line of text"))
+	e.code = rope.New([]byte("first line of text\nsecond line of text\nthird line of text\n"))
 
 	e.Row = 1
 	e.Col = 0
@@ -34,11 +34,11 @@ func TestOnSwapLinesUp(t *testing.T) {
 	apply_highlighter(e.code.Value(), "", "")
 	e.OnSwapLinesUp()
 
-	expected := "second line of text\nfirst line of text\nthird line of text"
+	expected := "second line of text\nfirst line of text\nthird line of text\n"
 	assert.Equal(t, expected, string(e.code.Value()), "swaplinesup mismatch")
 
 	e.OnUndo()
-	actual := "first line of text\nsecond line of text\nthird line of text"
+	actual := "first line of text\nsecond line of text\nthird line of text\n"
 	assert.Equal(t, actual, string(e.code.Value()), "undo swaplinesup mismatch")
 
 	e.OnRedo()
@@ -46,7 +46,7 @@ func TestOnSwapLinesUp(t *testing.T) {
 }
 
 func TestOnSwapLinesDown(t *testing.T) {
-	e.code = rope.New([]byte("first line of text\nsecond line of text\nthird line of text"))
+	e.code = rope.New([]byte("first line of text\nsecond line of text\nthird line of text\n"))
 
 	e.Row = 1
 	e.Col = 0
@@ -54,11 +54,11 @@ func TestOnSwapLinesDown(t *testing.T) {
 	apply_highlighter(e.code.Value(), "", "")
 	e.OnSwapLinesDown()
 
-	expected := "first line of text\nthird line of text\nsecond line of text"
+	expected := "first line of text\nthird line of text\nsecond line of text\n"
 	assert.Equal(t, expected, string(e.code.Value()), "swaplinesup mismatch")
 
 	e.OnUndo()
-	actual := "first line of text\nsecond line of text\nthird line of text"
+	actual := "first line of text\nsecond line of text\nthird line of text\n"
 	assert.Equal(t, actual, string(e.code.Value()), "undo swaplinesup mismatch")
 
 	e.OnRedo()

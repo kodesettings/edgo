@@ -57,8 +57,8 @@ func (e *Editor) OnSwapLinesUp() {
 	})
 
 	e.code.Remove(to, offset) // remove line_2 from current position
-	e.code.Insert(from, line_2) // add line_2 to top
-	offset = LineOffset(e.code.Value(), e.Row + 1)
+	if e.Row > 1 { offset = from + 1 } else { offset = from }
+	e.code.Insert(offset, line_2) // add line_2 to top
 
 	e.Row--
 	text_len := len(append(line_1, line_2...))
@@ -70,7 +70,8 @@ func (e *Editor) OnSwapLinesUp() {
 func (e *Editor) OnSwapLinesDown() {
 	e.Focus()
 
-	if e.Row < 1 { return }
+	nlines := e.code.Count(0, e.code.Len(), []byte{'\n'})
+	if e.Row == nlines - 1 { return }
 
 	from := LineOffset(e.code.Value(), e.Row)
 	to := LineOffset(e.code.Value(), e.Row + 1)
@@ -87,11 +88,13 @@ func (e *Editor) OnSwapLinesDown() {
 		{Insert, line_1, to - 1, CursorMove{e.Row, 0}},
 	})
 
+	// TODO: fix moving from first line
+
 	e.code.Remove(from, to) // remove line_1 from current position
 	offset = LineOffset(e.code.Value(), e.Row + 1)
 	e.code.Insert(offset, line_1) // add line_1 to bottom
 
-	e.Row--
+	e.Row++
 	text_len := len(append(line_1, line_2...))
 	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), from, text_len)
 	e.UpdateLsp(false, string(e.code.Value()))

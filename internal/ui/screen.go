@@ -18,7 +18,7 @@ func (e *Editor) DrawEverything() {
 	e.Screen.Clear() // Clearing the terminal screen before opening anything
 
 	var nlines int = 0
-	if e.code != nil { nlines := e.code.Count(0, e.code.Len(), []byte{'\n'})
+	if e.code != nil { nlines = e.code.Count(0, e.code.Len(), []byte{'\n'})
 		e.Lines = GetLinesArrayFromData(e.code.Value(), nlines) }
 	if len(e.Lines) == 0 { e.DrawLogo(); return }
 	if e.Update == false { return }
