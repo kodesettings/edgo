@@ -6,12 +6,15 @@ AVAILABLE ISSUES:
 == fixing all unit test cases
   - failing test cases are: process, lsp (for golang only, due to gopls timeout)
   - why lsp is timing out after didOpen in test case?
-== some user input cursor positions have to be fine tuned manually
-== copy/paste doesn't work now, needs to be fixed
-  - this is probably system dependent bug, need to investigate this issue
+== some user input cursor positions have to be fixed on the undo stack
+== tree-sitter highlighter breaks on special ascii characters
+== implement functionality to create and write to new empty files
 
 SOLVED ISSUES:
 
+== reimplemented and fixed all the keyboard actions for the new architecture
+== implemented rope string buffer for underlying text manipulation
+== remapped some keys and cleaned up keyboard inputs
 == fixed and optimized tree sitter highlighter operations
 == updated and refactored line buffer and redo/undo stack
 == removed files tree codes and io module achieving significant speedup
