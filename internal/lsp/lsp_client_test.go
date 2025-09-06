@@ -8,7 +8,7 @@ import (
 	assert "github.com/stretchr/testify/assert"
 )
 
-func TestLspClientStart(t *testing.T) {
+func TestLspClientFindProcess(t *testing.T) {
 	lsp := LspClient{}
 	started := lsp.Start("gopls")
 	defer lsp.stop()
@@ -21,15 +21,6 @@ func TestLspClientStart(t *testing.T) {
 
 	process, err := os.FindProcess(pid)
 	assert.Nil(t, err, "error finding Cmd with id %d: %s\n", process.Pid, err)
-}
-
-func TestLspClientStop(t *testing.T) {
-	lsp := LspClient{Lang: "go"}
-	lsp.Start("gopls")
-	defer lsp.stop()
-
-	pid := lsp.Cmd.Process.Pid
-	assert.NotEqual(t, pid, 0, "lsp pid is zero")
 }
 
 func TestLspClientInitialize(t *testing.T) {
@@ -59,7 +50,7 @@ func TestLspClientHover(t *testing.T) {
 	stringtext := string(text)
 	lsp.DidOpen(file, &stringtext)
 
-	response, err := lsp.Hover(file, 66-1, 8)
+	response, err := lsp.Hover(file, 51-1, 8)
 	assert.Nil(t, err, "error occured")
 
 	fmt.Println(response, err)
@@ -82,7 +73,7 @@ func TestLspClientCompletion(t *testing.T) {
 	stringtext := string(text)
 	lsp.DidOpen(file, &stringtext)
 
-	response, err := lsp.Completion(file, 88-1, 8)
+	response, err := lsp.Completion(file, 74-1, 8)
 	assert.Nil(t, err, "error occured")
 
 	fmt.Println(response, err)
@@ -105,7 +96,7 @@ func TestLspClientDefinition(t *testing.T) {
 	stringtext := string(text)
 	lsp.DidOpen(file, &stringtext)
 
-	response, err := lsp.Definition(file, 111-1, 8)
+	response, err := lsp.Definition(file, 97-1, 8)
 	assert.Nil(t, err, "error occured")
 
 	fmt.Println(response, err)
@@ -127,7 +118,7 @@ func TestLspClientSignatureHelp(t *testing.T) {
 	stringtext := string(text)
 	lsp.DidOpen(file, &stringtext)
 
-	response, err := lsp.SignatureHelp(file, 133-1, 8)
+	response, err := lsp.SignatureHelp(file, 119-1, 8)
 	assert.Nil(t, err, "error occured")
 
 	fmt.Println(response, err)
@@ -150,7 +141,7 @@ func TestLspClientReferences(t *testing.T) {
 	stringtext := string(text)
 	lsp.DidOpen(file, &stringtext)
 
-	response, err := lsp.References(file, 156-1, 8)
+	response, err := lsp.References(file, 142-1, 8)
 	assert.Nil(t, err, "error occured")
 
 	fmt.Println(response, err)
