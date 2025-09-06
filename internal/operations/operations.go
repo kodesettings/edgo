@@ -4,6 +4,7 @@ type Action string
 
 const (
 	Insert Action = "insert"
+	AddChar Action = "addchar"
 	Delete Action = "delete"
 	Start Action = "start"
 	End Action = "end"

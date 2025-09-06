@@ -32,9 +32,15 @@ func (e *Editor) InsertCharacter(line, pos int, ch rune) {
 	e.code.Insert(offset, []byte(string(ch)))
 	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), offset, len(string(ch)))
 
+	// undo operation type is switched between insert and addchar types
+	var op Action
+
+	// change op if this is a new line character
+	if ch == '\n' { op = Insert } else { op = AddChar }
+
 	// record the operation on the undo stack. Note that we're creating a new EditOperation
 	// and adding all the Operations to it
-	e.Undo = append(e.Undo, EditOperation{{Insert, []byte(string(ch)), offset, CursorMove{line, pos}}})
+	e.Undo = append(e.Undo, EditOperation{{op, []byte(string(ch)), offset, CursorMove{line, pos}}})
 }
 
 func (e *Editor) InsertString(line, pos int, linestring string) {

@@ -101,7 +101,7 @@ undo:
 	if len(lastOperation) > 0 { o = lastOperation[index] } else { goto exit }
 
 	switch o.Action {
-	case Insert:
+	case Insert, AddChar:
 		e.code.Remove(o.Offset, o.Offset + len(o.Text))
 		e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), o.Offset, len(o.Text))
 		e.Row = o.Cursor.Line; e.Col = o.Cursor.Column
@@ -126,16 +126,19 @@ func (e *Editor) OnRedo() {
 	lastRedoOperation := e.Redo[len(e.Redo)-1]
 	e.Redo = e.Redo[:len(e.Redo)-1]
 
-	index := 0
+	index, offset := 0, 0
 	var o Operation
 redo:
 	if len(lastRedoOperation) > 0 { o = lastRedoOperation[index] } else { goto exit }
 
 	switch o.Action {
+	case AddChar:
+		offset++
+		fallthrough
 	case Insert:
 		e.code.Insert(o.Offset, o.Text)
 		e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), o.Offset, len(o.Text))
-		e.Row = o.Cursor.Line; e.Col = o.Cursor.Column
+		e.Row = o.Cursor.Line; e.Col = o.Cursor.Column + offset
 	break;
 	case Delete:
 		e.code.Remove(o.Offset, o.Offset + len(o.Text))
