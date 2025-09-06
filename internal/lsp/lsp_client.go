@@ -149,22 +149,25 @@ skip:
 }
 
 func (l *LspClient) receiveLoop() {
-receive:
+repeat:
 	message := l.receiveDiagnostics()
 	slog.Info("recv:", "json", message)
-	var err error
-	var dr DiagnosticResponse
 
-	if !strings.Contains(message,"publishDiagnostics") { goto skip; }
-	err = json.Unmarshal([]byte(message), &dr)
-	if err != nil { slog.Error(err.Error()); goto receive; }
-	l.file2diagnostic[dr.Params.Uri] = dr.Params
-	l.DiagnosticsChannel <- message
-	goto receive;
-skip:
+	if strings.Contains(message,"publishDiagnostics") {
+		var dr DiagnosticResponse
+		err := json.Unmarshal([]byte(message), &dr)
+		if err != nil { slog.Error(err.Error()); goto repeat; }
+		l.file2diagnostic[dr.Params.Uri] = dr.Params
+		l.DiagnosticsChannel <- message
+		goto repeat;
+	} else if strings.Contains(message,"workspace/applyEdit") {
+		l.otherMessages <- message
+		goto repeat;
+	}
+
 	responseJSON := make(map[string]interface{})
-	err = json.Unmarshal([]byte(message), &responseJSON)
-	if err != nil { slog.Error(err.Error()); goto receive; }
+	err := json.Unmarshal([]byte(message), &responseJSON)
+	if err != nil { slog.Error(err.Error()); goto repeat; }
 
 	if value, found := responseJSON["id"]; found { // json has id
 		if id, ok := value.(float64); ok {
@@ -177,7 +180,7 @@ skip:
 		}
 	}
 
-	goto receive;
+	goto repeat;
 }
 
 func (this *LspClient) GetDiagnostic(filename string) (DiagnosticParams, bool) {
