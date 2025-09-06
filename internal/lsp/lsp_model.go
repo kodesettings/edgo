@@ -490,7 +490,6 @@ type CommandRequest struct {
 	Params  Command  `json:"params"`
 }
 
-
 type CommandResponse struct {
 	ID      int        `json:"id"`
 	JSONRPC string     `json:"jsonrpc"`
@@ -504,18 +503,4 @@ type EditParams struct {
 
 type DocumentEdit struct {
 	DocumentChanges ChangesResult `json:"documentChanges"`
-}
-
-type Applied struct {
-	Applied bool  `json:"applied"`
-}
-
-type ApplyWorkspaceEditParams struct {
-	Applied Applied  `json:"edit"`
-}
-
-type ApplyEditRequest struct {
-	ID int          `json:"id"`
-	JSONRPC string  `json:"jsonrpc"`
-	Result  Applied `json:"result"`
 }

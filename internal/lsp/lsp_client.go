@@ -485,11 +485,3 @@ func (this *LspClient) Command(command Command) (CommandResponse, error) {
 	if err != nil { slog.Error("Error parsing JSON:", "err", err.Error()) }
 	return response, err
 }
-
-func (this *LspClient) ApplyEdit(key int) {
-	request := ApplyEditRequest {
-		ID: key,  JSONRPC: "2.0",
-		Result:  Applied { true } ,
-	}
-	this.send(request)
-}

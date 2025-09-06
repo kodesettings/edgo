@@ -548,36 +548,3 @@ func (e *Editor) applyRename(renameResponse RenameResponse) {
 		e.Row = tmpr; e.Col = tmpc;  e.Y = tmpy;  e.X = tmpx;
 	}
 }
-
-func (e *Editor) OnCodeAction() {
-	if e.Lang == "" { return }
-	Lsp := e.lsp2lang[e.Lang]
-	if !Lsp.IsReady { return }
-
-	codeAction, err := Lsp.CodeAction(e.AbsoluteFilePath, e.Selection.Ssx, e.Selection.Ssy, e.Selection.Sex, e.Selection.Sey)
-	if err != nil { return }
-	if len(codeAction.Result) == 0 { return }
-
-	commandResponse, err := Lsp.Command(codeAction.Result[0].Command)
-	if err != nil { return }
-	if len(commandResponse.Params.Edit.DocumentChanges.DocumentChanges) == 0 { return }
-
-	e.handleEdits(commandResponse.Params.Edit.DocumentChanges.DocumentChanges[0].Edits)
-	Lsp.ApplyEdit(commandResponse.ID)
-}
-
-func (e *Editor) handleEdits(edits []Edit) {
-	for _, edit := range edits {
-		start := edit.Range.Start
-
-		newLines := strings.Split(edit.NewText, "\n")
-		for i, line := range newLines {
-			index := int(start.Line) + i
-			if index >= len(e.Lines) {
-				e.Lines = append(e.Lines, Line{[]rune(line)})
-			} else  {
-				e.Lines[index] = Line{[]rune(line)}
-			}
-		}
-	}
-}

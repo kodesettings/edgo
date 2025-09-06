@@ -25,7 +25,6 @@ func (e *Editor) HandleKeyboard(key Key, ev *EventKey, modifiers ModMask) {
 	if key == KeyTab { e.OnTab(); return }
 	if key == KeyCtrlH { e.OnHover(); return }
 	if key == KeyCtrlR { e.OnReferences(); return }
-	if key == KeyCtrlW { e.OnCodeAction(); return }
 	if key == KeyCtrlP { e.OnSignatureHelp(); return }
 	if key == KeyCtrlG { e.OnDefinition(); return }
 	if key == KeyCtrlE { e.OnErrors(); return }
