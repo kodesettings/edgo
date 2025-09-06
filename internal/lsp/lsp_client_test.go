@@ -11,7 +11,7 @@ import (
 func TestLspClientStart(t *testing.T) {
 	lsp := LspClient{}
 	started := lsp.Start("gopls")
-	defer lsp.Stop()
+	defer lsp.stop()
 
 	assert.Equal(t, true, started, "lsp not started")
 	assert.NotNil(t, lsp.Cmd, "cmd is nil")
@@ -21,26 +21,21 @@ func TestLspClientStart(t *testing.T) {
 
 	process, err := os.FindProcess(pid)
 	assert.Nil(t, err, "error finding Cmd with id %d: %s\n", process.Pid, err)
-	assert.NotEqual(t, lsp.isStopped, true, "expected lsp not to be stopped")
 }
 
 func TestLspClientStop(t *testing.T) {
 	lsp := LspClient{Lang: "go"}
 	lsp.Start("gopls")
-	defer lsp.Stop()
+	defer lsp.stop()
 
 	pid := lsp.Cmd.Process.Pid
 	assert.NotEqual(t, pid, 0, "lsp pid is zero")
-
-	lsp.Stop()
-
-	assert.Equal(t, true, lsp.isStopped, "expected lsp to be stopped, got false")
 }
 
 func TestLspClientInitialize(t *testing.T) {
 	lsp := LspClient{Lang: "go"}
 	lsp.Start("gopls")
-	defer lsp.Stop()
+	defer lsp.stop()
 
 	pid := lsp.Cmd.Process.Pid
 	assert.NotEqual(t, pid, 0, "lsp pid is zero")
@@ -54,7 +49,7 @@ func TestLspClientInitialize(t *testing.T) {
 func TestLspClientHover(t *testing.T) {
 	lsp := LspClient{Lang: "go"}
 	lsp.Start("gopls")
-	defer lsp.Stop()
+	defer lsp.stop()
 
 	currentDir, _ := os.Getwd()
 	lsp.Init(currentDir)
@@ -77,7 +72,7 @@ func TestLspClientHover(t *testing.T) {
 func TestLspClientCompletion(t *testing.T) {
 	lsp := LspClient{Lang: "go"}
 	lsp.Start("gopls")
-	defer lsp.Stop()
+	defer lsp.stop()
 
 	currentDir, _ := os.Getwd()
 	lsp.Init(currentDir)
@@ -100,7 +95,7 @@ func TestLspClientCompletion(t *testing.T) {
 func TestLspClientDefinition(t *testing.T) {
 	lsp := LspClient{Lang: "go"}
 	lsp.Start("gopls")
-	defer lsp.Stop()
+	defer lsp.stop()
 
 	currentDir, _ := os.Getwd()
 	lsp.Init(currentDir)
@@ -122,7 +117,7 @@ func TestLspClientDefinition(t *testing.T) {
 func TestLspClientSignatureHelp(t *testing.T) {
 	lsp := LspClient{Lang: "go"}
 	lsp.Start("gopls")
-	defer lsp.Stop()
+	defer lsp.stop()
 
 	currentDir, _ := os.Getwd()
 	lsp.Init(currentDir)
@@ -145,7 +140,7 @@ func TestLspClientSignatureHelp(t *testing.T) {
 func TestLspClientReferences(t *testing.T) {
 	lsp := LspClient{Lang: "go"}
 	lsp.Start("gopls")
-	defer lsp.Stop()
+	defer lsp.stop()
 
 	currentDir, _ := os.Getwd()
 	lsp.Init(currentDir)

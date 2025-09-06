@@ -16,15 +16,14 @@ import (
 )
 
 type LspClient struct {
-	Lang  string
-	Cmd   *exec.Cmd
-	stdin io.WriteCloser
+	Lang   string
+	Cmd    *exec.Cmd
+	stdin  io.WriteCloser
 	stdout io.ReadCloser
 	stop   context.CancelFunc
 	reader *bufio.Reader
 
-	IsReady   bool
-	isStopped bool
+	IsReady bool // flag for lsp initialization
 
 	message2chan          map[int]chan string
 	completionMessages    chan string
@@ -61,7 +60,6 @@ func (l *LspClient) Start(cmd string, args ...string) bool {
 	startError := l.Cmd.Start()
 	if startError != nil {
 		slog.Error("error starting lsp ", "err", startError.Error())
-		l.isStopped = true
 		return false
 	} else {
 		time.Sleep(time.Duration(1000) * time.Millisecond)
@@ -84,13 +82,6 @@ func (l *LspClient) Start(cmd string, args ...string) bool {
 
 	return true
 }
-
-func (l *LspClient) Stop() {
-	if l.isStopped { return }
-	l.stop()
-	l.isStopped = true
-}
-
 
 func (this *LspClient) send(o interface{})  {
 	m, err := json.Marshal(o)
@@ -152,8 +143,6 @@ repeat:
 	if line == "" {
 		responseMustBeNext = true
 		goto repeat;
-	} else if !this.isStopped {
-		goto repeat;
 	}
 
 	return ""
@@ -192,7 +181,7 @@ repeat:
 		}
 	}
 
-	if !l.isStopped { goto repeat; }
+	goto repeat;
 }
 
 func (this *LspClient) GetDiagnostic(filename string) (DiagnosticParams, bool) {
