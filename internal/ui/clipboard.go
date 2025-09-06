@@ -53,13 +53,13 @@ func (e *Editor) Cut(isCopySelected bool) {
 	e.Row = syd
 	e.Col = sxd
 
-	sxd += LineOffset(e.code.Value(), syd)
-	exd += LineOffset(e.code.Value(), eyd)
+	sxd += LineOffset(e.code.Value(), syd) + 1
+	exd += LineOffset(e.code.Value(), eyd) + 2
 
-	text := make([]byte, exd - sxd + 2)
-	copy(text, e.code.Slice(sxd, exd + 2))
+	text := make([]byte, exd - sxd)
+	copy(text, e.code.Slice(sxd, exd))
 
-	e.code.Remove(sxd, exd + 2)
+	e.code.Remove(sxd, exd)
 	e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), sxd, len(text))
 
 	e.Undo = append(e.Undo, EditOperation{{Delete, text, sxd, CursorMove{e.Row, e.Col}}})
@@ -72,11 +72,12 @@ func (e *Editor) Duplicate() {
 	e.Focus()
 
 	if e.code.Len() == 0 { return }
-	syd := LineOffset(e.code.Value(), e.Row)
-	eyd := LineOffset(e.code.Value(), e.Row + 1)
-	duplicatedSlice := e.code.Slice(syd, eyd + 1)
+	syd := LineOffset(e.code.Value(), e.Row) + 1
+	eyd := LineOffset(e.code.Value(), e.Row + 1) + 1
+	if e.Row == 0 { syd-- } // this is required for first line only
+	duplicatedSlice := e.code.Slice(syd, eyd)
 
-	e.code.Insert(eyd + 1, duplicatedSlice)
+	e.code.Insert(eyd, duplicatedSlice)
 	e.Row++
 
 	eyd = LineOffset(e.code.Value(), e.Row) + 1
@@ -108,7 +109,7 @@ undo:
 	case Delete:
 		e.code.Insert(o.Offset, o.Text)
 		e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), o.Offset, len(o.Text))
-		e.Row = o.Cursor.Line; e.Col = o.Cursor.Column + 1
+		e.Row = o.Cursor.Line; e.Col = o.Cursor.Column
 	break;
 	}
 
@@ -134,7 +135,7 @@ redo:
 	case Insert:
 		e.code.Insert(o.Offset, o.Text)
 		e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), o.Offset, len(o.Text))
-		e.Row = o.Cursor.Line; e.Col = o.Cursor.Column + 1
+		e.Row = o.Cursor.Line; e.Col = o.Cursor.Column
 	break;
 	case Delete:
 		e.code.Remove(o.Offset, o.Offset + len(o.Text))

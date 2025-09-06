@@ -6,10 +6,7 @@ AVAILABLE ISSUES:
 == fixing all unit test cases
   - failing test cases are: process, lsp (for golang only, due to gopls timeout)
   - why lsp is timing out after didOpen in test case?
-== some user input cursor routines have to be fine tuned manually
-  - cut, duplicate and selection enter operations have to be fixed, this is due to the
-    extra newline character that is in place in the string buffer but not present on the
-    ui layer during display.
+== some user input cursor positions have to be fine tuned manually
 == copy/paste doesn't work now, needs to be fixed
   - this is probably system dependent bug, need to investigate this issue
 

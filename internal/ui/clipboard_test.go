@@ -33,7 +33,7 @@ func TestCutActionPosition(t *testing.T) {
 	apply_highlighter(e.code.Value(), "", "")
 	e.Cut(true)
 
-	expected = "this is a sample textne of text"
+	expected = "this is a sample text\nne of text"
 	assert.Equal(t, expected, string(e.code.Value()), "cut lines mismatch")
 
 	e.OnUndo()
@@ -59,7 +59,7 @@ func TestCutActionLinesOnly(t *testing.T) {
 	apply_highlighter(e.code.Value(), "", "")
 	e.Cut(true)
 
-	expected = "this is a sample text"
+	expected = "this is a sample text\n"
 	assert.Equal(t, expected, string(e.code.Value()), "cut lines mismatch")
 
 	e.OnUndo()
