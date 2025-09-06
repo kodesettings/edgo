@@ -3,15 +3,14 @@
 
 AVAILABLE ISSUES:
 
-== fixing all unit test cases
-  - failing test cases are: process, lsp (for golang only, due to gopls timeout)
-  - why lsp is timing out after didOpen in test case?
 == some user input cursor positions have to be fixed on the undo stack
 == tree-sitter highlighter breaks on special ascii characters
 == implement functionality to create and write to new empty files
+== rewriting lsp channel handling so tests can run from root
 
 SOLVED ISSUES:
 
+== removed terminal process implementation as it was not used at all
 == reimplemented and fixed all the keyboard actions for the new architecture
 == implemented rope string buffer for underlying text manipulation
 == remapped some keys and cleaned up keyboard inputs
