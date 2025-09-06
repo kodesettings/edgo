@@ -94,41 +94,41 @@ func (this *LspClient) send(o interface{})  {
 }
 
 func (this *LspClient) receiveDiagnostics() string {
-
 	const LEN_HEADER = "Content-Length: "
 	var messageSize int
 	var responseMustBeNext bool
 	var line string
 	var err error
-repeat:
-	if messageSize != 0 && responseMustBeNext {
-		buf := make([]byte, messageSize)
-		_, err = io.ReadFull(this.reader, buf)
-		if err != nil { slog.Error(err.Error()); goto repeat; }
-		line = string(buf)
-		messageSize = 0
+diagnostics:
+	responseJSON := make(map[string]interface{})
+	method, methodFound := responseJSON["method"]
+	buf := make([]byte, messageSize)
 
-		responseJSON := make(map[string]interface{})
-		err = json.Unmarshal(buf, &responseJSON)
-		if err != nil { slog.Error(err.Error()); goto repeat; }
+	if messageSize == 0 || !responseMustBeNext { goto skip; }
 
-		method, methodFound := responseJSON["method"]
-		if methodFound && method.(string) == "textDocument/publishDiagnostics" {
-			var dr DiagnosticResponse
-			err = json.Unmarshal(buf, &dr)
-			if err != nil { slog.Error(err.Error()); goto repeat; }
+	_, err = io.ReadFull(this.reader, buf)
+	if err != nil { slog.Error(err.Error()); goto diagnostics; }
+	line = string(buf)
+	messageSize = 0
+
+	err = json.Unmarshal(buf, &responseJSON)
+	if err != nil { slog.Error(err.Error()); goto diagnostics; }
+
+	if methodFound && method.(string) == "textDocument/publishDiagnostics" {
+		var dr DiagnosticResponse
+		err = json.Unmarshal(buf, &dr)
+		if err != nil { slog.Error(err.Error()); goto diagnostics; }
+		return line
+	}
+
+	if value, idFound := responseJSON["id"]; idFound {
+		if _, ok := value.(float64); ok {
 			return line
 		}
-
-		if value, idFound := responseJSON["id"]; idFound {
-			if _, ok := value.(float64); ok {
-				return line
-			}
-		}
-	} else {
-		line, err = this.reader.ReadString('\n') // it stuck sometimes
-		if err != nil { slog.Error("[445 lsp]", "err", err.Error()); goto repeat; }
 	}
+skip:
+	line, err = this.reader.ReadString('\n') // it stuck sometimes
+	if err != nil { slog.Error("[445 lsp]", "err", err.Error()); goto diagnostics; }
 
 	line = strings.TrimSuffix(line, "\r\n")
 
@@ -137,12 +137,12 @@ repeat:
 		msize, _ := strconv.Atoi(sizeStr)
 		messageSize = msize
 		responseMustBeNext = false
-		goto repeat;
+		goto diagnostics;
 	}
 
 	if line == "" {
 		responseMustBeNext = true
-		goto repeat;
+		goto diagnostics;
 	}
 
 	return ""
@@ -160,8 +160,7 @@ repeat:
 		l.file2diagnostic[dr.Params.Uri] = dr.Params
 		l.DiagnosticsChannel <- message
 		goto repeat;
-	}
-	if strings.Contains(message,"workspace/applyEdit") {
+	} else if strings.Contains(message,"workspace/applyEdit") {
 		l.otherMessages <- message
 		goto repeat;
 	}
@@ -204,7 +203,6 @@ func WaitForRequest[T any](channel chan string, timeout int) (T, error) {
 
 	return response, err
 }
-
 
 func (l *LspClient) Init(dir string) {
 	l.id = 0
