@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"strings"
 	"testing"
 	assert "github.com/stretchr/testify/assert"
 )
@@ -28,6 +27,7 @@ func TestLspClientStart(t *testing.T) {
 func TestLspClientStop(t *testing.T) {
 	lsp := LspClient{Lang: "go"}
 	lsp.Start("gopls")
+	defer lsp.Stop()
 
 	pid := lsp.Cmd.Process.Pid
 	assert.NotEqual(t, pid, 0, "lsp pid is zero")
@@ -40,6 +40,7 @@ func TestLspClientStop(t *testing.T) {
 func TestLspClientInitialize(t *testing.T) {
 	lsp := LspClient{Lang: "go"}
 	lsp.Start("gopls")
+	defer lsp.Stop()
 
 	pid := lsp.Cmd.Process.Pid
 	assert.NotEqual(t, pid, 0, "lsp pid is zero")
@@ -53,6 +54,7 @@ func TestLspClientInitialize(t *testing.T) {
 func TestLspClientHover(t *testing.T) {
 	lsp := LspClient{Lang: "go"}
 	lsp.Start("gopls")
+	defer lsp.Stop()
 
 	currentDir, _ := os.Getwd()
 	lsp.Init(currentDir)
@@ -62,12 +64,12 @@ func TestLspClientHover(t *testing.T) {
 	stringtext := string(text)
 	lsp.DidOpen(file, &stringtext)
 
-	response, err := lsp.Hover(file, 75-1, 7)
+	response, err := lsp.Hover(file, 66-1, 8)
 	assert.Nil(t, err, "error occured")
 
 	fmt.Println(response, err)
 
-	expected := "func (*Logger).Start()"
+	expected := "func (this *LspClient) DidOpen(file string, text *string)"
 	got := response.Result.Contents.Value
 	assert.Equal(t, expected, got, "expected lsp hover result to be %s, got something else %s", expected, got)
 }
@@ -75,6 +77,7 @@ func TestLspClientHover(t *testing.T) {
 func TestLspClientCompletion(t *testing.T) {
 	lsp := LspClient{Lang: "go"}
 	lsp.Start("gopls")
+	defer lsp.Stop()
 
 	currentDir, _ := os.Getwd()
 	lsp.Init(currentDir)
@@ -84,19 +87,20 @@ func TestLspClientCompletion(t *testing.T) {
 	stringtext := string(text)
 	lsp.DidOpen(file, &stringtext)
 
-	response, err := lsp.Completion(file, 100-1, 8)
+	response, err := lsp.Completion(file, 88-1, 8)
 	assert.Nil(t, err, "error occured")
 
 	fmt.Println(response, err)
 
-	expected := "Start"
-	assert.Equal(t, 1, len(response.Result.Items), "items must be 1")
+	expected := "DidChange"
+	assert.Equal(t, 4, len(response.Result.Items), "items must be 4")
 	assert.Equal(t, expected, response.Result.Items[0].Label, "expected lsp completion result to be %s", expected)
 }
 
 func TestLspClientDefinition(t *testing.T) {
 	lsp := LspClient{Lang: "go"}
 	lsp.Start("gopls")
+	defer lsp.Stop()
 
 	currentDir, _ := os.Getwd()
 	lsp.Init(currentDir)
@@ -106,21 +110,19 @@ func TestLspClientDefinition(t *testing.T) {
 	stringtext := string(text)
 	lsp.DidOpen(file, &stringtext)
 
-	response, err := lsp.Definition(file, 124-1, 8)
+	response, err := lsp.Definition(file, 111-1, 8)
 	assert.Nil(t, err, "error occured")
 
 	fmt.Println(response, err)
 
-	expectedSuffix := "logger/logger.go"
-	containsSuffix := strings.Contains(response.Result[0].URI, expectedSuffix)
-
 	assert.Equal(t, 1, len(response.Result), "items must be 1")
-	assert.Equal(t, false, containsSuffix, "expected lsp definition result to be %s", expectedSuffix)
+	assert.NotEqual(t, "", response.Result[0].URI, "expected lsp definition uri result to be non empty")
 }
 
 func TestLspClientSignatureHelp(t *testing.T) {
 	lsp := LspClient{Lang: "go"}
 	lsp.Start("gopls")
+	defer lsp.Stop()
 
 	currentDir, _ := os.Getwd()
 	lsp.Init(currentDir)
@@ -130,31 +132,34 @@ func TestLspClientSignatureHelp(t *testing.T) {
 	stringtext := string(text)
 	lsp.DidOpen(file, &stringtext)
 
-	response, err := lsp.SignatureHelp(file, 156-1, 21)
+	response, err := lsp.SignatureHelp(file, 133-1, 8)
 	assert.Nil(t, err, "error occured")
 
 	fmt.Println(response, err)
 
-	expected := "Join"
+	expected := "DidOpen(file string, text *string)"
 	assert.Equal(t, 1, len(response.Result.Signatures), "items must be 1")
-	assert.Equal(t, expected, response.Result.Signatures[0].Label, "expected lsp definition result to be %s", expected)
+	assert.Equal(t, expected, response.Result.Signatures[0].Label, "expected lsp signature help result to be %s", expected)
 }
 
 func TestLspClientReferences(t *testing.T) {
 	lsp := LspClient{Lang: "go"}
 	lsp.Start("gopls")
+	defer lsp.Stop()
 
 	currentDir, _ := os.Getwd()
 	lsp.Init(currentDir)
 
-	file := path.Join(currentDir, "internal","lsp", "lsp_client_test.go")
+	file := path.Join(currentDir, "lsp_client_test.go")
 	text, _ := os.ReadFile(file)
 	stringtext := string(text)
 	lsp.DidOpen(file, &stringtext)
 
-	response, err := lsp.References(file, 175-1, 2)
+	response, err := lsp.References(file, 156-1, 8)
 	assert.Nil(t, err, "error occured")
 
 	fmt.Println(response, err)
-	// todo fix, something wrong with base dir
+
+	assert.Equal(t, 6, len(response.Result), "items must be 6")
+	assert.NotEqual(t, "", response.Result[0].URI, "expected lsp references result uri to be non empty")
 }
