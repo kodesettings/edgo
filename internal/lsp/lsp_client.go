@@ -26,14 +26,8 @@ type LspClient struct {
 
 	IsReady bool // flag for lsp initialization
 
-	message2chan          map[int]chan string
-	completionMessages    chan string
-	definitionMessages    chan string
-	referencesMessages    chan string
-	signatureHelpMessages chan string
-	hoverMessages         chan string
-	otherMessages         chan string
-	DiagnosticsChannel    chan string
+	userMessages       chan string
+	DiagnosticsChannel chan string
 
 	id              int
 	file2diagnostic map[string]DiagnosticParams
@@ -68,13 +62,7 @@ func (l *LspClient) Start(cmd string, args ...string) bool {
 	}
 
 	l.reader = bufio.NewReader(stdout)
-	l.message2chan = make(map[int]chan string)
-	l.completionMessages = make(chan string)
-	l.referencesMessages = make(chan string)
-	l.definitionMessages = make(chan string)
-	l.signatureHelpMessages = make(chan string)
-	l.hoverMessages = make(chan string)
-	l.otherMessages = make(chan string)
+	l.userMessages = make(chan string, 10)
 	l.DiagnosticsChannel = make(chan string, 10)
 	l.file2diagnostic = make(map[string]DiagnosticParams)
 	l.IsReady = true
@@ -128,20 +116,8 @@ repeat:
 	if strings.Contains(message,"publishDiagnostics") {
 		l.file2diagnostic[dr.Params.Uri] = dr.Params
 		l.DiagnosticsChannel <- message
-	} else {
-		responseJSON := make(map[string]interface{})
-		err := json.Unmarshal([]byte(message), &responseJSON)
-		if err != nil { slog.Error(err.Error()); goto repeat; }
-		if value, found := responseJSON["id"]; found { // json has id
-			if id, ok := value.(float64); ok {
-				channel, foundRequest := l.message2chan[int(id)]
-				if foundRequest {
-					channel <- message
-				} else  {
-					//skip message
-				}
-			}
-		}
+	} else if strings.Contains(message, "result") {
+		l.userMessages <- message
 	}
 
 	goto repeat;
@@ -183,12 +159,8 @@ func (l *LspClient) Init(dir string) {
 		},
 	}
 
-	l.message2chan[id] = l.otherMessages
 	l.send(initializeRequest)
-
-	response, err := WaitForRequest[interface{}](l.otherMessages, 3000)
-
-	delete(l.message2chan, id)
+	response, err := WaitForRequest[interface{}](l.userMessages, 3000)
 
 	if response == "" || err != nil {
 		slog.Info("cant get initialize response from lsp server")
@@ -257,31 +229,26 @@ func (this *LspClient) DidClose(file string) {
 
 func (this *LspClient) Hover(file string, line int, character int) (HoverResponse, error) {
 	this.id++
-	id := this.id
 
 	request := BaseRequest{
-		ID: id, JSONRPC: "2.0", Method:  "textDocument/hover",
+		ID: this.id, JSONRPC: "2.0", Method:  "textDocument/hover",
 		Params: Params {
 			TextDocument: TextDocument { URI: "file://" + file },
 			Position: Position { Line: line, Character: character },
 		},
 	}
 
-	this.message2chan[id] = this.hoverMessages
 	this.send(request)
+	response, err := WaitForRequest[HoverResponse](this.userMessages, 1000)
 
-	response, err := WaitForRequest[HoverResponse](this.hoverMessages, 1000)
-
-	delete(this.message2chan, id)
 	return response, err
 }
 
 func (this *LspClient) Completion(file string, line int, character int) (CompletionResponse, error) {
 	this.id++
-	id := this.id
 
 	request := BaseRequest{
-		ID: id, JSONRPC: "2.0", Method:  "textDocument/completion",
+		ID: this.id, JSONRPC: "2.0", Method:  "textDocument/completion",
 		Params: Params{
 			TextDocument: TextDocument { URI:  "file://" + file },
 			Position: Position { Line: line, Character: character },
@@ -289,18 +256,14 @@ func (this *LspClient) Completion(file string, line int, character int) (Complet
 		},
 	}
 
-	this.message2chan[id] = this.completionMessages
 	this.send(request)
+	response, err := WaitForRequest[CompletionResponse](this.userMessages, 1000)
 
-	response, err := WaitForRequest[CompletionResponse](this.completionMessages, 1000)
-
-	delete(this.message2chan, id)
 	return response, err
 }
 
 func (this *LspClient) Definition(file string, line int, character int) (DefinitionResponse, error) {
 	this.id++
-	id := this.id
 
 	request := DefinitionRequest{
 		ID: this.id, JSONRPC: "2.0", Method:  "textDocument/definition",
@@ -310,42 +273,34 @@ func (this *LspClient) Definition(file string, line int, character int) (Definit
 		},
 	}
 
-	this.message2chan[id] = this.definitionMessages
 	this.send(request)
+	response, err := WaitForRequest[DefinitionResponse](this.userMessages, 1000)
 
-	response, err := WaitForRequest[DefinitionResponse](this.definitionMessages, 1000)
-
-	delete(this.message2chan, id)
 	return response, err
 }
 
 func (this *LspClient) SignatureHelp(file string, line int, character int) (SignatureHelpResponse, error) {
 	this.id++
-	id := this.id
 
 	request := BaseRequest{
-		ID: id, JSONRPC: "2.0", Method:  "textDocument/signatureHelp",
+		ID: this.id, JSONRPC: "2.0", Method:  "textDocument/signatureHelp",
 		Params: Params {
 			TextDocument: TextDocument { URI: "file://" + file },
 			Position: Position { Line: line, Character: character },
 		},
 	}
 
-	this.message2chan[id] = this.signatureHelpMessages
 	this.send(request)
+	response, err := WaitForRequest[SignatureHelpResponse](this.userMessages, 1000)
 
-	response, err := WaitForRequest[SignatureHelpResponse](this.signatureHelpMessages, 1000)
-
-	delete(this.message2chan, id)
 	return response, err
 }
 
 func (this *LspClient) References(file string, line int, character int) (ReferencesResponse, error) {
 	this.id++
-	id := this.id
 
 	request := BaseRequest{
-		ID: id, JSONRPC: "2.0", Method:  "textDocument/references",
+		ID: this.id, JSONRPC: "2.0", Method:  "textDocument/references",
 		Params: Params{
 			TextDocument: TextDocument{ URI: "file://" + file },
 			Position: Position{ Line: line, Character: character },
@@ -353,43 +308,35 @@ func (this *LspClient) References(file string, line int, character int) (Referen
 		},
 	}
 
-	this.message2chan[id] = this.referencesMessages
 	this.send(request)
+	response, err := WaitForRequest[ReferencesResponse](this.userMessages, 3000)
 
-	response, err := WaitForRequest[ReferencesResponse](this.referencesMessages, 3000)
-
-	delete(this.message2chan, id)
 	return response, err
 }
 
 
 func (this *LspClient) PrepareRename(file string, line int, character int) (PrepareRenameResponse, error) {
 	this.id++
-	id := this.id
 
 	request := PrepareRenameRequest {
-		ID: id, JSONRPC: "2.0", Method:  "textDocument/prepareRename",
+		ID: this.id, JSONRPC: "2.0", Method:  "textDocument/prepareRename",
 		Params: Params{
 			TextDocument: TextDocument { URI:  "file://" + file },
 			Position: Position { Line: line, Character: character },
 		},
 	}
 
-	this.message2chan[id] = this.otherMessages
 	this.send(request)
+	response, err := WaitForRequest[PrepareRenameResponse](this.userMessages, 10000)
 
-	response, err := WaitForRequest[PrepareRenameResponse](this.otherMessages, 10000)
-
-	delete(this.message2chan, id)
 	return response, err
 }
 
 func (this *LspClient) Rename(file string, newname string, line int, character int) (RenameResponse, error) {
 	this.id++
-	id := this.id
 
 	request := RenameRequest{
-		ID: id,  JSONRPC: "2.0", Method:  "textDocument/rename",
+		ID: this.id,  JSONRPC: "2.0", Method:  "textDocument/rename",
 		Params: RenameParams {
 			NewName: newname,
 			Position: Position { Line: line, Character: character },
@@ -397,21 +344,17 @@ func (this *LspClient) Rename(file string, newname string, line int, character i
 		},
 	}
 
-	this.message2chan[id] = this.otherMessages
 	this.send(request)
+	response, err := WaitForRequest[RenameResponse](this.userMessages, 10000)
 
-	response, err := WaitForRequest[RenameResponse](this.otherMessages, 10000)
-
-	delete(this.message2chan, id)
 	return response, err
 }
 
 func (this *LspClient) CodeAction(file string, spc int, spl int, epc int, epl int) (CodeActionResponse, error) {
 	this.id++
-	id := this.id
 
 	request := CodeActionRequest {
-		ID: id,  JSONRPC: "2.0", Method: "textDocument/codeAction",
+		ID: this.id,  JSONRPC: "2.0", Method: "textDocument/codeAction",
 		Params: CodeActionParams {
 			TextDocument: TextDocument { URI:  "file://" + file },
 			Context: Context{ Only: []string{"refactor"}, TriggerKind: 1 },
@@ -422,27 +365,23 @@ func (this *LspClient) CodeAction(file string, spc int, spl int, epc int, epl in
 		},
 	}
 
-	this.message2chan[id] = this.otherMessages
 	this.send(request)
+	response, err := WaitForRequest[CodeActionResponse](this.userMessages, 10000)
 
-	response, err := WaitForRequest[CodeActionResponse](this.otherMessages, 10000)
-
-	delete(this.message2chan, id)
 	return response, err
 }
 
 func (this *LspClient) Command(command Command) (CommandResponse, error) {
 	this.id++
-	id := this.id
 
 	request := CommandRequest {
-		ID: id, JSONRPC: "2.0", Method: "workspace/executeCommand",
+		ID: this.id, JSONRPC: "2.0", Method: "workspace/executeCommand",
 		Params: command,
 	}
 
 	this.send(request)
 
-	jsonData := <- this.otherMessages
+	jsonData := <- this.userMessages
 
 	var response CommandResponse
 	err := json.Unmarshal([]byte(jsonData), &response)
