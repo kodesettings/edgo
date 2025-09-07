@@ -1,7 +1,6 @@
 package lsp
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"testing"
@@ -50,10 +49,8 @@ func TestLspClientHover(t *testing.T) {
 	stringtext := string(text)
 	lsp.DidOpen(file, &stringtext)
 
-	response, err := lsp.Hover(file, 51-1, 8)
+	response, err := lsp.Hover(file, 50-1, 8)
 	assert.Nil(t, err, "error occured")
-
-	fmt.Println(response, err)
 
 	expected := "func (this *LspClient) DidOpen(file string, text *string)"
 	got := response.Result.Contents.Value
@@ -73,10 +70,8 @@ func TestLspClientCompletion(t *testing.T) {
 	stringtext := string(text)
 	lsp.DidOpen(file, &stringtext)
 
-	response, err := lsp.Completion(file, 74-1, 8)
+	response, err := lsp.Completion(file, 71-1, 8)
 	assert.Nil(t, err, "error occured")
-
-	fmt.Println(response, err)
 
 	expected := "DidChange"
 	assert.Equal(t, 4, len(response.Result.Items), "items must be 4")
@@ -96,10 +91,8 @@ func TestLspClientDefinition(t *testing.T) {
 	stringtext := string(text)
 	lsp.DidOpen(file, &stringtext)
 
-	response, err := lsp.Definition(file, 97-1, 8)
+	response, err := lsp.Definition(file, 92-1, 8)
 	assert.Nil(t, err, "error occured")
-
-	fmt.Println(response, err)
 
 	assert.Equal(t, 1, len(response.Result), "items must be 1")
 	assert.NotEqual(t, "", response.Result[0].URI, "expected lsp definition uri result to be non empty")
@@ -118,10 +111,8 @@ func TestLspClientSignatureHelp(t *testing.T) {
 	stringtext := string(text)
 	lsp.DidOpen(file, &stringtext)
 
-	response, err := lsp.SignatureHelp(file, 119-1, 8)
+	response, err := lsp.SignatureHelp(file, 112-1, 8)
 	assert.Nil(t, err, "error occured")
-
-	fmt.Println(response, err)
 
 	expected := "DidOpen(file string, text *string)"
 	assert.Equal(t, 1, len(response.Result.Signatures), "items must be 1")
@@ -141,10 +132,8 @@ func TestLspClientReferences(t *testing.T) {
 	stringtext := string(text)
 	lsp.DidOpen(file, &stringtext)
 
-	response, err := lsp.References(file, 142-1, 8)
+	response, err := lsp.References(file, 133-1, 8)
 	assert.Nil(t, err, "error occured")
-
-	fmt.Println(response, err)
 
 	assert.Equal(t, 6, len(response.Result), "items must be 6")
 	assert.NotEqual(t, "", response.Result[0].URI, "expected lsp references result uri to be non empty")
