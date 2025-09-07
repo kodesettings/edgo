@@ -11,6 +11,7 @@ import (
 	"os/signal"
 	"strconv"
 	"strings"
+	"bytes"
 	"time"
 	"log/slog"
 )
@@ -93,90 +94,52 @@ func (this *LspClient) send(o interface{})  {
 	if err != nil { slog.Error(err.Error()) }
 }
 
-func (this *LspClient) receiveDiagnostics() string {
+func (this *LspClient) receiveDiagnostics() (DiagnosticResponse, string) {
+	var dr DiagnosticResponse = DiagnosticResponse{}
 
-	const LEN_HEADER = "Content-Length: "
-	var messageSize int
-	var responseMustBeNext bool
-	var line string
-	var err error
-repeat:
-	if messageSize != 0 && responseMustBeNext {
-		buf := make([]byte, messageSize)
-		_, err = io.ReadFull(this.reader, buf)
-		if err != nil { slog.Error(err.Error()); goto repeat; }
-		line = string(buf)
-		messageSize = 0
+	content_len, _, err := this.reader.ReadLine()
+	if err != nil { slog.Error("io readline", "error", err.Error()); return dr, "" }
 
-		responseJSON := make(map[string]interface{})
-		err = json.Unmarshal(buf, &responseJSON)
-		if err != nil { slog.Error(err.Error()); goto repeat; }
+	nbytes_str := bytes.TrimPrefix(content_len, []byte("Content-Length: "))
+	nbytes_conv, err := strconv.Atoi(string(nbytes_str))
+	if err != nil { slog.Error("strconv", "error", err.Error()); return dr, "" }
 
-		method, methodFound := responseJSON["method"]
-		if methodFound && method.(string) == "textDocument/publishDiagnostics" {
-			var dr DiagnosticResponse
-			err = json.Unmarshal(buf, &dr)
-			if err != nil { slog.Error(err.Error()); goto repeat; }
-			return line
-		}
+	_, _, err = this.reader.ReadLine() // reading line separator
+	buf := make([]byte, int(nbytes_conv)) // allocate parsed content length
 
-		if value, idFound := responseJSON["id"]; idFound {
-			if _, ok := value.(float64); ok {
-				return line
-			}
-		}
-	} else {
-		line, err = this.reader.ReadString('\n') // it stuck sometimes
-		if err != nil { slog.Error("[445 lsp]", "err", err.Error()); goto repeat; }
-	}
+	_, err = io.ReadFull(this.reader, buf)
+	if err != nil { slog.Error("io read", "error", err.Error()); return dr, "" }
 
-	line = strings.TrimSuffix(line, "\r\n")
+	// wrapping the extracted json body into a stream and
+	// trying to decode the value into a struct
+	reader := bufio.NewReader(bytes.NewReader(buf))
+	err = json.NewDecoder(reader).Decode(&dr)
+	if err != nil { slog.Error("json", "error", err.Error()); return dr, "" }
 
-	if strings.HasPrefix(line, LEN_HEADER) {
-		sizeStr := strings.TrimPrefix(line, LEN_HEADER)
-		msize, _ := strconv.Atoi(sizeStr)
-		messageSize = msize
-		responseMustBeNext = false
-		goto repeat;
-	}
-
-	if line == "" {
-		responseMustBeNext = true
-		goto repeat;
-	}
-
-	return ""
+	// returning both the diagnostic response and the string representation
+	return dr, string(buf)
 }
 
 func (l *LspClient) receiveLoop() {
 repeat:
-	message := l.receiveDiagnostics()
+	dr, message := l.receiveDiagnostics()
 	slog.Info("recv:", "json", message)
 
 	if strings.Contains(message,"publishDiagnostics") {
-		var dr DiagnosticResponse
-		err := json.Unmarshal([]byte(message), &dr)
-		if err != nil { slog.Error(err.Error()); goto repeat; }
 		l.file2diagnostic[dr.Params.Uri] = dr.Params
 		l.DiagnosticsChannel <- message
-		goto repeat;
-	}
-	if strings.Contains(message,"workspace/applyEdit") {
-		l.otherMessages <- message
-		goto repeat;
-	}
-
-	responseJSON := make(map[string]interface{})
-	err := json.Unmarshal([]byte(message), &responseJSON)
-	if err != nil { slog.Error(err.Error()); goto repeat; }
-
-	if value, found := responseJSON["id"]; found { // json has id
-		if id, ok := value.(float64); ok {
-			channel, foundRequest := l.message2chan[int(id)]
-			if foundRequest {
-				channel <- message
-			} else  {
-				//skip message
+	} else {
+		responseJSON := make(map[string]interface{})
+		err := json.Unmarshal([]byte(message), &responseJSON)
+		if err != nil { slog.Error(err.Error()); goto repeat; }
+		if value, found := responseJSON["id"]; found { // json has id
+			if id, ok := value.(float64); ok {
+				channel, foundRequest := l.message2chan[int(id)]
+				if foundRequest {
+					channel <- message
+				} else  {
+					//skip message
+				}
 			}
 		}
 	}
@@ -204,7 +167,6 @@ func WaitForRequest[T any](channel chan string, timeout int) (T, error) {
 
 	return response, err
 }
-
 
 func (l *LspClient) Init(dir string) {
 	l.id = 0
