@@ -72,30 +72,30 @@ func (l *LspClient) Start(cmd string, args ...string) bool {
 	return true
 }
 
-func (this *LspClient) send(o interface{})  {
+func (l *LspClient) send(o interface{})  {
 	m, err := json.Marshal(o)
 	if err != nil { panic(err) }
 
 	slog.Info("send:", "json", string(m))
 	message := fmt.Sprintf("Content-Length: %d\r\n\r\n%s", len(m), m)
-	_, err = this.stdin.Write([]byte(message))
+	_, err = l.stdin.Write([]byte(message))
 	if err != nil { slog.Error(err.Error()) }
 }
 
-func (this *LspClient) receiveDiagnostics() (DiagnosticResponse, string) {
+func (l *LspClient) receiveDiagnostics() (DiagnosticResponse, string) {
 	var dr DiagnosticResponse = DiagnosticResponse{}
 
-	content_len, _, err := this.reader.ReadLine()
+	content_len, _, err := l.reader.ReadLine()
 	if err != nil { slog.Error("io readline", "error", err.Error()); return dr, "" }
 
 	nbytes_str := bytes.TrimPrefix(content_len, []byte("Content-Length: "))
 	nbytes_conv, err := strconv.Atoi(string(nbytes_str))
 	if err != nil { slog.Error("strconv", "error", err.Error()); return dr, "" }
 
-	_, _, err = this.reader.ReadLine() // reading line separator
+	_, _, err = l.reader.ReadLine() // reading line separator
 	buf := make([]byte, int(nbytes_conv)) // allocate parsed content length
 
-	_, err = io.ReadFull(this.reader, buf)
+	_, err = io.ReadFull(l.reader, buf)
 	if err != nil { slog.Error("io read", "error", err.Error()); return dr, "" }
 
 	// wrapping the extracted json body into a stream and
