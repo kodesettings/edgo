@@ -482,25 +482,3 @@ type Argument struct {
 	URI   string `json:"URI"`
 	Range Range  `json:"Range"`
 }
-
-type CommandRequest struct {
-	ID int           `json:"id"`
-	JSONRPC string   `json:"jsonrpc"`
-	Method  string   `json:"method"`
-	Params  Command  `json:"params"`
-}
-
-type CommandResponse struct {
-	ID      int        `json:"id"`
-	JSONRPC string     `json:"jsonrpc"`
-	Method  string     `json:"method"`
-	Params  EditParams `json:"params"`
-}
-
-type EditParams struct {
-	Edit DocumentEdit `json:"edit"`
-}
-
-type DocumentEdit struct {
-	DocumentChanges ChangesResult `json:"documentChanges"`
-}

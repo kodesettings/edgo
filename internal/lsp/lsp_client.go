@@ -370,21 +370,3 @@ func (this *LspClient) CodeAction(file string, spc int, spl int, epc int, epl in
 
 	return response, err
 }
-
-func (this *LspClient) Command(command Command) (CommandResponse, error) {
-	this.id++
-
-	request := CommandRequest {
-		ID: this.id, JSONRPC: "2.0", Method: "workspace/executeCommand",
-		Params: command,
-	}
-
-	this.send(request)
-
-	jsonData := <- this.userMessages
-
-	var response CommandResponse
-	err := json.Unmarshal([]byte(jsonData), &response)
-	if err != nil { slog.Error("Error parsing JSON:", "err", err.Error()) }
-	return response, err
-}
