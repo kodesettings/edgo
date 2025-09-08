@@ -48,6 +48,7 @@ func (e *Editor) InsertString(line, pos int, linestring string) {
 	l := RemoveLeadingTabsSpaces(linestring)
 	offset := LineOffset(e.code.Value(), line) + pos + 1
 	e.code.Insert(offset, []byte(l))
+	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), offset, len(l))
 
 	// record the operation on the undo stack. Note that we're creating a new EditOperation
 	// and adding all the Operations to it
