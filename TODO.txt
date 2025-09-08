@@ -6,10 +6,10 @@ AVAILABLE ISSUES:
 == some user input cursor positions have to be fixed on the undo stack
 == tree-sitter highlighter breaks on special ascii characters
 == implement functionality to create and write to new empty files
-== rewriting lsp channel handling so tests can run from root
 
 SOLVED ISSUES:
 
+== lsp package is refactored and fixed out from bugs
 == removed terminal process implementation as it was not used at all
 == reimplemented and fixed all the keyboard actions for the new architecture
 == implemented rope string buffer for underlying text manipulation
