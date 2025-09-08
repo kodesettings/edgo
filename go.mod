@@ -8,7 +8,6 @@ require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/alecthomas/chroma v0.10.0
 	github.com/atotto/clipboard v0.1.4
-	github.com/creack/pty v1.1.21
 	github.com/gdamore/tcell v1.4.0
 	github.com/go-enry/go-enry/v2 v2.8.6
 	github.com/goccy/go-json v0.10.2
