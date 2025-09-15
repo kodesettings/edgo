@@ -26,8 +26,9 @@ func (e *Editor) AddChar(ch rune) {
 func (e *Editor) InsertCharacter(line, pos int, ch rune) {
 	offset := LineOffset(e.code.Value(), line) + pos
 
-	// this is required for insert only when there are no lines in the buffer
-	if e.code.Count(0, offset, []byte("\n")) > 0 { offset += 1 }
+	// adding one character offset after first line
+	// this is required due to the newline characters in the string buffer
+	if line > 0 { offset += 1 }
 
 	e.code.Insert(offset, []byte(string(ch)))
 	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), offset, len(string(ch)))

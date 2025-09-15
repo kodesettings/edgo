@@ -7,7 +7,6 @@ AVAILABLE ISSUES:
 == tree-sitter highlighter breaks on special ascii characters
 == implement functionality to create and write to new empty files
 == need to fine tune enter, paste and lsp completion cursor positions
-== there's a bug on the first two lines of text editing due to new lines
 
 SOLVED ISSUES:
 
