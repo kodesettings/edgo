@@ -1,9 +1,5 @@
 package lsp
 
-import (
-	"github.com/goccy/go-json"
-)
-
 type ClientInfo struct {
 	Name    string `json:"name,omitempty"`
 	Version string `json:"version,omitempty"`
@@ -177,18 +173,20 @@ type HoverResponse struct {
 	ID      int         `json:"id"`
 }
 
-type Parameter struct {
-	Label string `json:"label"`
+type ParameterInformation struct {
+	Label         string `json:"label"`
+	Documentation string `json:"documentation"`
 }
 
-type Signature struct {
-	Label      string      `json:"label"`
-	Parameters []Parameter `json:"parameters"`
+type SignatureInformation struct {
+	Label      string                 `json:"label"`
+	Parameters []ParameterInformation `json:"parameters"`
 }
 
 type SignatureHelpResult struct {
-	Signatures      []Signature `json:"signatures"`
-	ActiveParameter int         `json:"activeParameter"`
+	Signatures      []SignatureInformation `json:"signatures"`
+	ActiveSignature int                    `json:"activeSignature"`
+	ActiveParameter int                    `json:"activeParameter"`
 }
 
 type SignatureHelpResponse struct {
@@ -220,10 +218,10 @@ type PublishDiagnostics struct {
 }
 
 type SignatureHelp struct {
-	SignatureInformation SignatureInformation `json:"signatureInformation"`
+	SignatureInformation SignatureInformation2 `json:"signatureInformation"`
 }
 
-type SignatureInformation struct {
+type SignatureInformation2 struct {
 	DocumentationFormat []string `json:"documentationFormat"`
 }
 
@@ -255,14 +253,14 @@ var capabilities = Capabilities{
 			DataSupport:            true,
 		},
 		SignatureHelp: SignatureHelp{
-			SignatureInformation: SignatureInformation{
+			SignatureInformation: SignatureInformation2{
 				DocumentationFormat: []string{"plaintext", "markdown"},
 			},
 		},
 		Completion: Completion{
 			CapabilitiesCompletionItem: CapabilitiesCompletionItem{
 				ResolveProvider:      true,
-				//SnippetSupport:       true,
+				SnippetSupport:       true,
 				InsertReplaceSupport: true,
 				LabelDetailsSupport:  true,
 				ResolveSupport: ResolveSupport{
@@ -329,30 +327,6 @@ type DefinitionResponse2 struct {
 	JSONRPC string           `json:"jsonrpc"`
 	Result  DefinitionResult `json:"result"`
 	ID      int              `json:"id"`
-}
-
-func (m *DefinitionResponse) UnmarshalJSON(b []byte) error {
-	type TempDefinitionResponse DefinitionResponse
-	temp := &TempDefinitionResponse{}
-
-	// Try to unmarshal into DefinitionResponse
-	err := json.Unmarshal(b, temp)
-	if err != nil {
-		// If error, try to unmarshal into DefinitionResponse2
-		temp2 := &DefinitionResponse2{}
-		err2 := json.Unmarshal(b, temp2)
-		if err2 != nil {
-			return err
-		}
-		// If unmarshal into DefinitionResponse2 is successful, map fields to DefinitionResponse
-		m.ID = temp2.ID
-		m.JSONRPC = temp2.JSONRPC
-		m.Result = []DefinitionResult{temp2.Result}
-	} else {
-		*m = DefinitionResponse(*temp)
-	}
-
-	return nil
 }
 
 type Character struct {
@@ -472,7 +446,7 @@ type CodeActionResult struct {
 }
 
 type Command struct {
-	//Title     string     `json:"title"`
+	Title     string     `json:"title"`
 	Command   string     `json:"command"`
 	Arguments []Argument `json:"arguments"`
 }
