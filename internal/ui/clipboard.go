@@ -53,8 +53,11 @@ func (e *Editor) Cut(isCopySelected bool) {
 	e.Row = syd
 	e.Col = sxd
 
+	var exd_offset int = 2
+	if sxd == 0 { exd_offset++ }
+
 	sxd += LineOffset(e.code.Value(), syd) + 1
-	exd += LineOffset(e.code.Value(), eyd) + 2
+	exd += LineOffset(e.code.Value(), eyd) + exd_offset
 
 	text := make([]byte, exd - sxd)
 	copy(text, e.code.Slice(sxd, exd))

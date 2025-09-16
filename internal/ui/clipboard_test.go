@@ -18,7 +18,7 @@ func apply_highlighter(code []byte, theme string, lang string) {
 }
 
 func TestCutActionPosition(t *testing.T) {
-	e.code = rope.New([]byte("this is a sample text\nand another line of text to cut\none more line of text"))
+	e.code = rope.New([]byte("this is a sample text\nand another line of text to cut\none more line of text\n"))
 
 	e.Selection.Ssx = 0
 	e.Selection.Ssy = 1
@@ -33,7 +33,7 @@ func TestCutActionPosition(t *testing.T) {
 	apply_highlighter(e.code.Value(), "", "")
 	e.Cut(true)
 
-	expected = "this is a sample text\nne of text"
+	expected = "this is a sample text\ne of text\n"
 	assert.Equal(t, expected, string(e.code.Value()), "cut lines mismatch")
 
 	e.OnUndo()
@@ -44,7 +44,7 @@ func TestCutActionPosition(t *testing.T) {
 }
 
 func TestCutActionLinesOnly(t *testing.T) {
-	e.code = rope.New([]byte("this is a sample text\nand another line of text to cut\none more line of text"))
+	e.code = rope.New([]byte("this is a sample text\nand another line of text to cut\none more line of text\n"))
 
 	e.Selection.Ssx = 0
 	e.Selection.Ssy = 1

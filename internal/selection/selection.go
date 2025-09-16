@@ -139,8 +139,6 @@ func (this *Selection) GetSelectionString(text []byte) string {
 				in = false
 				// only one selection area can be, early return
 				if len(ret) > 0 {
-					// remove the last newline if present
-					if len(ret) > 0 && ret[len(ret)-1] == '\n' { ret = ret[:len(ret)-1] }
 					return string(ret)
 				}
 			}
