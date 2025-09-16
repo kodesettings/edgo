@@ -67,6 +67,28 @@ func (e *Editor) DeleteCharacter(line, pos int) {
 	e.Undo = append(e.Undo, EditOperation{{Delete, []byte{ch}, offset, CursorMove{line, pos}}})
 }
 
+func (e *Editor) ReplaceString(line, from, end int, instext string) {
+	offset := LineOffset(e.code.Value(), line)
+	begin_idx := offset + from + 1
+	end_idx := offset + end + 1
+
+	deltext := make([]byte, end_idx - begin_idx)
+	copy(deltext, e.code.Slice(begin_idx, end_idx))
+
+	e.code.Remove(begin_idx, end_idx)
+	e.treeSitterHighlighter.RemoveTextEdit(e.code.Value(), begin_idx, len(deltext))
+
+	e.code.Insert(begin_idx, []byte(instext))
+	e.treeSitterHighlighter.InsertTextEdit(e.code.Value(), begin_idx, len(instext))
+
+	// record the operation on the undo stack. Note that we're creating a new EditOperation
+	// and adding all the Operations to it
+	e.Undo = append(e.Undo, EditOperation{
+		{Delete, []byte(deltext), begin_idx, CursorMove{line, from}},
+		{Insert, []byte(instext), begin_idx, CursorMove{line, from}},
+	})
+}
+
 func (e *Editor) ShiftWithTabsToRight(line, pos int, selectedLines []int) {
 	e.Selection.Ssx = 0
 

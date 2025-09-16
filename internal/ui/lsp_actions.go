@@ -416,33 +416,22 @@ func (e *Editor) drawCompletion(atx int, aty int, height int, width int,
 func (e *Editor) completionApply(completion CompletionResponse, selected int) {
 	// parse completion
 	item := completion.Result.Items[selected]
-	from := item.TextEdit.Range.Start.Character
-	end := item.TextEdit.Range.End.Character
+	from := item.TextEdit.Replace.Start.Character
+	end := item.TextEdit.Replace.End.Character
 	newText := item.TextEdit.NewText
 
-	if item.TextEdit.Range.Start.Character != 0 && item.TextEdit.Range.End.Character != 0 {
-		// text edit supported by lsp server
-		// move cursor to beginning
-		e.Col = int(from)
-		// remove chars between from and end
-		e.Lines[e.Row].Buf = append(e.Lines[e.Row].Buf[:e.Col], e.Lines[e.Row].Buf[int(end):]...)
-		newText = item.TextEdit.NewText
-	}
+	// text edit not supported by lsp
+	if from == 0 { from = FindPrevWord(e.Lines[e.Row].Buf, e.Col) }
+	if end == 0 { end = FindNextWord(e.Lines[e.Row].Buf, e.Col) }
 
-	if from == 0 && end == 0 {
-		// text edit not supported by lsp
-		prev := FindPrevWord(e.Lines[e.Row].Buf, e.Col)
-		next := FindNextWord(e.Lines[e.Row].Buf, e.Col)
-		from = int(prev)
-		newText = item.InsertText
-		if len(newText) == 0 { newText = item.Label }
-		end = int(next)
-		e.Col = prev
-		e.Lines[e.Row].Buf = append(e.Lines[e.Row].Buf[:e.Col], e.Lines[e.Row].Buf[int(end) :]...)
-	}
+	// text to be inserted
+	newText = item.InsertText
+	if len(newText) == 0 { newText = item.Label }
+	e.Col = from + len(newText)
 
-	// add newText
-	for _, char := range newText { e.InsertCharacter(e.Row, e.Col, char); e.Col++ }
+	// replace text
+	e.ReplaceString(e.Row, from, end, newText)
+
 	e.UpdateLsp(false, string(e.code.Value()))
 	e.Update = true
 	e.IsContentChanged = true

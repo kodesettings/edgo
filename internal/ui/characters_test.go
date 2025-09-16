@@ -106,6 +106,23 @@ func TestDeleteCharacter(t *testing.T) {
 	assert.Equal(t, expected, string(e.code.Value()), "redo delete character mismatch")
 }
 
+func TestReplaceString(t *testing.T) {
+	e.code = rope.New([]byte("this is a sample text"))
+
+	apply_highlighter(e.code.Value(), "", "")
+	e.ReplaceString(0, 3, 11, "asd")
+
+	text := "this is a sample text"
+	expected := "thisasdmple text"
+	assert.Equal(t, expected, string(e.code.Value()), "delete string error")
+
+	e.OnUndo()
+	assert.Equal(t, text, string(e.code.Value()), "undo delete string mismatch")
+
+	e.OnRedo()
+	assert.Equal(t, expected, string(e.code.Value()), "redo delete string mismatch")
+}
+
 func TestDeleteLine(t *testing.T) {
 	e.code = rope.New([]byte("this is a sample text\n"))
 
