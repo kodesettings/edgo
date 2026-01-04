@@ -1,0 +1,13 @@
+{
+  "theme": "/Users/max/apps/go/edgo/internal/highlighter/themes/edgo_new.yml",
+  "langs": {
+    "c#": {
+      "name": "C#",
+      "lsp": "dotnet /Users/max/Downloads/omnisharp-osx-arm64-net6.0/OmniSharp.dll --languageserver",
+      "comment": "//",
+      "tabwidth": 4,
+      "cmd": "dotnet",
+      "cmdargs": "run"
+    }
+  }
+}
