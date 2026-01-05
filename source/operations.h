@@ -13,17 +13,17 @@ typedef enum {
 } action_t;
 
 typedef struct {
-	Action action;
-	std::string text;
-	int offset;
-	CursorMove cursor;
-} operation_t;
-
-typedef std::vector<Operation> EditOperation;
-
-typedef struct {
 	int line;
 	int column;
 } cursormove_t;
+
+typedef struct {
+	action_t action;
+	std::string text;
+	int offset;
+	cursormove_t cursor;
+} operation_t;
+
+typedef std::vector<operation_t> EditOperation;
 
 #endif // _OPERATIONS_H_
