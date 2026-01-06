@@ -23,8 +23,11 @@ typedef struct {
 	std::map<std::string, diagnosticparams_t> file2diagnostic;
 } lspclient_t;
 
+/* storing lspclient_t in memory */
+static lspclient_t lspclient;
+
 bool Start(const std::string cmd, std::string args...);
-void Send(const std::string message);
+template<class T> T send(const std::string message);
 
 diagnosticresponse_t receiveDiagnostics(void);
 void receiveLoop(void);

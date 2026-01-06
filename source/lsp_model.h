@@ -40,17 +40,22 @@ typedef struct {
 } context_t;
 
 typedef struct {
-	textdocument_t textDocument;
-	position _t    position;
-	context_t      context;
-} params_t;
-
-typedef struct {
 	string_t languageID;
 	string_t text;
 	string_t uri;
 	int      version;
 } textdocument_t;
+
+typedef struct {
+	int line;
+	int character;
+} position_t;
+
+typedef struct {
+	textdocument_t textDocument;
+	position_t     position;
+	context_t      context;
+} params_t;
 
 typedef  struct {
 	textdocument_t textDocument;
@@ -155,11 +160,6 @@ typedef struct {
 	position_t start;
 	position_t end;
 } range_t;
-
-typedef struct {
-	int line;
-	int character;
-} position_t;
 
 typedef struct {
 	string_t kind;
@@ -269,6 +269,11 @@ typedef struct {
 } diagnosticparams_t;
 
 typedef struct {
+	textdocument_t textDocument;
+	position_t     position;
+} definitionparams_t;
+
+typedef struct {
 	string_t           jsonrpc;
 	string_t           method;
 	diagnosticparams_t params;
@@ -280,11 +285,6 @@ typedef struct {
 	string_t           method;
 	definitionparams_t params;
 } definitionrequest_t;
-
-typedef struct {
-	textdocument_t textDocument;
-	position_t     position;
-} definitionparams_t;
 
 typedef struct {
 	string_t uri;
