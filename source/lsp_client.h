@@ -8,12 +8,6 @@
 
 typedef struct {
 	std::string lang;
-	Cmd    *exec.Cmd
-	stdin  io.WriteCloser
-	stdout io.ReadCloser
-	stop   context.CancelFunc
-	reader *bufio.Reader
-
 	bool isready; // flag for lsp initialization
 
 	std::stringstream usermessages;

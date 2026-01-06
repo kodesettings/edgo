@@ -1,9 +1,11 @@
 #ifndef _LSP_MODEL_H
 #define _LSP_MODEL_H
 
-// including capabilities with type definitions
-#include "lsp_capabilities.h"
+#include <string>
+#include <vector>
+#include <map>
 
+typedef std::string string_t;
 typedef struct {
 	string_t name;
 	string_t version;
@@ -13,6 +15,58 @@ typedef struct {
 	string_t name;
 	string_t uri;
 } workspacefolder_t;
+
+typedef std::vector<std::string> string_v;
+typedef struct {
+	string_v properties;
+} resolvesupport_t;
+
+typedef struct {
+	bool             resolveProvider;
+	bool             snippetSupport;
+	bool             insertReplaceSupport;
+	bool             labelDetailsSupport;
+	resolvesupport_t resolveSupport;
+} capabilitiescompletionitem_t;
+
+typedef struct {
+	capabilitiescompletionitem_t completionItem;
+} completion_t;
+
+typedef struct {
+	string_v documentationFormat;
+} signatureinformation2_t;
+
+typedef struct {
+	signatureinformation2_t signatureInformation;
+} signaturehelp_t;
+
+typedef struct {
+	bool relatedInformation;
+	bool versionSupport;
+	bool codeDescriptionSupport;
+	bool dataSupport;
+} publishdiagnostics_t;
+
+typedef struct {
+	string_v contentFormat;
+} hover_t;
+
+typedef struct {
+	hover_t              hover;
+	publishdiagnostics_t publishDiagnostics;
+	signaturehelp_t      signatureHelp;
+	completion_t         completion;
+} capabilitiestextdocument_t;
+
+typedef struct {
+	capabilitiestextdocument_t textDocument;
+} capabilities_t;
+
+//===========================================================
+// the capabilities initalizer is added in this section
+// this is for setting the default values
+#include "lsp_capabilities.h"
 
 typedef struct {
 	int               processId;
@@ -68,6 +122,10 @@ typedef struct {
 } didopenrequest_t;
 
 typedef struct {
+	string_t uri;
+} textdocumentidentifier_t;
+
+typedef struct {
 	textdocumentidentifier_t textDocument;
 } didclosetextdocumentparams_t;
 
@@ -76,12 +134,6 @@ typedef struct {
 	string_t                     method;
 	didclosetextdocumentparams_t params;
 } didcloserequest_t;
-
-typedef struct {
-	string_t jsonrpc;
-	string_t method;
-	string_t params;
-} initializerequest_t;
 
 typedef struct {
 	int      id;
@@ -102,6 +154,18 @@ typedef struct {
 } baserequest_t;
 
 typedef struct {
+	string_t uri;
+	int      version;
+} versionedtextdocumentidentifier_t;
+
+// NOTE: range argument is temporarily disabled
+typedef struct {
+//	range_t  range;
+	string_t text;
+} textdocumentcontentchangeevent_t;
+
+typedef std::vector<textdocumentcontentchangeevent_t> textdocumentcontentchangeevent_v;
+typedef struct {
 	versionedtextdocumentidentifier_t textDocument;
 	textdocumentcontentchangeevent_v contentChanges;
 } didchangetextdocumentparams_t;
@@ -113,29 +177,16 @@ typedef struct {
 } didchangerequest_t;
 
 typedef struct {
-	string_t uri;
-} textdocumentidentifier_t;
+	position_t start;
+	position_t end;
+} range_t;
 
 typedef struct {
-	string_t uri;
-	int      version;
-} versionedtextdocumentidentifier_t;
-
-typedef struct {
-//	range_t  range;
-	string_t text;
-} textdocumentcontentchangeevent_t;
-
-typedef struct {
-	string_t           jsonrpc;
-	completionresult_t result;
-	int                id;
-} completionresponse_t;
-
-typedef struct {
-	bool isIncomplete;
-	completionitem_v items;
-} completionresult_t;
+	range_t  range;
+	range_t  replace;
+	range_t  insert;
+	string_t newText;
+} textedit_t;
 
 typedef struct {
 	string_t   label;
@@ -149,17 +200,17 @@ typedef struct {
 	textedit_t textEdit;
 } completionitem_t;
 
+typedef std::vector<completionitem_t> completionitem_v;
 typedef struct {
-	range_t  range;
-	range_t  replace;
-	range_t  insert;
-	string_t newText;
-} textedit_t;
+	bool isIncomplete;
+	completionitem_v items;
+} completionresult_t;
 
 typedef struct {
-	position_t start;
-	position_t end;
-} range_t;
+	string_t           jsonrpc;
+	completionresult_t result;
+	int                id;
+} completionresponse_t;
 
 typedef struct {
 	string_t kind;
@@ -182,11 +233,13 @@ typedef struct {
 	string_t documentation;
 } parameterinformation_t;
 
+typedef std::vector<parameterinformation_t> parameterinformation_v;
 typedef struct {
 	string_t               label;
-	parameterinformation_v parameters,
+	parameterinformation_v parameters;
 } signatureinformation_t;
 
+typedef std::vector<signatureinformation_t> signatureinformation_v;
 typedef struct {
 	signatureinformation_v signatures;
 	int                    activeSignature;
@@ -198,52 +251,6 @@ typedef struct {
 	signaturehelpresult_t result;
 	int                   id;
 } signaturehelpresponse_t;
-
-typedef struct {
-	capabilitiestextdocument_t textDocument;
-} capabilities_t;
-
-typedef struct {
-	hover_t              hover;
-	publishdiagnostics_t publishDiagnostics;
-	signaturehelp_t      signatureHelp;
-	completion_t         completion;
-} capabilitiestextdocument_t;
-
-typedef struct {
-	string_v contentFormat;
-} hover_t;
-
-typedef struct {
-	bool relatedInformation;
-	bool versionSupport;
-	bool codeDescriptionSupport;
-	bool dataSupport;
-} publishdiagnostics_t;
-
-typedef struct {
-	signatureinformation2_t signatureInformation;
-} signaturehelp_t;
-
-typedef struct {
-	string_v documentationFormat;
-} signatureinformation2_t;
-
-typedef struct {
-	capabilitiescompletionitem_t completionItem;
-} completion_t;
-
-typedef struct {
-	bool             resolveProvider;
-	bool             snippetSupport;
-	bool             insertReplaceSupport;
-	bool             labelDetailsSupport;
-	resolvesupport_t resolveSupport;
-} capabilitiescompletionitem_t;
-
-typedef struct {
-	string_v properties;
-} resolvesupport_t;
 
 typedef struct {
 	std::map<string_t, string_t> langs;
@@ -262,6 +269,7 @@ typedef struct {
 	string_t          message;
 } diagnostic_t;
 
+typedef std::vector<diagnostic_t> diagnostic_v;
 typedef struct {
 	string_t      uri;
 	int           version;
@@ -288,9 +296,10 @@ typedef struct {
 
 typedef struct {
 	string_t uri;
-	range    range;
+	range_t  range;
 } definitionresult_t;
 
+typedef std::vector<definitionresult_t> definitionresult_v;
 typedef struct {
 	string_t           jsonrpc;
 	definitionresult_v result;
@@ -324,20 +333,21 @@ typedef struct {
 } didsaverequest_t;
 
 typedef struct {
+	position_t start;
+	position_t end;
+} span_t;
+
+typedef struct {
+	string_t uri;
+	span_t   range;
+} referencesrange_t;
+
+typedef std::vector<referencesrange_t> referencesrange_v;
+typedef struct {
 	string_t          jsonrpc;
 	referencesrange_v result;
 	int               id;
 } referencesresponse_t;
-
-typedef struct {
-	string_t uri
-	span_t   range;
-} referencesrange_t
-
-typedef struct {
-	position_t start;
-	position_t end;
-} span_t;
 
 typedef struct {
 	int      id;
@@ -369,24 +379,26 @@ typedef struct {
 } renamerequest_t;
 
 typedef struct {
-	string_t        jsonrpc;
-	changesresult_t result;
-	int             id;
-} renameresponse_t;
+	range_t  range;
+	string_t newText;
+} edit_t;
 
-typedef struct {
-	documentchange_v documentChanges;
-} changesresult_t;
-
+typedef std::vector<edit_t> edit_v;
 typedef struct {
 	textdocument_t textDocument;
 	edit_v         edits;
 } documentchange_t;
 
+typedef std::vector<documentchange_t> documentchange_v;
 typedef struct {
-	range_t  range;
-	string_t newText;
-} edit_t;
+	documentchange_v documentChanges;
+} changesresult_t;
+
+typedef struct {
+	string_t        jsonrpc;
+	changesresult_t result;
+	int             id;
+} renameresponse_t;
 
 typedef struct {
 	position_t start;
@@ -395,8 +407,8 @@ typedef struct {
 
 typedef struct {
 	textdocument_t textDocument;
-	requestrange_t range;
 	context_t      context;
+	requestrange_t range;
 } codeactionparams_t;
 
 typedef struct {
@@ -407,10 +419,17 @@ typedef struct {
 } codeactionrequest_t;
 
 typedef struct {
-	string_t           jsonrpc;
-	codeactionresult_v result;
-	int                id;
-} codeactionresponse_t;
+	string_t fix;
+	string_t uri;
+	range_t range;
+} argument_t;
+
+typedef std::vector<argument_t> argument_v;
+typedef struct {
+	string_t   title;
+	string_t   command;
+	argument_v arguments;
+} command_t;
 
 typedef struct {
 	string_t  title;
@@ -419,16 +438,11 @@ typedef struct {
 	command_t command;
 } codeactionresult_t;
 
+typedef std::vector<codeactionresult_t> codeactionresult_v;
 typedef struct {
-	string_t   title;
-	string_t   command;
-	argument_v arguments;
-} command_t;
-
-typedef struct {
-	string_t fix;
-	string_t uri;
-	range_t range;
-} argument_t;
+	string_t           jsonrpc;
+	codeactionresult_v result;
+	int                id;
+} codeactionresponse_t;
 
 #endif // _LSP_MODEL_H

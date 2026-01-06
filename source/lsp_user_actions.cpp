@@ -131,7 +131,7 @@ codeactionresponse_t CodeAction(std::string file, int spc, int spl, int epc, int
 		id: lspclient.id, jsonrpc: "2.0", method: "textDocument/codeAction",
 		params: codeactionparams_t {
 			textDocument: textdocument_t { uri:  "file://" + file },
-			context: context_t { only: std::string{{"refactor"}}, triggerKind: 1 },
+			context: context_t { only: string_v{"refactor"}, triggerKind: 1 },
 			range: requestrange_t {
 				start: position_t { line: spl, character: spc},
 				end: position_t { line: epl, character: epc},
