@@ -2,7 +2,7 @@
 #include "logging.h"
 
 bool StartLspClient(const std::string &cmd, std::string args...) {
-    LOG(INFO) << "starting lsp" << cmd << args;
+    LOG(INFO) << "starting lsp cmd:" << cmd << " args:" << args;
 
     auto exe = bp::search_path(cmd);
 	if (exe.empty()) { LOG(ERROR) << "lsp not found cmd" << cmd; return -1; }
