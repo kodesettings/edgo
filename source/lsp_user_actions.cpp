@@ -12,8 +12,8 @@ hoverresponse_t Hover(std::string file, const int line, const int character) {
 		},
 	};
 
-	// TODO: serialize request to string
-	auto response = send<hoverresponse_t>("");
+	send<baserequest_t>(request);
+	auto response = WaitForRequest<hoverresponse_t>(lspclient.userMessages, 1000);
 
 	return response;
 }
@@ -30,8 +30,8 @@ completionresponse_t Completion(std::string file, int line, int character) {
 		},
 	};
 
-	// TODO: serialize request to string
-	auto response = send<completionresponse_t>("");
+	send<baserequest_t>(request);
+	auto response = WaitForRequest<completionresponse_t>(lspclient.userMessages, 1000);
 
 	return response;
 }
@@ -47,8 +47,8 @@ definitionresponse_t Definition(std::string file, int line, int character) {
 		},
 	};
 
-	// TODO: serialize request to string
-	auto response = send<definitionresponse_t>("");
+	send<definitionrequest_t>(request);
+	auto response = WaitForRequest<definitionresponse_t>(lspclient.userMessages, 1000);
 
 	return response;
 }
@@ -64,8 +64,8 @@ signaturehelpresponse_t SignatureHelp(std::string file, int line, int character)
 		},
 	};
 
-	// TODO: serialize request to string
-	auto response = send<signaturehelpresponse_t>("");
+	send<baserequest_t>(request);
+	auto response = WaitForRequest<signaturehelpresponse_t>(lspclient.userMessages, 1000);
 
 	return response;
 }
@@ -82,8 +82,8 @@ referencesresponse_t References(std::string file, int line, int character) {
 		},
 	};
 
-	// TODO: serialize request to string
-	auto response = send<referencesresponse_t>("");
+	send<baserequest_t>(request);
+	auto response = WaitForRequest<referencesresponse_t>(lspclient.userMessages, 3000);
 
 	return response;
 }
@@ -100,8 +100,8 @@ preparerenameresponse_t PrepareRename(std::string file, int line, int character)
 		},
 	};
 
-	// TODO: serialize request to string
-	auto response = send<preparerenameresponse_t>("");
+	send<preparerenamerequest_t>(request);
+	auto response = WaitForRequest<preparerenameresponse_t>(lspclient.userMessages, 10000);
 
 	return response;
 }
@@ -118,8 +118,8 @@ renameresponse_t Rename(std::string file, std::string newname, int line, int cha
 		},
 	};
 
-	// TODO: serialize request to string
-	auto response = send<renameresponse_t>("");
+	send<renamerequest_t>(request);
+	auto response = WaitForRequest<renameresponse_t>(lspclient.userMessages, 10000);
 
 	return response;
 }
@@ -139,8 +139,8 @@ codeactionresponse_t CodeAction(std::string file, int spc, int spl, int epc, int
 		},
 	};
 
-	// TODO: serialize request to string
-	auto response = send<codeactionresponse_t>("");
+	send<codeactionrequest_t>(request);
+	auto response = WaitForRequest<codeactionresponse_t>(lspclient.userMessages, 10000);
 
 	return response;
 }

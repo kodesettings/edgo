@@ -6,4 +6,5 @@ add_library(edgo SHARED "config.cpp" "config.h" "selection.cpp" "selection.h" "o
 add_executable(edgotest "config_test.cpp" "selection_test.cpp")
 
 find_package(GTest REQUIRED)
+target_link_libraries(edgo PUBLIC glog pthread)
 target_link_libraries(edgotest PUBLIC ${GTEST_LIBRARIES} gtest_main pthread edgo)

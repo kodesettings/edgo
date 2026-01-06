@@ -5,13 +5,23 @@
 #include <glog/logging.h>
 #include <map>
 #include <sstream>
+#include <boost/process.hpp>
+#include <thread>
+#include <chrono>
+
+#include "logging.h"
+
+namespace bp = boost::process;
 
 typedef struct {
 	std::string lang;
-	bool isready; // flag for lsp initialization
+	bool isReady; // flag for lsp initialization
 
-	std::stringstream usermessages;
-	std::stringstream diagnosticschannel;
+	bp::opstream stdin;
+	bp::ipstream stdout;
+
+	std::stringstream userMessages;
+	std::stringstream diagnosticsChannel;
 
 	int id;
 	std::map<std::string, diagnosticparams_t> file2diagnostic;
@@ -21,7 +31,25 @@ typedef struct {
 static lspclient_t lspclient;
 
 bool Start(const std::string cmd, std::string args...);
-template<class T> T send(const std::string message);
+
+//
+// Method for calling serialization and sending data into stdin
+//
+template<typename T> void send(T obj) {
+	std::string message; // TODO: serialize object to json
+	LOG(INFO) << "send json" << message;
+	char f[message.size()];
+	sprintf(f, "Content-Length: %d\r\n\r\n%s", message.size(), message);
+	lspclient.stdin << std::string(f);
+}
+
+//
+// Method for deserializing message and setting a timeout for that
+//
+template<typename T> T WaitForRequest(std::stringstream &chan, long int timeout) {
+	// TODO: deserialize message and timeout
+	return T{};
+}
 
 diagnosticresponse_t receiveDiagnostics(void);
 void receiveLoop(void);
