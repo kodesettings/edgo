@@ -1,4 +1,5 @@
 #include "selection.h"
+#include "operations.h"
 #include <boost/algorithm/string.hpp>
 
 void selection::CleanSelection(void) {

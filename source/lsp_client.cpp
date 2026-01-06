@@ -1,0 +1,153 @@
+#include "lsp_client.h"
+#include "logging.h"
+
+bool StartLspClient(const std::string &cmd, std::string args...) {
+    LOG(INFO) << "starting lsp cmd:" << cmd << " args:" << args;
+
+    auto exe = bp::search_path(cmd);
+	if (exe.empty()) { LOG(ERROR) << "lsp not found cmd" << cmd; return -1; }
+
+	std::error_code ec;
+	bp::child c(cmd, bp::std_in < lspclient.stdin, bp::std_out > lspclient.stdout, ec);
+
+	if (ec) {
+		LOG(ERROR) << "error starting lsp err" << ec.message();
+		return false;
+	} else {
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		LOG(INFO) << "lsp started success " << cmd << " " << args;
+	}
+
+	lspclient.isReady = true;
+	std::thread(&receiveLoop).detach();
+
+	return true;
+}
+
+diagnostics_t receiveDiagnostics(void) {
+	std::string line;
+	if (!std::getline(lspclient.stdout, line)) {
+		LOG(ERROR) << "io readline error";
+		return diagnostics_t{};
+	}
+
+	auto nbytes_str = line.substr(std::string("Content-Length: ").size());
+	auto nbytes_conv = std::atoi(nbytes_str.c_str());
+	if (nbytes_conv == 0) {
+		LOG(ERROR) << "unable to parse header";
+		return diagnostics_t{};
+	} else {
+		// reading line separator
+		std::getline(lspclient.stdout, line);
+	}
+
+	if (!std::getline(lspclient.stdout, line)) {
+		LOG(ERROR) << "io readline error";
+		return diagnostics_t{};
+	}
+
+	// TODO: deserialize the content into object
+	return diagnostics_t { dr: diagnosticresponse_t{}, message: line };
+}
+
+void receiveLoop(void) {
+repeat:
+	diagnostics_t diagnostics = receiveDiagnostics();
+	LOG(INFO) << "recv:" << diagnostics.message;
+
+	if (diagnostics.message.find("publishDiagnostics")) {
+		lspclient.file2diagnostic[diagnostics.dr.params.uri] = diagnostics.dr.params;
+		lspclient.diagnosticsChannel << diagnostics.message;
+	} else if (diagnostics.message.find("result")) {
+		lspclient.userMessages << diagnostics.message;
+	}
+
+	goto repeat;
+}
+
+diagnosticparams_t GetDiagnostic(const std::string &filename) {
+	return lspclient.file2diagnostic[filename];
+}
+
+void InitLspClient(const std::string &dir) {
+	lspclient.id = 0;
+
+	auto initializeRequest = initializerequest_t {
+		id: lspclient.id, jsonrpc: "2.0", method: "initialize",
+		params: initializeparams_t {
+			rootUri: "file://" + dir, rootPath: dir,
+			workspaceFolders: workspacefolder_v{{name: "edgo", uri: "file://" + dir}},
+			capabilities: capabilities,
+			clientInfo: clientinfo_t{name: "edgo", version: "1.0.0"},
+		},
+	};
+
+	send<initializerequest_t>(initializeRequest);
+	auto response = WaitForRequest<initializeresponse_t>(lspclient.userMessages, 10000);
+
+	if (response.serverinfo.name.empty() || response.serverinfo.version.empty()) {
+		LOG(INFO) << "cant get initialize response from lsp server";
+		lspclient.isReady = false;
+		return;
+	}
+
+	auto initializedRequest = initializedrequest_t {
+		jsonrpc: "2.0", method: "initialized",
+		params: initializedparams_t{},
+	};
+
+	send<initializedrequest_t>(initializedRequest);
+
+	LOG(INFO) << "lsp initialized";
+	lspclient.isReady = true;
+}
+
+void DidOpen(const std::string &file, std::string *text) {
+	auto didOpenRequest = didopenrequest_t {
+		jsonrpc: "2.0", method: "textDocument/didOpen",
+		params: didopentextdocumentparams_t {
+			textDocument: textdocument_t {
+				languageId: lspclient.lang,
+				text: *text,
+				uri: "file://" + file,
+				version: 1,
+			},
+		},
+	};
+
+	send<didopenrequest_t>(didOpenRequest);
+}
+
+void DidChange(const std::string &file, std::string *text, int version) {
+	auto didChangeRequest = didchangerequest_t {
+		jsonrpc: "2.0", method: "textDocument/didChange",
+		params: didchangetextdocumentparams_t {
+			contentChanges: textdocumentcontentchangeevent_v {{
+//				range: range_t {
+//					start: position_t{line: spl, character: spc},
+//					end: position_t{line: epl, character: epc},
+//				},
+				text: *text,
+			}},
+			textDocument: versionedtextdocumentidentifier_t {
+				uri: "file://" + file,
+				version: version,
+			},
+		},
+	};
+
+	send<didchangerequest_t>(didChangeRequest);
+}
+
+void DidClose(const std::string &file) {
+	auto didCloseRequest = didcloserequest_t {
+		jsonrpc: "2.0", method: "textDocument/didClose",
+		params: didclosetextdocumentparams_t {
+			textDocument: textdocumentidentifier_t {
+				uri: "file://" + file,
+			},
+		},
+	};
+
+	send<didcloserequest_t>(didCloseRequest);
+}
