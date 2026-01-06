@@ -68,15 +68,16 @@ typedef struct {
 // this is for setting the default values
 #include "lsp_capabilities.h"
 
+typedef std::vector<workspacefolder_t> workspacefolder_v;
 typedef struct {
 	int               processId;
-	string_t          rootPath;
 	string_t          rootUri;
-	workspacefolder_t workspaceFolders;
-	clientinfo_t      clientInfo;
+	string_t          rootPath;
+	workspacefolder_v workspaceFolders;
 	string_t          trace;
 	string_t          initializationOptions;
 	capabilities_t    capabilities;
+	clientinfo_t      clientInfo;
 	string_t          workDoneToken;
 } initializeparams_t;
 
@@ -87,6 +88,24 @@ typedef struct {
 	initializeparams_t params;
 } initializerequest_t;
 
+typedef struct {} initializedparams_t;
+
+typedef struct {
+	string_t            jsonrpc;
+	string_t            method;
+	initializedparams_t params;
+} initializedrequest_t;
+
+typedef struct {
+	string_t name;
+	string_t version;
+} serverinfo_t;
+
+typedef struct {
+	capabilities_t capabilities;
+	serverinfo_t serverinfo;
+} initializeresponse_t;
+
 typedef struct {
 	bool     includeDeclaration;
 	string_v only;
@@ -94,7 +113,7 @@ typedef struct {
 } context_t;
 
 typedef struct {
-	string_t languageID;
+	string_t languageId;
 	string_t text;
 	string_t uri;
 	int      version;
@@ -166,8 +185,8 @@ typedef struct {
 
 typedef std::vector<textdocumentcontentchangeevent_t> textdocumentcontentchangeevent_v;
 typedef struct {
-	versionedtextdocumentidentifier_t textDocument;
 	textdocumentcontentchangeevent_v contentChanges;
+	versionedtextdocumentidentifier_t textDocument;
 } didchangetextdocumentparams_t;
 
 typedef struct {
