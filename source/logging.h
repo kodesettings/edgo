@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
+
 #ifndef _LOGGING_H_
 #define _LOGGING_H_
 
