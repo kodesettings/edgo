@@ -46,7 +46,8 @@ Extra features
     on the right side of the pane to launch the test inside the editor. This is useful
     for novice users who would like to write test cases and validate them right away.
 
-License
+Licensing
 
-    Edgo text editor's code, theme assets and documentation is covered by MIT license.
-
+    This project is based on the original work, licensed under MIT. See license.txt
+    for the original license. Modifications and new code are licensed under GNU GPLv2.
+    See source/license.txt for details.
