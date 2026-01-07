@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
+
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
@@ -32,14 +33,14 @@ typedef struct {
 	int tabwidth;
 	std::string cmd;
 	std::string cmdargs;
-} lang;
+} lang_t;
 
 typedef struct {
-	std::map<std::string, lang> langs;
+	std::map<std::string, lang_t> langs;
 	std::string theme;
-} config;
+} config_t;
 
-static config default_config { .langs = {
+static config_t default_config { .langs = {
 	{ "go",         { lsp: "gopls", tabwidth: 4, cmd: "go", cmdargs: "run" }},
 	{ "python",     { lsp: "pyright-langserver --stdio", comment: "#", tabwidth: 4, cmd: "python3" }},
 	{ "typescript", { lsp: "typescript-language-server --stdio", cmd: "tsx" }},
@@ -63,12 +64,12 @@ static config default_config { .langs = {
 }
 };
 
-lang default_lang_config { name: "",.lsp = "",.comment = "//",.tabwidth = 2 };
+lang_t default_lang_config { name: "",.lsp = "",.comment = "//",.tabwidth = 2 };
 
 using boost::property_tree::ptree;
 
-config ParseLang(const ptree& pt);
-void OverrideDefaultConfig(config *provided_config);
-config GetConfig(void);
+config_t ParseLang(const ptree& pt);
+void OverrideDefaultConfig(config_t *provided_config);
+config_t GetConfig(void);
 
 #endif // _CONFIG_H_

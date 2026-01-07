@@ -14,20 +14,21 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
+
 #include "config.h"
 
-config ParseLang(const ptree& pt) {
-	config conf;
+config_t ParseLang(const ptree& pt) {
+	config_t conf;
 
 	for (const auto& item : pt.get_child("langs")) {
-		lang l;
-		l.name     = item.second.get<std::string>("name");
-		l.lsp      = item.second.get<std::string>("lsp");
-		l.comment  = item.second.get<std::string>("comment");
-		l.tabwidth = item.second.get<int>("tabwidth");
-		l.cmd      = item.second.get<std::string>("cmd");
-		l.cmdargs  = item.second.get<std::string>("cmdargs");
-		conf.langs[item.first] = l;
+		lang_t lang;
+		lang.name     = item.second.get<std::string>("name");
+		lang.lsp      = item.second.get<std::string>("lsp");
+		lang.comment  = item.second.get<std::string>("comment");
+		lang.tabwidth = item.second.get<int>("tabwidth");
+		lang.cmd      = item.second.get<std::string>("cmd");
+		lang.cmdargs  = item.second.get<std::string>("cmdargs");
+		conf.langs[item.first] = lang;
 	}
 
 	conf.theme = pt.get<std::string>("theme");
@@ -35,13 +36,13 @@ config ParseLang(const ptree& pt) {
 	return count == 0 ? default_config : conf;
 }
 
-void OverrideDefaultConfig(config *provided_config) {
+void OverrideDefaultConfig(config_t *provided_config) {
 	const auto m_langs = provided_config->langs;
 
 	// override default config
 	for (auto it = m_langs.begin(); it != m_langs.end(); ++it) {
 		//set default tab width and comment if not specified
-		lang langConf = it->second;
+		lang_t langConf = it->second;
 		std::string langName = it->first;
 		if (langConf.tabwidth == 0) { langConf.tabwidth = 2; }
 		if (langConf.comment == "") { langConf.comment = "//"; }
@@ -49,7 +50,7 @@ void OverrideDefaultConfig(config *provided_config) {
 	}
 }
 
-config GetConfig(void) {
+config_t GetConfig(void) {
 	// override default config
 	OverrideDefaultConfig(&default_config);
 	default_config.theme = "vesper";
@@ -65,7 +66,7 @@ config GetConfig(void) {
 	}
 
 	ptree pt;
-	config json_config = ParseLang(pt);
+	config_t json_config = ParseLang(pt);
 
 	// read json config and override
 	OverrideDefaultConfig(&json_config);
