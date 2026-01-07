@@ -16,6 +16,8 @@ add_library(edgo SHARED
 	"lsp_client.h"
 	"utils.cpp"
 	"utils.h"
+	"editor.h"
+	"screen_logo.h"
 )
 
 # test case files

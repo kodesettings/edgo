@@ -64,7 +64,7 @@ static config_t default_config { .langs = {
 }
 };
 
-lang_t default_lang_config { name: "",.lsp = "",.comment = "//",.tabwidth = 2 };
+static lang_t default_lang_config { name: "",.lsp = "",.comment = "//",.tabwidth = 2 };
 
 using boost::property_tree::ptree;
 

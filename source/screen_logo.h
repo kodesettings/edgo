@@ -15,37 +15,24 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "utils.h"
-#include "editor.h"
-#include "screen_logo.h"
+#ifndef _SCREEN_LOGO_H_
+#define _SCREEN_LOGO_H_
 
-line_v GetLinesArrayFromData(std::string data, int lineNum) {
-	line_v lines = line_v(lineNum);
-	int row = 0;
-	for (auto b : data) {
-		if (b == '\n') {
-			row++;
-			continue;
-		} else if (row == lineNum) {
-			break;
-		} else {
-			lines[row].buf.append(&b);
-		}
-	}
-	return lines;
-}
+// https://patorjk.com/software/taag/#p=testall&h=0&f=3D%20Diagonal&t=edgo
+#define LOGO "\
+ _______ ______   ______  _____  \
+ |______ |     \ |  ____ |     | \
+ |______ |_____/ |_____| |_____| \
+                                 \
+"
 
-int LineOffset(std::string text, int lineNum) {
-	int index = 0;
-	for (int i = 0; i < (int)text.length(); i++) {
-		if ((char)text.at(i) == '\n') {
-			index++;
-		}
+#define DESCRIPTION "\
+Yet another console text editor, but with native lsp support \
+\
+HINT: To open a file supply the file path argument in command line. \
+      such as ./edgo <path_to_file> \
+\
+Press Ctrl + Q to quit and for key bindings read the manual. \
+"
 
-		if (index == lineNum) {
-			return i; // start of next line
-		}
-	}
-
-	return text.length(); // end of text
-}
+#endif // _SCREEN_LOGO_H_
