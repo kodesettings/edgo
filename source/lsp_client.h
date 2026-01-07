@@ -5,14 +5,23 @@
 #include <glog/logging.h>
 #include <map>
 #include <sstream>
+#include <boost/version.hpp>
+#if BOOST_VERSION < 108800
 #include <boost/process.hpp>
+namespace bp = boost::process;
+#else
+#include <boost/process/v1/child.hpp>
+#include <boost/process/v1/io.hpp>
+#include <boost/process/v1/pipe.hpp>
+#include <boost/process/v1/start_dir.hpp>
+#include <boost/process/v1/search_path.hpp>
+namespace bp = boost::process::v1;
+#endif
 #include <thread>
 #include <chrono>
 
 #include "logging.h"
 #include "lsp_model.h"
-
-namespace bp = boost::process;
 
 typedef struct {
 	std::string lang;
@@ -40,7 +49,7 @@ template<typename T> void send(T obj) {
 	std::string message; // TODO: serialize object to json
 	LOG(INFO) << "send json" << message;
 	char f[message.size()];
-	sprintf(f, "Content-Length: %d\r\n\r\n%s", message.size(), message);
+	sprintf(f, "Content-Length: %ld\r\n\r\n%s", message.size(), message.c_str());
 	lspclient.stdin << std::string(f);
 }
 
