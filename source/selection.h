@@ -20,6 +20,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 class selection {
 public:
@@ -40,7 +41,7 @@ public:
 	bool Equal(int x, int y, int x1, int y1);
 	std::vector<indices_t> GetSelectedIndices(std::string text);
 	std::string GetSelectionString(std::string text);
-	std::vector<int> GetSelectedLines(std::string text);
+	std::set<int> GetSelectedLines(std::string text);
 };
 
 #endif // _SELECTION_H_

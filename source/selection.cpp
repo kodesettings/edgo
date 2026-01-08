@@ -161,9 +161,8 @@ std::string selection::GetSelectionString(std::string text) {
 	return std::string(ret);
 }
 
-
-std::vector<int> selection::GetSelectedLines(std::string text) {
-	std::vector<int> lineNumbers;
+std::set<int> selection::GetSelectedLines(std::string text) {
+	std::set<int> lineNumbers;
 	bool in = false;
 
 	// check for empty selection
@@ -186,7 +185,7 @@ std::vector<int> selection::GetSelectedLines(std::string text) {
 		for (int i = 0; i < (int)line.size(); i++) {
 			// if inside selection
 			if (GreaterEqual(i, j, startx, starty) && LessThan(i, j, endx, endy)) {
-				lineNumbers.push_back(j);
+				lineNumbers.insert(j);
 				in = true;
 			} else {
 				in = false;
@@ -197,7 +196,7 @@ std::vector<int> selection::GetSelectedLines(std::string text) {
 			}
 		}
 		if (in && LessThan(0, j, endx, endy)) {
-			lineNumbers.push_back(j);
+			lineNumbers.insert(j);
 		}
 	}
 	return lineNumbers;

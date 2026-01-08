@@ -106,3 +106,18 @@ TEST(SelectionTests, TestMultipleLineSelection3) {
 	
 	EXPECT_EQ(got, expected);
 }
+
+TEST(SelectionTests, TestGetSelectedLines) {
+	auto text = "Hello, world!\nHow are you doing today?\nI hope you're doing well.";
+
+	selection selection;
+	selection.ssx = 0;
+	selection.ssy = 0;
+	selection.sex = 0;
+	selection.sey = 2;
+
+	auto got = selection.GetSelectedLines(text);
+	auto expected = std::set<int>{0,1};
+
+	EXPECT_EQ(got, expected);
+}

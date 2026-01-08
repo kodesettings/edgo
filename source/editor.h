@@ -109,7 +109,7 @@ void InsertCharacter(int line, int pos, char ch);
 void InsertString(int line, int pos, std::string linestring);
 void DeleteCharacter(int line, int pos);
 void ReplaceString(int line, int from, int end, std::string instext);
-void ShiftWithTabsToRight(int line, int pos, std::vector<int> selectedLines);
+void ShiftWithTabsToRight(int line, int pos, std::set<int> selectedLines);
 bool MaybeAddPair(int line, int pos, char ch, char *ret);
 
 // cursor routines

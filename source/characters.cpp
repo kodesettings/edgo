@@ -110,7 +110,7 @@ void ReplaceString(int line, int from, int end, std::string instext) {
 	});
 }
 
-void ShiftWithTabsToRight(int line, int pos, std::vector<int> selectedLines) {
+void ShiftWithTabsToRight(int line, int pos, std::set<int> selectedLines) {
 	e.__selection.ssx = 0;
 
 	editoperation_t ops{};
