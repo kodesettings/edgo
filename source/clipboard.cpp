@@ -74,7 +74,7 @@ void Cut(bool isCopySelected) {
 	sxd += LineOffset(e.code_str(), syd) + 1;
 	exd += LineOffset(e.code_str(), eyd) + exd_offset;
 
-	auto text = e.code.substr(sxd, exd);
+	auto text = e.code.substr(sxd, exd - sxd);
 
 	e.code.erase(sxd, exd - sxd);
 	RemoveTextEdit(e.code_str(), sxd, text.length());
@@ -120,7 +120,7 @@ undo:
 	switch (o.action) {
 	case INSERT:
 	case ADDCHAR:
-		e.code.erase(o.offset, o.offset - o.text.size());
+		e.code.erase(o.offset, o.text.size());
 		RemoveTextEdit(e.code_str(), o.offset, o.text.size());
 		e.row = o.cursor.line; e.col = o.cursor.column;
 	break;
@@ -160,7 +160,7 @@ redo:
 		e.row = o.cursor.line; e.col = o.cursor.column + offset;
 	break;
 	case DELETE:
-		e.code.erase(o.offset, o.offset - o.text.size());
+		e.code.erase(o.offset, o.text.size());
 		RemoveTextEdit(e.code_str(), o.offset, o.text.size());
 		e.row = o.cursor.line; e.col = o.cursor.column;
 	break;

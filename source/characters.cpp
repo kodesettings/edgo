@@ -91,13 +91,12 @@ void DeleteCharacter(int line, int pos) {
 void ReplaceString(int line, int from, int end, std::string instext) {
 	int offset = LineOffset(e.code_str(), line);
 	int begin_idx = offset + from + 1;
-	int end_idx = offset + end + 1;
 
-	auto deltext = e.code.substr(begin_idx, end_idx);
+	auto deltext = e.code.substr(begin_idx, end - from);
 	auto deltext_str = std::string(deltext.begin(), deltext.end());
 	auto instext_str = std::string(instext.begin(), instext.end());
 
-	e.code.erase(begin_idx, end_idx - begin_idx);
+	e.code.erase(begin_idx, deltext.size());
 	RemoveTextEdit(e.code_str(), begin_idx, deltext.size());
 
 	e.code.insert(begin_idx, instext.c_str());
