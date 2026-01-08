@@ -60,10 +60,10 @@ void OnSwapLinesUp(void) {
 	auto to = LineOffset(e.code_str(), e.row);
 	auto offset = LineOffset(e.code_str(), e.row + 1);
 
-	auto line_1 = e.code.substr(from, to + 1);
-	auto line_2 = e.code.substr(to + 1, offset + 1);
+	auto line_1 = e.code.substr(from, to - from);
+	auto line_2 = e.code.substr(to + 1, offset - to);
 
-	e.code.erase(to, offset - to); // remove line_2 from current position
+	e.code.erase(to, line_2.size()); // remove line_2 from current position
 	RemoveTextEdit(e.code_str(), to, line_2.size());
 
 	if (e.row > 1) { offset = from + 1; } else { offset = from; }
@@ -90,12 +90,12 @@ void OnSwapLinesDown(void) {
 	auto to = LineOffset(e.code_str(), e.row + 1);
 	auto offset = LineOffset(e.code_str(), e.row + 2);
 
-	auto line_1 = e.code.substr(from, to + 1);
-	auto line_2 = e.code.substr(to + 1, offset);
+	auto line_1 = e.code.substr(from, to - from);
+	auto line_2 = e.code.substr(to + 1, offset - to);
 
 	// TODO: fix moving from first line
 
-	e.code.erase(from, to - from ); // remove line_1 from current position
+	e.code.erase(from, line_1.size()); // remove line_1 from current position
 	RemoveTextEdit(e.code_str(), from, line_1.size());
 
 	offset = LineOffset(e.code_str(), e.row + 1);
