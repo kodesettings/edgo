@@ -22,6 +22,8 @@ add_library(edgo SHARED
 	"cursor.cpp"
 	"highlighter.h"
 	"clipboard.cpp"
+	"sdl2_init.h"
+	"features_v01.cpp"
 )
 
 # test case files
@@ -32,6 +34,7 @@ add_executable(edgotest
 	"utils_test.cpp"
 	"characters_test.cpp"
 	"clipboard_test.cpp"
+	"features_v01_test.cpp"
 )
 
 find_package(GTest REQUIRED)

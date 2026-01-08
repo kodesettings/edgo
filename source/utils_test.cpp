@@ -38,3 +38,10 @@ TEST(UtilsTests, TestRemoveLeadingTabsSpaces) {
 
 	EXPECT_EQ(output, "sometext");
 }
+
+TEST(UtilsTests, TestFoundCharacterOccurances) {
+	std::string s("asd\nasd\n");
+	int val = FindCharacterOccurances(s, '\n');
+
+	EXPECT_EQ(val, 2);
+}

@@ -38,5 +38,6 @@ typedef std::vector<std::string> string_v;
 line_v GetLinesArrayFromData(std::string data, int lineNum);
 int LineOffset(std::string text, int lineNum);
 std::string RemoveLeadingTabsSpaces(const std::string &s);
+int FindCharacterOccurances(const std::string &s, const char ch);
 
 #endif // _UTILS_H_

@@ -126,4 +126,9 @@ void Duplicate(void);
 void OnUndo(void);
 void OnRedo(void);
 
+// features v01 routines
+void OnCommentLine(void);
+void OnSwapLinesUp(void);
+void OnSwapLinesDown(void);
+
 #endif // _EDITOR_H_

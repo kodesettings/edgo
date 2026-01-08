@@ -60,3 +60,16 @@ std::string RemoveLeadingTabsSpaces(const std::string &s) {
 
 	return "";
 }
+
+// Find occurances of a character in the string
+int FindCharacterOccurances(const std::string &s, const char ch) {
+	int counter = 0;
+	size_t pos = 0;
+
+	while ((pos = s.find(ch, pos)) != std::string::npos) {
+		counter++;
+		pos += 1;
+	}
+
+	return counter;
+}
