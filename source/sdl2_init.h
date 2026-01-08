@@ -15,14 +15,21 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef _LOGGING_H_
-#define _LOGGING_H_
+#ifndef _SDL2_INIT_H_
+#define _SDL2_INIT_H_
 
+#include <SDL2/SDL.h>
 #include <glog/logging.h>
 
-// Initialization macros for google's logging system.
-// By default we have to log into files on disk.
-#define EDGO_LOGGING_INIT google::InitGoogleLogging("edgo");
-#define EDGO_LOGGING_TO_FILE FLAGS_logtostderr = 0;
+#define __init_clipboard__ { \
+	if (SDL_Init(SDL_INIT_VIDEO) != 0) { \
+		LOG(ERROR) << "SDL_Init failed: " << SDL_GetError(); \
+		return 1;\
+	} \
+}
 
-#endif // _LOGGING_H_
+#define __set_clipboard_text(text) SDL_SetClipboardText(text)
+#define __get_clipboard_text() SDL_GetClipboardText()
+#define __free_clipboard(text) SDL_free(text)
+
+#endif // _SDL2_INIT_H_

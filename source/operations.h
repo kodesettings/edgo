@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
+
 #ifndef _OPERATIONS_H_
 #define _OPERATIONS_H_
 
@@ -21,11 +22,11 @@
 #include <vector>
 
 typedef enum {
-	Insert     = 0x01, // insert text into the undo stack
-	AddChar    = 0x02, // add one character into the undo stack
-	Delete     = 0x03, // delete text from the undo stack
-	Start      = 0x04, // flag for start operation
-	End        = 0x05 // flag for end operation
+	INSERT     = 0x01, // insert text into the undo stack
+	ADDCHAR    = 0x02, // add one character into the undo stack
+	DELETE     = 0x03, // delete text from the undo stack
+	START      = 0x04, // flag for start operation
+	END        = 0x05 // flag for end operation
 } action_t;
 
 typedef struct {
@@ -40,6 +41,6 @@ typedef struct {
 	cursormove_t cursor;
 } operation_t;
 
-typedef std::vector<operation_t> EditOperation;
+typedef std::vector<operation_t> editoperation_t;
 
 #endif // _OPERATIONS_H_

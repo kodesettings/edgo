@@ -15,14 +15,12 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef _LOGGING_H_
-#define _LOGGING_H_
+#ifndef _HIGHLIGHTER_H_
+#define _HIGHLIGHTER_H_
 
-#include <glog/logging.h>
+#include <string>
 
-// Initialization macros for google's logging system.
-// By default we have to log into files on disk.
-#define EDGO_LOGGING_INIT google::InitGoogleLogging("edgo");
-#define EDGO_LOGGING_TO_FILE FLAGS_logtostderr = 0;
+static void InsertTextEdit(const std::string &code, int offset, int length) {}
+static void RemoveTextEdit(const std::string &code, int offset, int length) {}
 
-#endif // _LOGGING_H_
+#endif // _HIGHLIGHTER_H_

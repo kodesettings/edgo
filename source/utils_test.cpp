@@ -15,24 +15,33 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "config.h"
+#include "utils.h"
 #include <gtest/gtest.h>
 
-TEST(ConfigTests, TestReadConfig) {
-	// Read conf
-	auto conf = GetConfig();
+TEST(UtilsTests, TestGetLinesArrayFromData) {
+	const std::string data = "some data\nmore data\nand more data";
+	line_v output = GetLinesArrayFromData(data, 3);
 
-	// Print config
-	for (auto lang : conf.langs) {
-		printf("name: %s, lsp: %s, comment: %s, tab width: %d\n",
-			lang.first.c_str(), lang.second.lsp.c_str(),
-			lang.second.comment.c_str(), lang.second.tabwidth
-		);
-	}
+	EXPECT_EQ(output.size(), 3);
+}
 
-	auto golang = conf.langs["go"];
+TEST(UtilsTests, TestLineOffset) {
+	const std::string text = "some data\nmore data\nand more data";
+	int offset = LineOffset(text, 3);
 
-	EXPECT_EQ(golang.lsp, "gopls");
-	EXPECT_EQ(golang.comment, "//");
-	EXPECT_EQ(golang.tabwidth, 4);
+	EXPECT_EQ(offset, text.length());
+}
+
+TEST(UtilsTests, TestRemoveLeadingTabsSpaces) {
+	const std::string text = "\t\t  sometext";
+	std::string output = RemoveLeadingTabsSpaces(text);
+
+	EXPECT_EQ(output, "sometext");
+}
+
+TEST(UtilsTests, TestFoundCharacterOccurances) {
+	std::string s("asd\nasd\n");
+	int val = FindCharacterOccurances(s, '\n');
+
+	EXPECT_EQ(val, 2);
 }

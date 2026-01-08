@@ -14,11 +14,13 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
+
 #ifndef _SELECTION_H_
 #define _SELECTION_H_
 
 #include <string>
 #include <vector>
+#include <set>
 
 class selection {
 public:
@@ -39,7 +41,7 @@ public:
 	bool Equal(int x, int y, int x1, int y1);
 	std::vector<indices_t> GetSelectedIndices(std::string text);
 	std::string GetSelectionString(std::string text);
-	std::vector<int> GetSelectedLines(std::string text);
+	std::set<int> GetSelectedLines(std::string text);
 };
 
 #endif // _SELECTION_H_

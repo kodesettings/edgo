@@ -15,14 +15,24 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef _LOGGING_H_
-#define _LOGGING_H_
+#ifndef _SCREEN_LOGO_H_
+#define _SCREEN_LOGO_H_
 
-#include <glog/logging.h>
+// https://patorjk.com/software/taag/#p=testall&h=0&f=3D%20Diagonal&t=edgo
+#define LOGO "\
+ _______ ______   ______  _____  \
+ |______ |     \ |  ____ |     | \
+ |______ |_____/ |_____| |_____| \
+                                 \
+"
 
-// Initialization macros for google's logging system.
-// By default we have to log into files on disk.
-#define EDGO_LOGGING_INIT google::InitGoogleLogging("edgo");
-#define EDGO_LOGGING_TO_FILE FLAGS_logtostderr = 0;
+#define DESCRIPTION "\
+Yet another console text editor, but with native lsp support \
+\
+HINT: To open a file supply the file path argument in command line. \
+      such as ./edgo <path_to_file> \
+\
+Press Ctrl + Q to quit and for key bindings read the manual. \
+"
 
-#endif // _LOGGING_H_
+#endif // _SCREEN_LOGO_H_
