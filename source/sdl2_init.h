@@ -15,8 +15,8 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef _H_CLIPBOARD_H_
-#define _H_CLIPBOARD_H_
+#ifndef _H_CLIPBOARD_H
+#define _H_CLIPBOARD_H
 
 #include <SDL2/SDL.h>
 #include <glog/logging.h>
@@ -32,4 +32,4 @@
 #define __get_clipboard_text() SDL_GetClipboardText()
 #define __free_clipboard(text) SDL_free(text)
 
-#endif // _H_CLIPBOARD_H_
+#endif // _H_CLIPBOARD_H
