@@ -15,28 +15,12 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef _UTILS_H_
-#define _UTILS_H_
+#ifndef _HIGHLIGHTER_H_
+#define _HIGHLIGHTER_H_
 
-#include <vector>
 #include <string>
 
-// Matched characters
-static std::vector<char> matched {
-	' ', '.', ',', '=', '+', '-', '[', '(', '{', ']', ')', '}', 
-	'"', ':', '&', '?','!',';','\t', '/','<','>'
-};
+void InsertTextEdit(const std::string &code, int offset, int length) {}
+void RemoveTextEdit(const std::string &code, int offset, int length) {}
 
-// Inner struct to contain a line of text
-typedef struct {
-	std::string buf;
-} line_t;
-
-typedef std::vector<line_t> line_v;
-typedef std::vector<std::string> string_v;
-
-line_v GetLinesArrayFromData(std::string data, int lineNum);
-int LineOffset(std::string text, int lineNum);
-std::string RemoveLeadingTabsSpaces(const std::string &s);
-
-#endif // _UTILS_H_
+#endif // _HIGHLIGHTER_H_

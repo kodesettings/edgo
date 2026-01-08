@@ -18,6 +18,9 @@ add_library(edgo SHARED
 	"utils.h"
 	"editor.h"
 	"screen_logo.h"
+	"characters.cpp"
+	"cursor.cpp"
+	"highlighter.h"
 )
 
 # test case files
@@ -26,6 +29,7 @@ add_executable(edgotest
 	"selection_test.cpp"
 	"lsp_client_test.cpp"
 	"utils_test.cpp"
+	"characters_test.cpp"
 )
 
 find_package(GTest REQUIRED)

@@ -41,6 +41,6 @@ typedef struct {
 	cursormove_t cursor;
 } operation_t;
 
-typedef std::vector<operation_t> EditOperation;
+typedef std::vector<operation_t> editoperation_t;
 
 #endif // _OPERATIONS_H_

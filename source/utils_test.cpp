@@ -31,3 +31,10 @@ TEST(UtilsTests, TestLineOffset) {
 
 	EXPECT_EQ(offset, text.length());
 }
+
+TEST(UtilsTests, TestRemoveLeadingTabsSpaces) {
+	const std::string text = "\t\t  sometext";
+	std::string output = RemoveLeadingTabsSpaces(text);
+
+	EXPECT_EQ(output, "sometext");
+}

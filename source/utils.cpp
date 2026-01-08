@@ -49,3 +49,14 @@ int LineOffset(std::string text, int lineNum) {
 
 	return text.length(); // end of text
 }
+
+// Function to remove leading tabs and spaces
+std::string RemoveLeadingTabsSpaces(const std::string &s) {
+	for (int i = 0; i < (int)s.length(); i++) {
+		if (s[i] != '\t' && s[i] != ' ') {
+			return s.substr(i);
+		}
+	}
+
+	return "";
+}

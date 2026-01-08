@@ -51,8 +51,8 @@ typedef struct {
 
 	selection __selection; // selection
 
-	EditOperation undo; // stack for undo operations
-	EditOperation redo; // stack for redo operations
+	std::vector<editoperation_t> undo; // stack for undo operations
+	std::vector<editoperation_t> redo; // stack for redo operations
 
 	std::string cwd;   // current dir
 	std::string inputFile; // exact user input
@@ -92,6 +92,7 @@ typedef struct {
 
 //	treesitterhighlighter *treeSitterHighlighter;
 	rope<char> code; // storing a rope node element
+	std::string code_str(void) { return std::string(code.begin(), code.end()); }
 
 //	std::map<int, testdata_t> tests;
 //	testfinder testFinder;
@@ -99,5 +100,21 @@ typedef struct {
 
 //	path *treePath;
 } editor_t;
+
+extern editor_t e;
+
+// character manipulation routines
+void AddCharacter(char ch);
+void InsertCharacter(int line, int pos, char ch);
+void InsertString(int line, int pos, std::string linestring);
+void DeleteCharacter(int line, int pos);
+void ReplaceString(int line, int from, int end, std::string instext);
+void ShiftWithTabsToRight(int line, int pos, std::vector<int> selectedLines);
+bool MaybeAddPair(int line, int pos, char ch, char *ret);
+
+// cursor routines
+void Focus(void);
+void FocusCenter(void);
+void FocusProcessPanel(void);
 
 #endif // _EDITOR_H_
