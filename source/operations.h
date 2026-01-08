@@ -22,11 +22,11 @@
 #include <vector>
 
 typedef enum {
-	Insert     = 0x01, // insert text into the undo stack
-	AddChar    = 0x02, // add one character into the undo stack
-	Delete     = 0x03, // delete text from the undo stack
-	Start      = 0x04, // flag for start operation
-	End        = 0x05 // flag for end operation
+	INSERT     = 0x01, // insert text into the undo stack
+	ADDCHAR    = 0x02, // add one character into the undo stack
+	DELETE     = 0x03, // delete text from the undo stack
+	START      = 0x04, // flag for start operation
+	END        = 0x05 // flag for end operation
 } action_t;
 
 typedef struct {

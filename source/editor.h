@@ -30,42 +30,42 @@
 using __gnu_cxx::rope;
 
 typedef struct {
-	int COLUMNS;     // terminal size columns
-	int ROWS;        // terminal size rows
-	int LINES_WIDTH; // draw file lines number
+	int COLUMNS;                        // terminal size columns
+	int ROWS;                           // terminal size rows
+	int LINES_WIDTH;                    // draw file lines number
 
 	int TERMINAL_HEIGHT;
 	int TERMINAL_WIDHT;
 
-	int row; // cursor position row
-	int col; // cursor position column
-	int y;   // row offset for scrolling
-	int x;   // col offset for scrolling
+	int row;                            // cursor position row
+	int col;                            // cursor position column
+	int y;                              // row offset for scrolling
+	int x;                              // col offset for scrolling
 
-	line_v lines; // Lines of text characters
+	line_v lines;                       // Lines of text characters
 
-	std::string lang; // current file language
-	config_t config; // config, lsp, tabs, comments, etc
-	lang_t langConf; // current lang conf
-	int langTabWidth; // current lang tabs indentation  '\t' -> "    "
+	std::string lang;                   // current file language
+	config_t config;                    // config, lsp, tabs, comments, etc
+	lang_t langConf;                    // current lang conf
+	int langTabWidth;                   // current lang tabs indentation  '\t' -> "    "
 
-	selection __selection; // selection
+	selection __selection;              // selection
 
-	std::vector<editoperation_t> undo; // stack for undo operations
-	std::vector<editoperation_t> redo; // stack for redo operations
+	std::vector<editoperation_t> undo;  // stack for undo operations
+	std::vector<editoperation_t> redo;  // stack for redo operations
 
-	std::string cwd;   // current dir
-	std::string inputFile; // exact user input
-	std::string filename; // current file name
-	std::string absoluteFilePath; // current file name and directory
-	bool isContentChanged; // shows * if file is changed
-	bool isColorize; // colorize text is true by default
-	bool update;  // for Screen updates,  if false it will not draw
-	bool isOverlay; // true if overlay is active (completion, hover, errors...)
-	bool isStartupScreen; // true if no file was opened
+	std::string cwd;                    // current dir
+	std::string inputFile;              // exact user input
+	std::string filename;               // current file name
+	std::string absoluteFilePath;       // current file name and directory
+	bool isContentChanged;              // shows * if file is changed
+	bool isColorize;                    // colorize text is true by default
+	bool update;                        // for Screen updates,  if false it will not draw
+	bool isOverlay;                     // true if overlay is active (completion, hover, errors...)
+	bool isStartupScreen;               // true if no file was opened
 
 	bool isContentSearch;
-	std::string searchPattern; // pattern for search in a buffer
+	std::string searchPattern;          // pattern for search in a buffer
 //	searchresult_v searchResults;
 	int searchResultIndex;
 

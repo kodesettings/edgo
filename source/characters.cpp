@@ -58,7 +58,7 @@ void InsertCharacter(int line, int pos, char ch) {
 	action_t op;
 
 	// change op if this is a new line character
-	if (ch == '\n') { op = Insert; } else { op = AddChar; }
+	if (ch == '\n') { op = INSERT; } else { op = ADDCHAR; }
 
 	// record the operation on the undo stack. Note that we're creating a new EditOperation
 	// and adding all the Operations to it
@@ -74,7 +74,7 @@ void InsertString(int line, int pos, std::string linestring) {
 
 	// record the operation on the undo stack. Note that we're creating a new EditOperation
 	// and adding all the Operations to it
-	e.undo.push_back({operation_t{Insert, l, offset, cursormove_t{line, pos}}});
+	e.undo.push_back({operation_t{INSERT, l, offset, cursormove_t{line, pos}}});
 }
 
 void DeleteCharacter(int line, int pos) {
@@ -85,7 +85,7 @@ void DeleteCharacter(int line, int pos) {
 
 	// record the operation on the undo stack. Note that we're creating a new EditOperation
 	// and adding all the Operations to it
-	e.undo.push_back({operation_t{Delete, std::to_string(ch), offset, cursormove_t{line, pos}}});
+	e.undo.push_back({operation_t{DELETE, std::to_string(ch), offset, cursormove_t{line, pos}}});
 }
 
 void ReplaceString(int line, int from, int end, std::string instext) {
@@ -106,8 +106,8 @@ void ReplaceString(int line, int from, int end, std::string instext) {
 	// record the operation on the undo stack. Note that we're creating a new EditOperation
 	// and adding all the Operations to it
 	e.undo.push_back(editoperation_t{
-		operation_t{Delete, deltext_str, begin_idx, cursormove_t{line, from}},
-		operation_t{Insert, instext_str, begin_idx, cursormove_t{line, from}}
+		operation_t{DELETE, deltext_str, begin_idx, cursormove_t{line, from}},
+		operation_t{INSERT, instext_str, begin_idx, cursormove_t{line, from}}
 	});
 }
 
@@ -118,7 +118,7 @@ void ShiftWithTabsToRight(int line, int pos, std::vector<int> selectedLines) {
 	for (int linenumber : selectedLines) {
 		int offset = LineOffset(e.code_str(), linenumber);
 		e.code.insert(offset, "\t");
-		ops.push_back(operation_t{Insert, "\t", offset, cursormove_t{line, pos}});
+		ops.push_back(operation_t{INSERT, "\t", offset, cursormove_t{line, pos}});
 	}
 
 	e.__selection.sex = pos;
