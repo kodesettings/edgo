@@ -15,7 +15,6 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "config.h"
 #include "editor.h"
 #include <gtest/gtest.h>
 
@@ -32,11 +31,11 @@ TEST(CharacterTests, TestAddCharacter) {
 	const auto expected = "this is a sgample text";
 	EXPECT_EQ(e.code_str(), expected);
 
-//	OnUndo();
-//	EXPECT_EQ(e.code_str(), text);
+	OnUndo();
+	EXPECT_EQ(e.code_str(), text);
 
-//	OnRedo();
-//	EXPECT_EQ(e.code_str(), expected);
+	OnRedo();
+	EXPECT_EQ(e.code_str(), expected);
 }
 
 TEST(CharacterTests, TestInsertCharacter) {
@@ -52,11 +51,11 @@ TEST(CharacterTests, TestInsertCharacter) {
 	const auto expected = "thfis is a sample text";
 	EXPECT_EQ(e.code_str(), expected);
 
-//	OnUndo();
-//	EXPECT_EQ(e.code_str(), text);
+	OnUndo();
+	EXPECT_EQ(e.code_str(), text);
 
-//	OnRedo();
-//	EXPECT_EQ(e.code_str(), expected);
+	OnRedo();
+	EXPECT_EQ(e.code_str(), expected);
 }
 
 TEST(CharacterTests, TestInsertString) {
@@ -72,11 +71,11 @@ TEST(CharacterTests, TestInsertString) {
 	const auto expected = "thsomeis is a sample text";
 	EXPECT_EQ(e.code_str(), expected);
 
-//	OnUndo();
-//	EXPECT_EQ(e.code_str(), text);
+	OnUndo();
+	EXPECT_EQ(e.code_str(), text);
 
-//	OnRedo();
-//	EXPECT_EQ(e.code_str(), expected);
+	OnRedo();
+	EXPECT_EQ(e.code_str(), expected);
 }
 
 TEST(CharacterTests, TestInsertLines) {
@@ -92,11 +91,11 @@ TEST(CharacterTests, TestInsertLines) {
 	const auto expected = "this is a snew line\nanother line\nample text";
 	EXPECT_EQ(e.code_str(), expected);
 
-//	OnUndo();
-//	EXPECT_EQ(e.code_str(), text);
+	OnUndo();
+	EXPECT_EQ(e.code_str(), text);
 
-//	OnRedo();
-//	EXPECT_EQ(e.code_str(), expected);
+	OnRedo();
+	EXPECT_EQ(e.code_str(), expected);
 }
 
 TEST(CharacterTests, TestDeleteCharacter) {
@@ -112,11 +111,11 @@ TEST(CharacterTests, TestDeleteCharacter) {
 	const auto expected = "ths is a sample text";
 	EXPECT_EQ(e.code_str(), expected);
 
-//	OnUndo();
-//	EXPECT_EQ(e.code_str(), text);
+	OnUndo();
+	EXPECT_EQ(e.code_str(), text);
 
-//	OnRedo();
-//	EXPECT_EQ(e.code_str(), expected);
+	OnRedo();
+	EXPECT_EQ(e.code_str(), expected);
 }
 
 TEST(CharacterTests, TestReplaceString) {
@@ -129,11 +128,11 @@ TEST(CharacterTests, TestReplaceString) {
 	const auto expected = "thisasdmple text";
 	EXPECT_EQ(e.code_str(), expected);
 
-//	OnUndo();
-//	EXPECT_EQ(e.code_str(), text);
+	OnUndo();
+	EXPECT_EQ(e.code_str(), text);
 
-//	OnRedo();
-//	EXPECT_EQ(e.code_str(), expected);
+	OnRedo();
+	EXPECT_EQ(e.code_str(), expected);
 }
 
 TEST(CharacterTests, TestDeleteLine) {
@@ -146,11 +145,11 @@ TEST(CharacterTests, TestDeleteLine) {
 	const auto expected = "this is a sample text";
 	EXPECT_EQ(e.code_str(), expected);
 
-//	OnUndo();
-//	EXPECT_EQ(e.code_str(), text);
+	OnUndo();
+	EXPECT_EQ(e.code_str(), text);
 
-//	OnRedo();
-//	EXPECT_EQ(e.code_str(), expected);
+	OnRedo();
+	EXPECT_EQ(e.code_str(), expected);
 }
 
 TEST(CharacterTests, TestInsertLine) {
@@ -163,11 +162,11 @@ TEST(CharacterTests, TestInsertLine) {
 	const auto expected = "this is a sample text\n\n";
 	EXPECT_EQ(e.code_str(), expected);
 
-//	OnUndo();
-//	EXPECT_EQ(e.code_str(), text);
+	OnUndo();
+	EXPECT_EQ(e.code_str(), text);
 
-//	OnRedo();
-//	EXPECT_EQ(e.code_str(), expected);
+	OnRedo();
+	EXPECT_EQ(e.code_str(), expected);
 }
 
 TEST(CharacterTests, TestShiftWithTabsToRight) {
@@ -188,11 +187,11 @@ TEST(CharacterTests, TestShiftWithTabsToRight) {
 	const auto expected = "\tthis is a sample text\t\none more line";
 	EXPECT_EQ(e.code_str(), expected);
 
-//	OnUndo();
-//	EXPECT_EQ(e.code_str(), text);
+	OnUndo();
+	EXPECT_EQ(e.code_str(), text);
 
-//	OnRedo();
-//	EXPECT_EQ(e.code_str(), expected);
+	OnRedo();
+	EXPECT_EQ(e.code_str(), expected);
 }
 
 TEST(CharacterTests, TestMaybeAddPair) {

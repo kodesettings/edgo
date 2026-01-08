@@ -117,4 +117,13 @@ void Focus(void);
 void FocusCenter(void);
 void FocusProcessPanel(void);
 
+// clipboard routines
+void set_update_parameters(bool changed);
+void OnCopy(void);
+void OnPaste(void);
+void Cut(bool isCopySelected);
+void Duplicate(void);
+void OnUndo(void);
+void OnRedo(void);
+
 #endif // _EDITOR_H_

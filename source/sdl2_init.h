@@ -15,12 +15,21 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef _HIGHLIGHTER_H_
-#define _HIGHLIGHTER_H_
+#ifndef _H_CLIPBOARD_H
+#define _H_CLIPBOARD_H
 
-#include <string>
+#include <SDL2/SDL.h>
+#include <glog/logging.h>
 
-static void InsertTextEdit(const std::string &code, int offset, int length) {}
-static void RemoveTextEdit(const std::string &code, int offset, int length) {}
+#define __init_clipboard__ { \
+	if (SDL_Init(SDL_INIT_VIDEO) != 0) { \
+		LOG(ERROR) << "SDL_Init failed: " << SDL_GetError(); \
+		return 1;\
+	} \
+}
 
-#endif // _HIGHLIGHTER_H_
+#define __set_clipboard_text(text) SDL_SetClipboardText(text)
+#define __get_clipboard_text() SDL_GetClipboardText()
+#define __free_clipboard(text) SDL_free(text)
+
+#endif // _H_CLIPBOARD_H

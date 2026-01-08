@@ -62,7 +62,7 @@ void InsertCharacter(int line, int pos, char ch) {
 
 	// record the operation on the undo stack. Note that we're creating a new EditOperation
 	// and adding all the Operations to it
-	e.undo.push_back({operation_t{op, std::to_string(ch), offset, cursormove_t{line, pos}}});
+	e.undo.push_back({operation_t{op, std::string(1, ch), offset, cursormove_t{line, pos}}});
 }
 
 void InsertString(int line, int pos, std::string linestring) {
@@ -85,7 +85,7 @@ void DeleteCharacter(int line, int pos) {
 
 	// record the operation on the undo stack. Note that we're creating a new EditOperation
 	// and adding all the Operations to it
-	e.undo.push_back({operation_t{DELETE, std::to_string(ch), offset, cursormove_t{line, pos}}});
+	e.undo.push_back({operation_t{DELETE, std::string(1, ch), offset, cursormove_t{line, pos}}});
 }
 
 void ReplaceString(int line, int from, int end, std::string instext) {

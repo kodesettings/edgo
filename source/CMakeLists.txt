@@ -21,6 +21,7 @@ add_library(edgo SHARED
 	"characters.cpp"
 	"cursor.cpp"
 	"highlighter.h"
+	"clipboard.cpp"
 )
 
 # test case files
@@ -30,8 +31,9 @@ add_executable(edgotest
 	"lsp_client_test.cpp"
 	"utils_test.cpp"
 	"characters_test.cpp"
+	"clipboard_test.cpp"
 )
 
 find_package(GTest REQUIRED)
-target_link_libraries(edgo PUBLIC glog pthread boost_filesystem)
+target_link_libraries(edgo PUBLIC glog pthread boost_filesystem SDL2)
 target_link_libraries(edgotest PUBLIC ${GTEST_LIBRARIES} gtest_main pthread edgo)
