@@ -1,0 +1,5 @@
+CREDITS
+
+Max Petrov - original edgo logic and golang implementation
+Marcell Nemes - refactor and rewrite in cpp
+
