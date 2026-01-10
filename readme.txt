@@ -48,6 +48,6 @@ Extra features
 
 Licensing
 
-    This project is based on the original work licensed under MIT. See legacy/license.txt
+    This project is based on the original work licensed under MIT. See source/copying.txt
     for the original license. Modifications and new code are licensed under GNU GPLv2.
     See source/license.txt for details.
