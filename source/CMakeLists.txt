@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.12)
 
 project(edgo VERSION 0.0.2 LANGUAGES CXX)
 
+find_package(GTest REQUIRED)
+
 # edgo library files
 add_library(edgo SHARED
 	"config.cpp"
@@ -20,6 +22,7 @@ add_library(edgo SHARED
 	"screen_logo.h"
 	"characters.cpp"
 	"cursor.cpp"
+	"highlighter.cpp"
 	"highlighter.h"
 	"clipboard.cpp"
 	"sdl2_init.h"
@@ -50,8 +53,24 @@ add_executable(edgotest
 	"characters_test.cpp"
 	"clipboard_test.cpp"
 	"features_v01_test.cpp"
+	"highlighter_test.cpp"
 )
 
-find_package(GTest REQUIRED)
-target_link_libraries(edgo PUBLIC glog pthread boost_filesystem SDL2)
+# tree-sitter language bindings
+set(TS_LANGUAGE_LIBS
+	tree-sitter-java
+	tree-sitter-bash
+	tree-sitter-cpp
+	tree-sitter-html
+	tree-sitter-css
+	tree-sitter-go
+	tree-sitter-c
+	tree-sitter-javascript
+	tree-sitter-rust
+	tree-sitter-python
+)
+
+# TODO: add submodules build scripts
+# target and test builds
+target_link_libraries(edgo PUBLIC glog pthread boost_filesystem SDL2 tree-sitter ${TS_LANGUAGE_LIBS})
 target_link_libraries(edgotest PUBLIC ${GTEST_LIBRARIES} gtest_main pthread edgo)

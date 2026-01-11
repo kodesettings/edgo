@@ -20,6 +20,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 //---------------------------------------------------------------
 
@@ -38,22 +39,36 @@ typedef struct {
 	std::string query;
 } query_t;
 
-static std::map<std::string, std::string> languages = {
-	{"javascript", QUERY_JAVASCRIPT},
-	{"typescript", QUERY_JAVASCRIPT},
-	{"python",     QUERY_PYTHON},
-	{"rust",       QUERY_RUST},
-	{"go",         QUERY_GO},
-	{"c",          QUERY_C},
-	{"c++",        QUERY_CPP},
-	{"cpp",        QUERY_CPP},
-	{"css",        QUERY_CSS},
-	{"html",       QUERY_HTML},
-	{"java",       QUERY_JAVA},
-	{"bash",       QUERY_BASH},
+// Supported languages for syntax highlighting
+enum languages {
+	BASH          = 0x034,
+	C             = 0x035,
+	CPP           = 0x036,
+	GO            = 0x037,
+	HTML          = 0x038,
+	CSS           = 0x039,
+	JAVA          = 0x040,
+	JAVASCRIPT    = 0x041,
+	TYPESCRIPT    = 0x042,
+	PYTHON        = 0x043,
+	RUST          = 0x044,
 };
 
-inline std::string MatchQueryLang(std::string lang) {
+static std::map<enum languages, std::string> languages = {
+	{JAVASCRIPT, QUERY_JAVASCRIPT},
+	{TYPESCRIPT, QUERY_JAVASCRIPT},
+	{PYTHON,     QUERY_PYTHON},
+	{RUST,       QUERY_RUST},
+	{GO,         QUERY_GO},
+	{C,          QUERY_C},
+	{CPP,        QUERY_CPP},
+	{CSS,        QUERY_CSS},
+	{HTML,       QUERY_HTML},
+	{JAVA,       QUERY_JAVA},
+	{BASH,       QUERY_BASH},
+};
+
+static std::string MatchQueryLang(enum languages &lang) {
 	return languages[lang];
 }
 
