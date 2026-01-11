@@ -15,12 +15,24 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef _HIGHLIGHTER_H_
-#define _HIGHLIGHTER_H_
+#ifndef _LANG_HTML_H_
+#define _LANG_HTML_H_
 
-#include "langs.h"
 
-static void InsertTextEdit(const std::string &code, int offset, int length) {}
-static void RemoveTextEdit(const std::string &code, int offset, int length) {}
+#define QUERY_HTML "\
+(tag_name) @tag \
+(erroneous_end_tag_name) @tag.error \
+(doctype) @constant \
+(attribute_name) @attribute \
+(attribute_value) @string \
+(comment) @comment \
+\
+[ \
+  \"<\" \
+  \">\" \
+  \"</\" \
+  \"/>\" \
+] @punctuation.bracket \
+"
 
-#endif // _HIGHLIGHTER_H_
+#endif // _LANG_HTML_H_

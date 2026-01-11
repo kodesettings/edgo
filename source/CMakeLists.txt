@@ -24,6 +24,20 @@ add_library(edgo SHARED
 	"clipboard.cpp"
 	"sdl2_init.h"
 	"features_v01.cpp"
+
+# embedded scm files
+	"lang_bash.h"
+	"lang_c.h"
+	"lang_cpp.h"
+	"lang_css.h"
+	"lang_go.h"
+	"lang_html.h"
+	"lang_java.h"
+	"lang_javascript.h"
+	"lang_python.h"
+	"lang_rust.h"
+
+	"langs.h"
 )
 
 # test case files
