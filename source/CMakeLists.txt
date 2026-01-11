@@ -38,6 +38,7 @@ add_library(edgo SHARED
 	"lang_rust.h"
 
 	"langs.h"
+	"themes.h"
 )
 
 # test case files

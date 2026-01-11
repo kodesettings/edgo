@@ -19,6 +19,7 @@
 #define _HIGHLIGHTER_H_
 
 #include "langs.h"
+#include "themes.h"
 
 static void InsertTextEdit(const std::string &code, int offset, int length) {}
 static void RemoveTextEdit(const std::string &code, int offset, int length) {}
