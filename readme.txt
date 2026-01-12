@@ -7,10 +7,15 @@
 
 Installation
 
-    Install golang on your OS and then clone the repository.
+    Prerequisite is to have CMake installed (at least version 3.12) and the required
+    dependencies during the build on your system.
 
     git clone https://github.com/vipmax/edgo && cd edgo
-    make
+    git submodule update --recursive
+
+    mkdir build
+    cd build && cmake ../
+    make (may require root access to install dependency targets)
 
 Usage
 
@@ -24,8 +29,8 @@ Configuration
     Please check the manual page in your console for all the key bindings and for how to
     alter the color schemas or LSP configuration of the editor.
 
-    Themes are supported via the configuration file and the theme sources can be found
-    in internal/highlighter/themes directory for now.
+    Themes are supported: darcula, edgo, edgo-new, material-darker, vesper. You can set
+    them in the configuration file.
 
 The LSP Support
 
