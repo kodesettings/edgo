@@ -19,7 +19,19 @@
 #include "editor.h"
 #include "screen_logo.h"
 
-line_v GetLinesArrayFromData(std::string data, int lineNum) {
+std::string ReadFileToString(const std::string &filepath) { 
+	std::ifstream file(filepath, std::ios_base::in);
+	std::string str, fcontent;
+
+	while (std::getline(file, str)) {
+		fcontent.append(str);
+	}
+
+	file.close();
+	return fcontent;
+}
+
+line_v GetLinesArrayFromData(const std::string &data, int lineNum) {
 	line_v lines = line_v(lineNum);
 	int row = 0;
 	for (auto b : data) {
@@ -35,7 +47,7 @@ line_v GetLinesArrayFromData(std::string data, int lineNum) {
 	return lines;
 }
 
-int LineOffset(std::string text, int lineNum) {
+int LineOffset(const std::string &text, int lineNum) {
 	int index = 0;
 	for (int i = 0; i < (int)text.length(); i++) {
 		if ((char)text.at(i) == '\n') {

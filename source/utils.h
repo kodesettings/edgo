@@ -35,8 +35,9 @@ typedef struct {
 typedef std::vector<line_t> line_v;
 typedef std::vector<std::string> string_v;
 
-line_v GetLinesArrayFromData(std::string data, int lineNum);
-int LineOffset(std::string text, int lineNum);
+std::string ReadFileToString(const std::string &filepath);
+line_v GetLinesArrayFromData(const std::string &data, int lineNum);
+int LineOffset(const std::string &text, int lineNum);
 std::string RemoveLeadingTabsSpaces(const std::string &s);
 int FindCharacterOccurances(const std::string &s, const char ch);
 

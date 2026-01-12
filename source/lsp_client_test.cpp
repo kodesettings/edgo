@@ -16,31 +16,26 @@
 */
 
 #include "lsp_client.h"
+#include "utils.h"
 #include <gtest/gtest.h>
-#include <fstream>
-#include <unistd.h>
 
 // make sure that lsp client is initialized for the entire suite
 class LspTest : public ::testing::Test {
 protected:
 	static void SetUpTestSuite() {
-		lspclient.lang = "go";
-		started = StartLspClient("gopls", "");
+		lspclient.lang = "cpp";
+		started = StartLspClient("clangd", "");
 
 		// finding current working directory
-		char currentDir[PATH_MAX];
-		getcwd(currentDir, sizeof(currentDir));
-		InitLspClient(currentDir);
+		char currentdir[PATH_MAX];
+		getcwd(currentdir, sizeof(currentdir));
+		InitLspClient(currentdir);
 
 		// reading file content
-		file = file.append("lsp_client_test.cpp");
-		std::vector<char> filedata;
-		std::ifstream testfile(file, std::ios_base::in);
-		testfile.read(filedata.data(), 2400);
-		testfile.close();
+		auto filepath = strcat(currentdir, "/../lsp_client_test.cpp");
+		content = ReadFileToString(filepath);
 
 		// accessing didOpen event
-		content = std::string(filedata.data());
 		DidOpen(file, &content);
 	}
 public:
@@ -74,7 +69,10 @@ TEST_F(LspTest, TestLspClientCompletion) {
 
 	auto expected = "DidOpen";
 	EXPECT_EQ(response.result.items.size(), 1);
-	EXPECT_EQ(expected, response.result.items[0].label);
+
+	if (!response.result.items.empty()) {
+		EXPECT_EQ(expected, response.result.items[0].label);
+	}
 }
 
 TEST_F(LspTest, TestLspClientDefinition) {
@@ -82,7 +80,10 @@ TEST_F(LspTest, TestLspClientDefinition) {
 	EXPECT_NE(response.jsonrpc, "");
 
 	EXPECT_EQ(response.result.size(), 1);
-	EXPECT_NE(response.result[0].uri, "");
+
+	if (!response.result.empty()) {
+		EXPECT_NE(response.result[0].uri, "");
+	}
 }
 
 TEST_F(LspTest, TestLspClientSignatureHelp) {
@@ -91,7 +92,10 @@ TEST_F(LspTest, TestLspClientSignatureHelp) {
 
 	auto expected = "DidOpen(const std::string &file, std::string *text)";
 	EXPECT_EQ(response.result.signatures.size(), 1);
-	EXPECT_EQ(expected, response.result.signatures[0].label);
+
+	if (!response.result.signatures.empty()) {
+		EXPECT_EQ(expected, response.result.signatures[0].label);
+	}
 }
 
 TEST_F(LspTest, TestLspClientReferences) {
@@ -99,5 +103,8 @@ TEST_F(LspTest, TestLspClientReferences) {
 	EXPECT_NE(response.jsonrpc, "");
 
 	EXPECT_EQ(response.result.size(), 2);
-	EXPECT_NE(response.result[0].uri, "");
+
+	if (!response.result.empty()) {
+		EXPECT_NE(response.result[0].uri, "");
+	}
 }
