@@ -22,7 +22,7 @@ treesitterhighlighter_t h;
 
 void SetTheme(const std::string &themepath) {/* setting theme if needed */ }
 
-void GetSitterLang(enum languages &lang, bool *parsed) {
+void GetSitterLang(enum languages lang, bool *parsed) {
 	switch (lang) {
 	case BASH: *parsed = ts_parser_set_language(h.parser, tree_sitter_bash()); break;
 	case C: *parsed = ts_parser_set_language(h.parser, tree_sitter_c()); break;
@@ -39,7 +39,7 @@ void GetSitterLang(enum languages &lang, bool *parsed) {
 	}
 }
 
-void SetLang(enum languages &lang) {
+void SetLang(enum languages lang) {
 	if (h.lang == lang) { return; }
 	h.lang = lang;
 

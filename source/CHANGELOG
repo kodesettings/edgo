@@ -1,17 +1,16 @@
-== TODO LIST, DEVELOPMENT TASKLIST, BUGFIXES
-======================================================================================
+CHANGELOG
 
--------------------
+-------------------------------------------------------------------
 Version 0.0.2 - WIP
 
 == complete refactor and rewrite in cpp in source folder
-== omit process, runner and in-editor test functionalities from future versions
+== omit process, runner and in-editor test functionalities from future versions????
 == some user input cursor positions have to be fixed on the undo stack
 == tree-sitter highlighter breaks on special ascii characters
 == implement functionality to create and write to new empty files
 
---------------------
-Version 0.0.1 - Done
+-------------------------------------------------------------------
+Version 0.0.1 - Modifications done on the original Go repository
 
 == refactored lsp completion to new version to replace text at cursor
 == lsp package is refactored and fixed out from bugs

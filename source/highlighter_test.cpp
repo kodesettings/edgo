@@ -1,1 +1,129 @@
-// TODO: add tests
+/**
+    Copyright (C) 2023 - 2026, edgo authors
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, see <https://www.gnu.org/licenses/>.
+*/
+
+#include "highlighter.h"
+#include "utils.h"
+#include "test_languages.h"
+#include <gtest/gtest.h>
+
+void validation_helper(struct TSNode node) {
+	// Process the current node here.
+//	EXPECT_NE(ts_node_start_point(node), nullptr);
+//	EXPECT_NE(ts_node_end_point(node), nullptr);
+	EXPECT_EQ(ts_node_is_missing(node), false);
+	EXPECT_EQ(ts_node_is_null(node), false);
+
+	// Visit each child node recursively.
+	uint32_t childcount = ts_node_child_count(node);
+	for (uint32_t i = 0; i < childcount; i++) {
+		node = ts_node_named_child(node, i);
+		validation_helper(node); // recursive validation
+	}
+}
+
+TEST(HighlighterTests, TestTreeSitter) {
+	auto sourcecode = ReadFileToString("highlighter_test.cpp");
+	SetLang(CPP); // Setup new parser
+	Parse(sourcecode); // Parse source code
+	EXPECT_NE(h.tree, nullptr);
+}
+
+TEST(HighlighterTests, TestTreeSitterGo) {
+	auto sourcecode = GO_SAMPLE;
+	SetLang(GO); // Setup new parser
+	Parse(sourcecode); // Parse source code
+	EXPECT_NE(h.tree, nullptr);
+}
+
+TEST(HighlighterTests, TestTreeSitterPython) {
+	auto sourcecode = PYTHON_SAMPLE;
+	SetLang(PYTHON); // Setup new parser
+	Parse(sourcecode); // Parse source code
+	EXPECT_NE(h.tree, nullptr);
+}
+
+TEST(HighlighterTests, TestTreeSitterJs) {
+	auto sourcecode = JAVASCRIPT_SAMPLE;
+	SetLang(JAVASCRIPT); // Setup new parser
+	Parse(sourcecode); // Parse source code
+	EXPECT_NE(h.tree, nullptr);
+}
+
+TEST(HighlighterTests, TestTreeSitterJsEdit) {
+	auto sourcecode = JAVASCRIPT_SAMPLE;
+	SetLang(JAVASCRIPT); // Setup new parser
+	Parse(sourcecode); // Parse source code
+	EXPECT_NE(h.tree, nullptr);
+
+	TSNode node = ts_tree_root_node(h.tree);
+	validation_helper(node);
+
+	// Edit input
+	InsertTextEdit("2", 14, 1);
+	node = ts_tree_root_node(h.tree);
+	validation_helper(node);
+}
+
+TEST(HighlighterTests, TestTreeSitterJsEditDelete) {
+	auto sourcecode = JAVASCRIPT_SAMPLE;
+	SetLang(JAVASCRIPT); // Setup new parser
+	Parse(sourcecode); // Parse source code
+	EXPECT_NE(h.tree, nullptr);
+
+	TSNode node = ts_tree_root_node(h.tree);
+	validation_helper(node);
+
+	// Edit input
+	RemoveTextEdit("lo", 14, 2);
+	node = ts_tree_root_node(h.tree);
+	validation_helper(node);
+}
+
+TEST(HighlighterTests, TestTreeSitterJsEditDeleteMultiple) {
+	auto sourcecode = JAVASCRIPT_SAMPLE;
+	SetLang(JAVASCRIPT); // Setup new parser
+	Parse(sourcecode); // Parse source code
+	EXPECT_NE(h.tree, nullptr);
+
+	TSNode node = ts_tree_root_node(h.tree);
+	validation_helper(node);
+
+	// Edit input
+	RemoveTextEdit("lo", 14, 2);
+	node = ts_tree_root_node(h.tree);
+	validation_helper(node);
+
+	// Edit input
+	RemoveTextEdit("el", 12, 2);
+	node = ts_tree_root_node(h.tree);
+	validation_helper(node);
+}
+
+TEST(HighlighterTests, TestTreeSitterJsEditEnter) {
+	auto sourcecode = JAVASCRIPT_SAMPLE;
+	SetLang(JAVASCRIPT); // Setup new parser
+	Parse(sourcecode); // Parse source code
+	EXPECT_NE(h.tree, nullptr);
+
+	TSNode node = ts_tree_root_node(h.tree);
+	validation_helper(node);
+
+	// Edit input
+	InsertTextEdit("\n", 19, 1);
+	node = ts_tree_root_node(h.tree);
+	validation_helper(node);
+}

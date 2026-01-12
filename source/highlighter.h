@@ -73,8 +73,8 @@ inline uint32_t GetColorCode(std::string colorcode) {
 }
 
 void SetTheme(const std::string &themepath);
-void GetSitterLang(enum languages &lang, bool *parsed);
-void SetLang(enum languages &lang);
+void GetSitterLang(enum languages lang, bool *parsed);
+void SetLang(enum languages lang);
 void InsertTextEdit(const std::string &code, int offset, int length);
 void RemoveTextEdit(const std::string &code, int offset, int length);
 void Parse(const std::string &code);

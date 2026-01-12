@@ -44,6 +44,7 @@ add_library(edgo SHARED
 
 	"langs.h"
 	"themes.h"
+	"test_languages.h"
 )
 
 # test case files

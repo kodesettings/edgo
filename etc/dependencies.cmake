@@ -1,3 +1,5 @@
+# This file is to list any in-repository dependencies. This is usually not needed
+# and hopefully it's use is temporary only as we would like to fetch these from package repos.
 include(ExternalProject)
 
 ExternalProject_Add(bash SOURCE_DIR ../../lib/tree-sitter-bash BINARY_DIR ../../lib/tree-sitter-bash/build)
