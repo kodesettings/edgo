@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.12)
 
 project(edgo VERSION 0.0.2 LANGUAGES CXX)
-
 find_package(GTest REQUIRED)
+
+# adding dependency targets
+include("../etc/dependencies.cmake")
 
 # edgo library files
 add_library(edgo SHARED
@@ -70,7 +72,6 @@ set(TS_LANGUAGE_LIBS
 	tree-sitter-python
 )
 
-# TODO: add submodules build scripts
 # target and test builds
 target_link_libraries(edgo PUBLIC glog pthread boost_filesystem SDL2 tree-sitter ${TS_LANGUAGE_LIBS})
 target_link_libraries(edgotest PUBLIC ${GTEST_LIBRARIES} gtest_main pthread edgo)
