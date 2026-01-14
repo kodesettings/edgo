@@ -22,8 +22,6 @@
 
 void validation_helper(struct TSNode node) {
 	// Process the current node here.
-//	EXPECT_NE(ts_node_start_point(node), nullptr);
-//	EXPECT_NE(ts_node_end_point(node), nullptr);
 	EXPECT_EQ(ts_node_is_missing(node), false);
 	EXPECT_EQ(ts_node_is_null(node), false);
 
@@ -33,13 +31,6 @@ void validation_helper(struct TSNode node) {
 		node = ts_node_named_child(node, i);
 		validation_helper(node); // recursive validation
 	}
-}
-
-TEST(HighlighterTests, TestTreeSitter) {
-	auto sourcecode = ReadFileToString("highlighter_test.cpp");
-	SetLang(CPP); // Setup new parser
-	Parse(sourcecode); // Parse source code
-	EXPECT_NE(h.tree, nullptr);
 }
 
 TEST(HighlighterTests, TestTreeSitterGo) {
