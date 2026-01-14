@@ -11,11 +11,10 @@ Installation
     dependencies during the build on your system.
 
     git clone https://github.com/vipmax/edgo && cd edgo
-    git submodule update --recursive
 
     mkdir build
     cd build && cmake ../
-    make (may require root access to install dependency targets)
+    make
 
 Usage
 
