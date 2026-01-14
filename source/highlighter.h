@@ -22,16 +22,16 @@
 #include "themes.h"
 
 // tree-sitter language bindings
-#include "../lib/tree-sitter-bash/bindings/c/tree_sitter/tree-sitter-bash.h"
-#include "../lib/tree-sitter-c/bindings/c/tree_sitter/tree-sitter-c.h"
-#include "../lib/tree-sitter-cpp/bindings/c/tree-sitter-cpp.h"
-#include "../lib/tree-sitter-go/bindings/c/tree_sitter/tree-sitter-go.h"
-#include "../lib/tree-sitter-html/bindings/c/tree-sitter-html.h"
-#include "../lib/tree-sitter-css/bindings/c/tree_sitter/tree-sitter-css.h"
-#include "../lib/tree-sitter-java/bindings/c/tree-sitter-java.h"
-#include "../lib/tree-sitter-javascript/bindings/c/tree_sitter/tree-sitter-javascript.h"
-#include "../lib/tree-sitter-python/bindings/c/tree_sitter/tree-sitter-python.h"
-#include "../lib/tree-sitter-rust/bindings/c/tree-sitter-rust.h"
+#include <tree_sitter/tree-sitter-bash.h>
+#include <tree_sitter/tree-sitter-c.h>
+#include <tree_sitter/tree-sitter-cpp.h>
+#include <tree_sitter/tree-sitter-go.h>
+#include <tree_sitter/tree-sitter-html.h>
+#include <tree_sitter/tree-sitter-css.h>
+#include <tree_sitter/tree-sitter-java.h>
+#include <tree_sitter/tree-sitter-javascript.h>
+#include <tree_sitter/tree-sitter-python.h>
+#include <tree_sitter/tree-sitter-rust.h>
 
 // base tree-sitter API
 #include <tree_sitter/api.h>

@@ -1,10 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 
 project(edgo VERSION 0.0.2 LANGUAGES CXX)
-find_package(GTest REQUIRED)
 
-# adding dependency targets
-include("../etc/dependencies.cmake")
+find_package(GTest REQUIRED)
 
 # edgo library files
 add_library(edgo SHARED
