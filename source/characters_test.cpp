@@ -16,6 +16,7 @@
 */
 
 #include "editor.h"
+#include "highlighter.h"
 #include <gtest/gtest.h>
 
 TEST(CharacterTests, TestAddCharacter) {
@@ -24,7 +25,7 @@ TEST(CharacterTests, TestAddCharacter) {
 	e.row = 0;
 	e.col = 11;
 
-//	apply_highlighter(e.code.Value(), "", "")
+	APPLY_HIGHLIGHTER
 	AddCharacter('g');
 
 	const auto text = "this is a sample text";
@@ -44,7 +45,7 @@ TEST(CharacterTests, TestInsertCharacter) {
 	e.row = 0;
 	e.col = 2;
 
-//	apply_highlighter(e.code.Value(), "", "")
+	APPLY_HIGHLIGHTER
 	InsertCharacter(0, 2, 'f');
 
 	const auto text = "this is a sample text";
@@ -64,7 +65,7 @@ TEST(CharacterTests, TestInsertString) {
 	e.row = 0;
 	e.col = 1;
 
-//	apply_highlighter(e.code.Value(), "", "")
+	APPLY_HIGHLIGHTER
 	InsertString(0, 1, "some");
 
 	const auto text = "this is a sample text";
@@ -84,7 +85,7 @@ TEST(CharacterTests, TestInsertLines) {
 	e.row = 0;
 	e.col = 10;
 
-//	apply_highlighter(e.code.Value(), "", "")
+	APPLY_HIGHLIGHTER
 	InsertString(0, 10, "new line\nanother line\n");
 
 	const auto text = "this is a sample text";
@@ -104,7 +105,7 @@ TEST(CharacterTests, TestDeleteCharacter) {
 	e.row = 0;
 	e.col = 2;
 
-//	apply_highlighter(e.code.Value(), "", "")
+	APPLY_HIGHLIGHTER
 	DeleteCharacter(0, 2);
 
 	const auto text = "this is a sample text";
@@ -121,7 +122,7 @@ TEST(CharacterTests, TestDeleteCharacter) {
 TEST(CharacterTests, TestReplaceString) {
 	e.code = rope<char>("this is a sample text");
 
-//	apply_highlighter(e.code.Value(), "", "")
+	APPLY_HIGHLIGHTER
 	ReplaceString(0, 3, 11, "asd");
 
 	const auto text = "this is a sample text";
@@ -138,7 +139,7 @@ TEST(CharacterTests, TestReplaceString) {
 TEST(CharacterTests, TestDeleteLine) {
 	e.code = rope<char>("this is a sample text\n");
 
-//	apply_highlighter(e.code.Value(), "", "")
+	APPLY_HIGHLIGHTER
 	DeleteCharacter(0, e.code.size() - 1);
 
 	const auto text = "this is a sample text\n";
@@ -155,7 +156,7 @@ TEST(CharacterTests, TestDeleteLine) {
 TEST(CharacterTests, TestInsertLine) {
 	e.code = rope<char>("this is a sample text\n");
 
-//	apply_highlighter(e.code.Value(), "", "")
+	APPLY_HIGHLIGHTER
 	InsertCharacter(0, e.code.size() - 1, '\n');
 
 	const auto text = "this is a sample text\n";

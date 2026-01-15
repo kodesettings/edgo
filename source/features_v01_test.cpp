@@ -16,12 +16,13 @@
 */
 
 #include "editor.h"
+#include "highlighter.h"
 #include <gtest/gtest.h>
 
 TEST(FeaturesV01Tests, TestOnCommentLine) {
 	e.code = rope<char>("this is a sample text");
 
-//	apply_highlighter(e.code.Value(), "", "")
+	APPLY_HIGHLIGHTER
 
 	e.langConf.comment = "//";
 	OnCommentLine();
@@ -43,7 +44,7 @@ TEST(FeaturesV01Tests, TestOnSwapLinesUp) {
 	e.row = 1;
 	e.col = 0;
 
-//	apply_highlighter(e.code.Value(), "", "")
+	APPLY_HIGHLIGHTER
 	OnSwapLinesUp();
 
 	auto expected = "second line of text\nfirst line of text\nthird line of text\n";
@@ -63,7 +64,7 @@ TEST(FeaturesV01Tests, TestOnSwapLinesDown) {
 	e.row = 1;
 	e.col = 0;
 
-//	apply_highlighter(e.code.Value(), "", "")
+	APPLY_HIGHLIGHTER
 	OnSwapLinesDown();
 
 	auto expected = "first line of text\nthird line of text\nsecond line of text\n";

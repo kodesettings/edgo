@@ -61,7 +61,7 @@ void SetLang(enum languages lang) {
 	const auto queryLang = MatchQueryLang(h.lang);
 	h.language = (TSLanguage*)ts_parser_language(h.parser);
 	h.query = ts_query_new(h.language, queryLang.c_str(), queryLang.size(), &err_offset, &err_type);
-	if (err_type != TSQueryError::TSQueryErrorNone) { 
+	if (!h.query) { 
 		LOG(FATAL) << "could not parse query language, exiting ...";
 		exit(-1);
 	}

@@ -79,6 +79,8 @@ void InsertTextEdit(const std::string &code, int offset, int length);
 void RemoveTextEdit(const std::string &code, int offset, int length);
 void Parse(const std::string &code);
 
+#define APPLY_HIGHLIGHTER { SetLang(CSS); Parse(e.code_str()); }
+
 //--------------------------------------------------------------------------------
 
 typedef std::vector<coloredbyterange_t> coloredbyterange_v;

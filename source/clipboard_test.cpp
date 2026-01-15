@@ -16,15 +16,8 @@
 */
 
 #include "editor.h"
+#include "highlighter.h"
 #include <gtest/gtest.h>
-/*
-func apply_highlighter(code []byte, theme string, lang string) {
-	e.treeSitterHighlighter = NewTreeSitter()
-	e.treeSitterHighlighter.SetTheme(theme)
-	e.treeSitterHighlighter.SetLang(lang)
-	e.treeSitterHighlighter.Parse(code)
-}
-*/
 
 TEST(ClipboardTests, TestCutActionPosition) {
 	e.code = rope<char>("this is a sample text\nand another line of text to cut\none more line of text\n");
@@ -39,7 +32,7 @@ TEST(ClipboardTests, TestCutActionPosition) {
 	EXPECT_EQ(expected, got);
 
 	auto text = e.code_str();
-//	apply_highlighter(e.code_str(), "", "");
+	APPLY_HIGHLIGHTER
 	Cut(true);
 
 	expected = "this is a sample text\ne of text\n";
@@ -65,7 +58,7 @@ TEST(ClipboardTests, TestCutActionLinesOnly) {
 	EXPECT_EQ(expected, got);
 
 	auto text = e.code_str();
-//	apply_highlighter(e.code_str(), "", "");
+	APPLY_HIGHLIGHTER
 	Cut(true);
 
 	expected = "this is a sample text\n";
@@ -85,7 +78,7 @@ TEST(ClipboardTests, TestDuplicateAction) {
 	e.code = rope<char>("this is a sample text\nand another line of text to cut\none more line of text");
 
 	auto text = e.code_str();
-//	apply_highlighter(e.code.Value(), "", "");
+	APPLY_HIGHLIGHTER
 	Duplicate();
 
 	auto expected = "this is a sample text\nthis is a sample text\nand another line of text to cut\none more line of text";
@@ -103,7 +96,7 @@ TEST(ClipboardTests, TestUndoRedoStack) {
 	e.col = 0;
 
 	e.code = rope<char>("");
-//	apply_highlighter(e.code.Value(), "", "");
+	APPLY_HIGHLIGHTER
 
 	e.undo.clear();
 	e.redo.clear();

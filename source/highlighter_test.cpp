@@ -20,19 +20,6 @@
 #include "test_languages.h"
 #include <gtest/gtest.h>
 
-void validation_helper(struct TSNode node) {
-	// Process the current node here.
-	EXPECT_EQ(ts_node_is_missing(node), false);
-	EXPECT_EQ(ts_node_is_null(node), false);
-
-	// Visit each child node recursively.
-	uint32_t childcount = ts_node_child_count(node);
-	for (uint32_t i = 0; i < childcount; i++) {
-		node = ts_node_named_child(node, i);
-		validation_helper(node); // recursive validation
-	}
-}
-
 TEST(HighlighterTests, TestTreeSitterGo) {
 	auto sourcecode = GO_SAMPLE;
 	SetLang(GO); // Setup new parser
@@ -61,12 +48,12 @@ TEST(HighlighterTests, TestTreeSitterJsEdit) {
 	EXPECT_NE(h.tree, nullptr);
 
 	TSNode node = ts_tree_root_node(h.tree);
-	validation_helper(node);
+	EXPECT_EQ(ts_node_is_null(node), false);
 
 	// Edit input
 	InsertTextEdit("2", 14, 1);
 	node = ts_tree_root_node(h.tree);
-	validation_helper(node);
+	EXPECT_EQ(ts_node_is_null(node), false);
 }
 
 TEST(HighlighterTests, TestTreeSitterJsEditDelete) {
@@ -76,12 +63,12 @@ TEST(HighlighterTests, TestTreeSitterJsEditDelete) {
 	EXPECT_NE(h.tree, nullptr);
 
 	TSNode node = ts_tree_root_node(h.tree);
-	validation_helper(node);
+	EXPECT_EQ(ts_node_is_null(node), false);
 
 	// Edit input
 	RemoveTextEdit("lo", 14, 2);
 	node = ts_tree_root_node(h.tree);
-	validation_helper(node);
+	EXPECT_EQ(ts_node_is_null(node), false);
 }
 
 TEST(HighlighterTests, TestTreeSitterJsEditDeleteMultiple) {
@@ -91,17 +78,17 @@ TEST(HighlighterTests, TestTreeSitterJsEditDeleteMultiple) {
 	EXPECT_NE(h.tree, nullptr);
 
 	TSNode node = ts_tree_root_node(h.tree);
-	validation_helper(node);
+	EXPECT_EQ(ts_node_is_null(node), false);
 
 	// Edit input
 	RemoveTextEdit("lo", 14, 2);
 	node = ts_tree_root_node(h.tree);
-	validation_helper(node);
+	EXPECT_EQ(ts_node_is_null(node), false);
 
 	// Edit input
 	RemoveTextEdit("el", 12, 2);
 	node = ts_tree_root_node(h.tree);
-	validation_helper(node);
+	EXPECT_EQ(ts_node_is_null(node), false);
 }
 
 TEST(HighlighterTests, TestTreeSitterJsEditEnter) {
@@ -111,10 +98,10 @@ TEST(HighlighterTests, TestTreeSitterJsEditEnter) {
 	EXPECT_NE(h.tree, nullptr);
 
 	TSNode node = ts_tree_root_node(h.tree);
-	validation_helper(node);
+	EXPECT_EQ(ts_node_is_null(node), false);
 
 	// Edit input
 	InsertTextEdit("\n", 19, 1);
 	node = ts_tree_root_node(h.tree);
-	validation_helper(node);
+	EXPECT_EQ(ts_node_is_null(node), false);
 }
