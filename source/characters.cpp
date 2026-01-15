@@ -24,7 +24,7 @@
 editor_t e;
 
 void AddCharacter(char ch) {
-//	if (e.__selection.GetSelectionString(e.code_str()).length() != 0) { Cut(false); }
+	if (e.__selection.GetSelectionString(e.code_str()).length() != 0) { Cut(false); }
 
 	Focus();
 	InsertCharacter(e.row, e.col, ch);
