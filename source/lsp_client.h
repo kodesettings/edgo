@@ -34,6 +34,10 @@ namespace bp = boost::process;
 #include <boost/process/v1/search_path.hpp>
 namespace bp = boost::process::v1;
 #endif
+#include <cereal/archives/json.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/map.hpp>
 #include <thread>
 #include <chrono>
 
@@ -63,19 +67,30 @@ bool StartLspClient(const std::string &cmd, std::string args...);
 // Method for calling serialization and sending data into stdin
 //
 template<typename T> void send(T obj) {
-	std::string message; // TODO: serialize object to json
-	LOG(INFO) << "send json" << message;
-	char f[message.size()];
-	sprintf(f, "Content-Length: %ld\r\n\r\n%s", message.size(), message.c_str());
-	lspclient.stdin << std::string(f);
+	std::ostringstream oss1, oss2;
+	cereal::JSONOutputArchive oar(oss1);
+	oar(obj);
+
+	std::string json(oss1.str());
+
+	// removing characters to get rid of pretty printing
+	json.erase(std::remove(json.begin(), json.end(), ' '), json.end());
+	json.erase(std::remove(json.begin(), json.end(), '\n'), json.end());
+	LOG(INFO) << "send json: " << json;
+
+	oss2 << "Content-Length: " << json.size() << "\r\n\r\n" << json;
+	lspclient.stdin << oss2.str();
 }
 
 //
 // Method for deserializing message and setting a timeout for that
 //
 template<typename T> T WaitForRequest(std::stringstream &chan, long int timeout) {
-	// TODO: deserialize message and timeout
-	return T{};
+	cereal::JSONInputArchive iar(chan);
+	// TODO: add timeout feature
+	T obj;
+	iar(obj);
+	return obj;
 }
 
 typedef struct {diagnosticresponse_t dr; std::string message; } diagnostics_t;
