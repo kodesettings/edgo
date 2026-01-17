@@ -15,8 +15,8 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef _LSP_CLIENT_H
-#define _LSP_CLIENT_H
+#ifndef _LSP_CLIENT_H_
+#define _LSP_CLIENT_H_
 
 #include <string>
 #include <glog/logging.h>
@@ -73,9 +73,13 @@ template<typename T> void send(T obj) {
 
 	std::string json(oss1.str());
 
-	// removing characters to get rid of pretty printing
+	// avoid pretty printing
 	json.erase(std::remove(json.begin(), json.end(), ' '), json.end());
 	json.erase(std::remove(json.begin(), json.end(), '\n'), json.end());
+
+	// some adjustments...
+	json.erase(json.begin(), json.begin() + 10); // remove the beginning key
+	json.erase(json.end() - 1, json.end()); // omit last closing character
 	LOG(INFO) << "send json: " << json;
 
 	oss2 << "Content-Length: " << json.size() << "\r\n\r\n" << json;
@@ -114,4 +118,4 @@ void DidOpen(const std::string &file, std::string *text);
 void DidChange(const std::string &file, std::string *text, int version);
 void DidClose(const std::string &file);
 
-#endif // _LSP_CLIENT_H
+#endif // _LSP_CLIENT_H_

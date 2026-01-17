@@ -15,8 +15,8 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef _LSP_CAPABILITIES_H
-#define _LSP_CAPABILITIES_H
+#ifndef _LSP_CAPABILITIES_H_
+#define _LSP_CAPABILITIES_H_
 
 //===================================================================
 // capabilities are initially sent when connected to the LSP server
@@ -52,4 +52,4 @@ const auto capabilities = capabilities_t {
 	}
 };
 
-#endif // _LSP_CAPABILITIES_H
+#endif // _LSP_CAPABILITIES_H_

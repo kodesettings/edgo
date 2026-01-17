@@ -15,8 +15,8 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef _LSP_MODEL_H
-#define _LSP_MODEL_H
+#ifndef _LSP_MODEL_H_
+#define _LSP_MODEL_H_
 
 #include <string>
 #include <vector>
@@ -1001,4 +1001,4 @@ typedef struct {
 	}
 } codeactionresponse_t;
 
-#endif // _LSP_MODEL_H
+#endif // _LSP_MODEL_H_
