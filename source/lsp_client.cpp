@@ -24,7 +24,7 @@ bool StartLspClient(const std::string &cmd, std::string args...) {
 	if (exe.empty()) { LOG(ERROR) << "lsp not found cmd" << cmd; return -1; }
 
 	std::error_code ec;
-	bp::child c(cmd, bp::std_in < lspclient.stdin, bp::std_out > lspclient.stdout, ec);
+	lspclient.c = bp::child(cmd, bp::std_in < lspclient.stdin, bp::std_out > lspclient.stdout, ec);
 
 	if (ec) {
 		LOG(ERROR) << "error starting lsp err" << ec.message();
@@ -47,19 +47,15 @@ diagnostics_t receiveDiagnostics(void) {
 		return diagnostics_t{};
 	}
 
-	auto nbytes_str = line.substr(std::string("Content-Length: ").size());
-	auto nbytes_conv = std::atoi(nbytes_str.c_str());
-	if (nbytes_conv == 0) {
+	if (line.find("Content-Length") == std::string::npos) {
 		LOG(ERROR) << "unable to parse header";
 		return diagnostics_t{};
 	} else {
 		// reading line separator
 		std::getline(lspclient.stdout, line);
-	}
 
-	if (!std::getline(lspclient.stdout, line)) {
-		LOG(ERROR) << "io readline error";
-		return diagnostics_t{};
+		// reading body content
+		std::getline(lspclient.stdout, line);
 	}
 
 	// TODO: deserialize the content into object
@@ -69,13 +65,13 @@ diagnostics_t receiveDiagnostics(void) {
 void receiveLoop(void) {
 repeat:
 	diagnostics_t diagnostics = receiveDiagnostics();
-	LOG(INFO) << "recv:" << diagnostics.message;
+	LOG(INFO) << "recv: " << diagnostics.message;
 
 	if (diagnostics.message.find("publishDiagnostics")) {
 		lspclient.file2diagnostic[diagnostics.dr.params.uri] = diagnostics.dr.params;
-		lspclient.diagnosticsChannel << diagnostics.message;
+		lspclient.diagnosticsChannel.push(diagnostics.message);
 	} else if (diagnostics.message.find("result")) {
-		lspclient.userMessages << diagnostics.message;
+		lspclient.userMessages.push(diagnostics.message);
 	}
 
 	goto repeat;

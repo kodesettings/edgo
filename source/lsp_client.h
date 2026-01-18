@@ -22,6 +22,7 @@
 #include <glog/logging.h>
 #include <map>
 #include <sstream>
+#include <queue>
 #include <boost/version.hpp>
 #if BOOST_VERSION < 108800
 #include <boost/process.hpp>
@@ -51,8 +52,10 @@ typedef struct {
 	bp::opstream stdin;
 	bp::ipstream stdout;
 
-	std::stringstream userMessages;
-	std::stringstream diagnosticsChannel;
+	std::queue<std::string> userMessages;
+	std::queue<std::string> diagnosticsChannel;
+
+	bp::child c; // child process
 
 	int id;
 	std::map<std::string, diagnosticparams_t> file2diagnostic;
@@ -68,18 +71,18 @@ bool StartLspClient(const std::string &cmd, std::string args...);
 //
 template<typename T> void send(T obj) {
 	std::ostringstream oss1, oss2;
-	cereal::JSONOutputArchive oar(oss1);
+	cereal::JSONOutputArchive oar(oss1, cereal::JSONOutputArchive::Options::NoIndent());
 	oar(obj);
 
 	std::string json(oss1.str());
 
 	// avoid pretty printing
-	json.erase(std::remove(json.begin(), json.end(), ' '), json.end());
+	// TODO: the last brace is also omitted for some reason, why?
+	// first line removes line breaks, second line removes beginning key
+	// that was added automatically by the serialization library
 	json.erase(std::remove(json.begin(), json.end(), '\n'), json.end());
+	json.erase(json.begin(), json.begin() + 10);
 
-	// some adjustments...
-	json.erase(json.begin(), json.begin() + 10); // remove the beginning key
-	json.erase(json.end() - 1, json.end()); // omit last closing character
 	LOG(INFO) << "send json: " << json;
 
 	oss2 << "Content-Length: " << json.size() << "\r\n\r\n" << json;
@@ -89,11 +92,14 @@ template<typename T> void send(T obj) {
 //
 // Method for deserializing message and setting a timeout for that
 //
-template<typename T> T WaitForRequest(std::stringstream &chan, long int timeout) {
-	cereal::JSONInputArchive iar(chan);
+template<typename T> T WaitForRequest(std::queue<std::string> &chan, long int timeout) {
+	if (chan.empty()) return T{};
 	// TODO: add timeout feature
+	std::stringstream is(chan.front());
+	cereal::JSONInputArchive iar(is);
 	T obj;
 	iar(obj);
+	chan.pop(); // removing item from queue
 	return obj;
 }
 
