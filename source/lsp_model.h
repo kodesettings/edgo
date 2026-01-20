@@ -22,12 +22,11 @@
 #include <vector>
 #include <map>
 #include <cereal/cereal.hpp>
-#include <cereal/types/optional.hpp>
 
 typedef std::string string_t;
 typedef struct {
-	std::optional<string_t> name;
-	std::optional<string_t> version;
+	string_t name;
+	string_t version;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
@@ -155,15 +154,15 @@ typedef struct {
 
 typedef std::vector<workspacefolder_t> workspacefolder_v;
 typedef struct {
-	std::optional<int>               processId;
-	std::optional<string_t>          rootUri;
-	std::optional<string_t>          rootPath;
-	std::optional<workspacefolder_v> workspaceFolders;
-	std::optional<string_t>          trace;
-	std::optional<string_t>          initializationOptions;
-	std::optional<capabilities_t>    capabilities;
-	std::optional<clientinfo_t>      clientInfo;
-	std::optional<string_t>          workDoneToken;
+	int               processId;
+	string_t          rootUri;
+	string_t          rootPath;
+	workspacefolder_v workspaceFolders;
+	string_t          trace;
+	string_t          initializationOptions;
+	capabilities_t    capabilities;
+	clientinfo_t      clientInfo;
+	string_t          workDoneToken;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
@@ -200,9 +199,9 @@ typedef struct {
 } initializedparams_t;
 
 typedef struct {
-	string_t                           jsonrpc;
-	string_t                           method;
-	std::optional<initializedparams_t> params;
+	string_t            jsonrpc;
+	string_t            method;
+	initializedparams_t params;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
@@ -248,9 +247,9 @@ typedef struct {
 } initializeresponse_t;
 
 typedef struct {
-	std::optional<bool>     includeDeclaration;
-	std::optional<string_v> only;
-	std::optional<int>      triggerKind;
+	bool     includeDeclaration;
+	string_v only;
+	int      triggerKind;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
@@ -261,10 +260,10 @@ typedef struct {
 } context_t;
 
 typedef struct {
-	std::optional<string_t> languageId;
-	std::optional<string_t> text;
-	std::optional<string_t> uri;
-	std::optional<int>      version;
+	string_t languageId;
+	string_t text;
+	string_t uri;
+	int      version;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
@@ -287,9 +286,9 @@ typedef struct {
 } position_t;
 
 typedef struct {
-	textdocument_t            textDocument;
-	std::optional<position_t> position;
-	std::optional<context_t>  context;
+	textdocument_t textDocument;
+	position_t     position;
+	context_t      context;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
@@ -353,9 +352,9 @@ typedef struct {
 } didcloserequest_t;
 
 typedef struct {
-	std::optional<int> id;
-	string_t           jsonrpc;
-	string_t           method;
+	int      id;
+	string_t jsonrpc;
+	string_t method;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
@@ -377,10 +376,10 @@ typedef struct {
 } exitrequest_t;
 
 typedef struct {
-	std::optional<int> id;
-	string_t           jsonrpc;
-	string_t           method;
-	params_t           params;
+	int      id;
+	string_t jsonrpc;
+	string_t method;
+	params_t params;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
@@ -652,8 +651,8 @@ typedef struct {
 } diagnosticparams_t;
 
 typedef struct {
-	textdocument_t            textDocument;
-	std::optional<position_t> position;
+	textdocument_t textDocument;
+	position_t     position;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
