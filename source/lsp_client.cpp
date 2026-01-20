@@ -35,12 +35,12 @@ bool StartLspClient(const std::string &cmd, std::string args...) {
 	}
 
 	lspclient.isReady = true;
-	std::thread(&receiveLoop).detach();
+	std::thread(&receiveLoop, &lspclient.stdout).detach();
 
 	return true;
 }
 
-diagnostics_t receiveDiagnostics(void) {
+diagnostics_t receiveDiagnostics(bp::ipstream *stdout) {
 	std::string line;
 	if (!std::getline(lspclient.stdout, line)) {
 		LOG(ERROR) << "io readline error";
@@ -51,20 +51,28 @@ diagnostics_t receiveDiagnostics(void) {
 		LOG(ERROR) << "unable to parse header";
 		return diagnostics_t{};
 	} else {
+		// get content length from header
+		auto nbytes_str = line.substr(std::string("Content-Length: ").size());
+		auto nbytes_conv = std::atoi(nbytes_str.c_str());
+
 		// reading line separator
 		std::getline(lspclient.stdout, line);
 
-		// reading body content
-		std::getline(lspclient.stdout, line);
+		// allocate buffer, reading body content and trimming
+		// the content to the right size to omit closing bytes
+		char temp[nbytes_conv];
+		stdout->read(temp, nbytes_conv);
+		line = std::string(temp, temp + strlen(temp) - 4);
 	}
 
 	// TODO: deserialize the content into object
 	return diagnostics_t { dr: diagnosticresponse_t{}, message: line };
 }
 
-void receiveLoop(void) {
+void receiveLoop(bp::ipstream *stdout) {
 repeat:
-	diagnostics_t diagnostics = receiveDiagnostics();
+	lspclient.mtx.lock(); // locking this iteration
+	diagnostics_t diagnostics = receiveDiagnostics(stdout);
 	LOG(INFO) << "recv: " << diagnostics.message;
 
 	if (diagnostics.message.find("publishDiagnostics")) {
@@ -74,6 +82,7 @@ repeat:
 		lspclient.userMessages.push(diagnostics.message);
 	}
 
+	lspclient.mtx.unlock(); // unlocking iteration
 	goto repeat;
 }
 

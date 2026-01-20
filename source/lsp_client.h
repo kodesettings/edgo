@@ -56,6 +56,7 @@ typedef struct {
 	std::queue<std::string> diagnosticsChannel;
 
 	bp::child c; // child process
+	std::mutex mtx; // mutex
 
 	int id;
 	std::map<std::string, diagnosticparams_t> file2diagnostic;
@@ -87,6 +88,7 @@ template<typename T> void send(T obj) {
 
 	oss2 << "Content-Length: " << json.size() << "\r\n\r\n" << json;
 	lspclient.stdin << oss2.str();
+	lspclient.stdin.flush();
 }
 
 //
@@ -94,18 +96,20 @@ template<typename T> void send(T obj) {
 //
 template<typename T> T WaitForRequest(std::queue<std::string> &chan, long int timeout) {
 	if (chan.empty()) return T{};
+	lspclient.mtx.lock();
 	// TODO: add timeout feature
 	std::stringstream is(chan.front());
 	cereal::JSONInputArchive iar(is);
 	T obj;
 	iar(obj);
 	chan.pop(); // removing item from queue
+	lspclient.mtx.unlock();
 	return obj;
 }
 
 typedef struct {diagnosticresponse_t dr; std::string message; } diagnostics_t;
-diagnostics_t receiveDiagnostics(void);
-void receiveLoop(void);
+diagnostics_t receiveDiagnostics(bp::ipstream *stdout);
+void receiveLoop(bp::ipstream *stdout);
 diagnosticparams_t GetDiagnostic(const std::string &filename);
 void InitLspClient(const std::string &dir);
 
