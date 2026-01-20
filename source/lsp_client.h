@@ -67,6 +67,13 @@ static lspclient_t lspclient;
 
 bool StartLspClient(const std::string &cmd, std::string args...);
 
+// TODO: this is for temporary use, because the serialization library
+// produces weird output that we have to alter
+namespace cereal {
+inline void epilogue(cereal::JSONInputArchive&, const initializeresponse_t&){}
+inline void prologue(cereal::JSONInputArchive&, const initializeresponse_t&){}
+}
+
 //
 // Method for calling serialization and sending data into stdin
 //
@@ -92,16 +99,26 @@ template<typename T> void send(T obj) {
 }
 
 //
-// Method for deserializing message and setting a timeout for that
+// Deserialization method
+//
+template<typename T> T recvjson(const std::string &json) {
+	T obj;
+	try {
+		std::stringstream is(json);
+		cereal::JSONInputArchive iar(is);
+		iar(obj);
+	} catch (std::exception &e) {LOG(ERROR) << e.what();}
+	return obj;
+}
+
+//
+// Method for deserializing message from the queue
 //
 template<typename T> T WaitForRequest(std::queue<std::string> &chan, long int timeout) {
 	if (chan.empty()) return T{};
 	lspclient.mtx.lock();
 	// TODO: add timeout feature
-	std::stringstream is(chan.front());
-	cereal::JSONInputArchive iar(is);
-	T obj;
-	iar(obj);
+	T obj = recvjson<T>(chan.front()); // get the item from queue
 	chan.pop(); // removing item from queue
 	lspclient.mtx.unlock();
 	return obj;

@@ -232,6 +232,19 @@ typedef struct {
 		ar & CEREAL_NVP(capabilities);
 		ar & CEREAL_NVP(serverinfo);
 	}
+} initializeparams2_t;
+
+typedef struct {
+	int                 id;
+	string_t            jsonrpc;
+	initializeparams2_t result;
+
+	template <class Archive>
+	void serialize(Archive& ar) {
+		ar & CEREAL_NVP(id);
+		ar & CEREAL_NVP(jsonrpc);
+		ar & CEREAL_NVP(result);
+	}
 } initializeresponse_t;
 
 typedef struct {

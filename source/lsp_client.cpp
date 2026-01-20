@@ -65,8 +65,8 @@ diagnostics_t receiveDiagnostics(bp::ipstream *stdout) {
 		line = std::string(temp, temp + strlen(temp) - 4);
 	}
 
-	// TODO: deserialize the content into object
-	return diagnostics_t { dr: diagnosticresponse_t{}, message: line };
+	const auto dr = recvjson<diagnosticresponse_t>(line);
+	return diagnostics_t { dr: dr, message: line };
 }
 
 void receiveLoop(bp::ipstream *stdout) {
@@ -75,10 +75,10 @@ repeat:
 	diagnostics_t diagnostics = receiveDiagnostics(stdout);
 	LOG(INFO) << "recv: " << diagnostics.message;
 
-	if (diagnostics.message.find("publishDiagnostics")) {
+	if (diagnostics.message.find("publishDiagnostics") != std::string::npos) {
 		lspclient.file2diagnostic[diagnostics.dr.params.uri] = diagnostics.dr.params;
 		lspclient.diagnosticsChannel.push(diagnostics.message);
-	} else if (diagnostics.message.find("result")) {
+	} else if (diagnostics.message.find("result") != std::string::npos) {
 		lspclient.userMessages.push(diagnostics.message);
 	}
 
@@ -106,7 +106,7 @@ void InitLspClient(const std::string &dir) {
 	send<initializerequest_t>(initializeRequest);
 	auto response = WaitForRequest<initializeresponse_t>(lspclient.userMessages, 10000);
 
-	if (response.serverinfo.name.empty() || response.serverinfo.version.empty()) {
+	if (response.result.serverinfo.name.empty() || response.result.serverinfo.version.empty()) {
 		LOG(INFO) << "cant get initialize response from lsp server";
 		lspclient.isReady = false;
 		return;
