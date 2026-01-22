@@ -29,7 +29,7 @@ hoverresponse_t Hover(std::string file, const int line, const int character) {
 	};
 
 	send<baserequest_t>(request);
-	auto response = WaitForRequest<hoverresponse_t>(lspclient.userMessages, 1000);
+	auto response = WaitForRequest<hoverresponse_t>(&lspclient.userMessages, 1000);
 
 	return response;
 }
@@ -47,7 +47,7 @@ completionresponse_t Completion(std::string file, int line, int character) {
 	};
 
 	send<baserequest_t>(request);
-	auto response = WaitForRequest<completionresponse_t>(lspclient.userMessages, 1000);
+	auto response = WaitForRequest<completionresponse_t>(&lspclient.userMessages, 1000);
 
 	return response;
 }
@@ -64,7 +64,7 @@ definitionresponse_t Definition(std::string file, int line, int character) {
 	};
 
 	send<definitionrequest_t>(request);
-	auto response = WaitForRequest<definitionresponse_t>(lspclient.userMessages, 1000);
+	auto response = WaitForRequest<definitionresponse_t>(&lspclient.userMessages, 1000);
 
 	return response;
 }
@@ -81,7 +81,7 @@ signaturehelpresponse_t SignatureHelp(std::string file, int line, int character)
 	};
 
 	send<baserequest_t>(request);
-	auto response = WaitForRequest<signaturehelpresponse_t>(lspclient.userMessages, 1000);
+	auto response = WaitForRequest<signaturehelpresponse_t>(&lspclient.userMessages, 1000);
 
 	return response;
 }
@@ -99,7 +99,7 @@ referencesresponse_t References(std::string file, int line, int character) {
 	};
 
 	send<baserequest_t>(request);
-	auto response = WaitForRequest<referencesresponse_t>(lspclient.userMessages, 3000);
+	auto response = WaitForRequest<referencesresponse_t>(&lspclient.userMessages, 3000);
 
 	return response;
 }
@@ -117,7 +117,7 @@ preparerenameresponse_t PrepareRename(std::string file, int line, int character)
 	};
 
 	send<preparerenamerequest_t>(request);
-	auto response = WaitForRequest<preparerenameresponse_t>(lspclient.userMessages, 10000);
+	auto response = WaitForRequest<preparerenameresponse_t>(&lspclient.userMessages, 10000);
 
 	return response;
 }
@@ -135,7 +135,7 @@ renameresponse_t Rename(std::string file, std::string newname, int line, int cha
 	};
 
 	send<renamerequest_t>(request);
-	auto response = WaitForRequest<renameresponse_t>(lspclient.userMessages, 10000);
+	auto response = WaitForRequest<renameresponse_t>(&lspclient.userMessages, 10000);
 
 	return response;
 }
@@ -156,7 +156,7 @@ codeactionresponse_t CodeAction(std::string file, int spc, int spl, int epc, int
 	};
 
 	send<codeactionrequest_t>(request);
-	auto response = WaitForRequest<codeactionresponse_t>(lspclient.userMessages, 10000);
+	auto response = WaitForRequest<codeactionresponse_t>(&lspclient.userMessages, 10000);
 
 	return response;
 }

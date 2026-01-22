@@ -62,8 +62,8 @@ typedef struct {
 	std::map<std::string, diagnosticparams_t> file2diagnostic;
 } lspclient_t;
 
-/* storing lspclient_t in memory */
 static lspclient_t lspclient;
+#define SLEEP_INTERVAL 500000
 
 bool StartLspClient(const std::string &cmd, std::string args...);
 
@@ -114,19 +114,66 @@ template<typename T> T recvjson(const std::string &json) {
 //
 // Method for deserializing message from the queue
 //
-template<typename T> T WaitForRequest(std::queue<std::string> &chan, long int timeout) {
-	if (chan.empty()) return T{};
+template<typename T> T WaitForRequest(std::queue<std::string> *chan, long int timeout) {
+	usleep(timeout); // timeout
+	if (chan->empty()) return T{};
 	lspclient.mtx.lock();
-	// TODO: add timeout feature
-	T obj = recvjson<T>(chan.front()); // get the item from queue
-	chan.pop(); // removing item from queue
+	T obj = recvjson<T>(chan->front()); // get the item from queue
+	chan->pop(); // removing item from queue
 	lspclient.mtx.unlock();
 	return obj;
 }
 
 typedef struct {diagnosticresponse_t dr; std::string message; } diagnostics_t;
-diagnostics_t receiveDiagnostics(bp::ipstream *stdout);
-void receiveLoop(bp::ipstream *stdout);
+inline static diagnostics_t receiveDiagnostics(bp::ipstream *stdout) {
+	std::string line;
+	if (!std::getline(*stdout, line)) {
+		LOG(ERROR) << "io readline error";
+		return diagnostics_t{};
+	}
+
+	if (line.find("Content-Length") == std::string::npos) {
+		LOG(ERROR) << "unable to parse header";
+		return diagnostics_t{};
+	} else {
+		// get content length from header
+		auto nbytes_str = line.substr(std::string("Content-Length: ").size());
+		auto nbytes_conv = std::atoi(nbytes_str.c_str());
+
+		// reading line separator
+		std::getline(*stdout, line);
+
+		// allocate buffer, reading body content and trimming
+		// the content to the right size to omit closing bytes
+		char temp[nbytes_conv];
+		stdout->read(temp, nbytes_conv);
+		line = std::string(temp, temp + strlen(temp) - 4);
+	}
+
+	const auto dr = recvjson<diagnosticresponse_t>(line);
+	return diagnostics_t { dr: dr, message: line };
+}
+
+inline static void receiveLoop(bp::ipstream *stdout) {
+repeat:
+	diagnostics_t diagnostics = receiveDiagnostics(stdout);
+	LOG(INFO) << "recv: " << diagnostics.message;
+
+	if (diagnostics.message.find("publishDiagnostics") != std::string::npos) {
+		lspclient.mtx.lock(); // locking this iteration
+		lspclient.file2diagnostic[diagnostics.dr.params.uri] = diagnostics.dr.params;
+		lspclient.diagnosticsChannel.push(diagnostics.message);
+		lspclient.mtx.unlock(); // unlocking iteration
+	} else if (diagnostics.message.find("result") != std::string::npos) {
+		lspclient.mtx.lock(); // locking this iteration
+		lspclient.userMessages.push(diagnostics.message);
+		lspclient.mtx.unlock(); // unlocking iteration
+	}
+
+	usleep(SLEEP_INTERVAL); // sleep for 500ms
+	goto repeat;
+}
+
 diagnosticparams_t GetDiagnostic(const std::string &filename);
 void InitLspClient(const std::string &dir);
 

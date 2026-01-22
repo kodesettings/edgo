@@ -30,60 +30,14 @@ bool StartLspClient(const std::string &cmd, std::string args...) {
 		LOG(ERROR) << "error starting lsp err" << ec.message();
 		return false;
 	} else {
-		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		usleep(SLEEP_INTERVAL); // sleep for 500ms
 		LOG(INFO) << "lsp started success " << cmd << " " << args;
 	}
 
-	lspclient.isReady = true;
-	std::thread(&receiveLoop, &lspclient.stdout).detach();
+	static std::thread t(&receiveLoop, &lspclient.stdout);
+	t.detach();
 
 	return true;
-}
-
-diagnostics_t receiveDiagnostics(bp::ipstream *stdout) {
-	std::string line;
-	if (!std::getline(lspclient.stdout, line)) {
-		LOG(ERROR) << "io readline error";
-		return diagnostics_t{};
-	}
-
-	if (line.find("Content-Length") == std::string::npos) {
-		LOG(ERROR) << "unable to parse header";
-		return diagnostics_t{};
-	} else {
-		// get content length from header
-		auto nbytes_str = line.substr(std::string("Content-Length: ").size());
-		auto nbytes_conv = std::atoi(nbytes_str.c_str());
-
-		// reading line separator
-		std::getline(lspclient.stdout, line);
-
-		// allocate buffer, reading body content and trimming
-		// the content to the right size to omit closing bytes
-		char temp[nbytes_conv];
-		stdout->read(temp, nbytes_conv);
-		line = std::string(temp, temp + strlen(temp) - 4);
-	}
-
-	const auto dr = recvjson<diagnosticresponse_t>(line);
-	return diagnostics_t { dr: dr, message: line };
-}
-
-void receiveLoop(bp::ipstream *stdout) {
-repeat:
-	lspclient.mtx.lock(); // locking this iteration
-	diagnostics_t diagnostics = receiveDiagnostics(stdout);
-	LOG(INFO) << "recv: " << diagnostics.message;
-
-	if (diagnostics.message.find("publishDiagnostics") != std::string::npos) {
-		lspclient.file2diagnostic[diagnostics.dr.params.uri] = diagnostics.dr.params;
-		lspclient.diagnosticsChannel.push(diagnostics.message);
-	} else if (diagnostics.message.find("result") != std::string::npos) {
-		lspclient.userMessages.push(diagnostics.message);
-	}
-
-	lspclient.mtx.unlock(); // unlocking iteration
-	goto repeat;
 }
 
 diagnosticparams_t GetDiagnostic(const std::string &filename) {
@@ -104,7 +58,7 @@ void InitLspClient(const std::string &dir) {
 	};
 
 	send<initializerequest_t>(initializeRequest);
-	auto response = WaitForRequest<initializeresponse_t>(lspclient.userMessages, 10000);
+	auto response = WaitForRequest<initializeresponse_t>(&lspclient.userMessages, 10000);
 
 	if (response.result.serverinfo.name.empty() || response.result.serverinfo.version.empty()) {
 		LOG(INFO) << "cant get initialize response from lsp server";
