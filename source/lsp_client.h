@@ -23,6 +23,7 @@
 #include <map>
 #include <sstream>
 #include <queue>
+#include <thread>
 #include <boost/version.hpp>
 #if BOOST_VERSION < 108800
 #include <boost/process.hpp>
@@ -39,8 +40,6 @@ namespace bp = boost::process::v1;
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/map.hpp>
-#include <thread>
-#include <chrono>
 
 #include "logging.h"
 #include "lsp_model.h"
@@ -65,32 +64,19 @@ typedef struct {
 static lspclient_t lspclient;
 #define SLEEP_INTERVAL 500000
 
-bool StartLspClient(const std::string &cmd, std::string args...);
-
-// TODO: this is for temporary use, because the serialization library
-// produces weird output that we have to alter
-namespace cereal {
-inline void epilogue(cereal::JSONInputArchive&, const initializeresponse_t&){}
-inline void prologue(cereal::JSONInputArchive&, const initializeresponse_t&){}
-}
-
 //
 // Method for calling serialization and sending data into stdin
 //
 template<typename T> void send(T obj) {
 	std::ostringstream oss1, oss2;
 	cereal::JSONOutputArchive oar(oss1, cereal::JSONOutputArchive::Options::NoIndent());
-	oar(obj);
+	obj.serialize(oar);
 
 	std::string json(oss1.str());
 
 	// avoid pretty printing
-	// TODO: the last brace is also omitted for some reason, why?
-	// first line removes line breaks, second line removes beginning key
-	// that was added automatically by the serialization library
-	json.erase(std::remove(json.begin(), json.end(), '\n'), json.end());
-	json.erase(json.begin(), json.begin() + 10);
-
+	// NOTE: the last character is skipped to prevent removal of closing brace
+	json.erase(std::remove(json.begin(), json.end(), '\n'), json.end() - 1);
 	LOG(INFO) << "send json: " << json;
 
 	oss2 << "Content-Length: " << json.size() << "\r\n\r\n" << json;
@@ -106,7 +92,7 @@ template<typename T> T recvjson(const std::string &json) {
 	try {
 		std::stringstream is(json);
 		cereal::JSONInputArchive iar(is);
-		iar(obj);
+		obj.serialize(iar);
 	} catch (std::exception &e) {LOG(ERROR) << e.what();}
 	return obj;
 }
@@ -174,6 +160,8 @@ repeat:
 	goto repeat;
 }
 
+// lsp initialization
+bool StartLspClient(const std::string &cmd, std::string args...);
 diagnosticparams_t GetDiagnostic(const std::string &filename);
 void InitLspClient(const std::string &dir);
 

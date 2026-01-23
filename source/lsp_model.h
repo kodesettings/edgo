@@ -223,13 +223,13 @@ typedef struct {
 } serverinfo_t;
 
 typedef struct {
-	capabilities_t capabilities;
-	serverinfo_t serverinfo;
+//	capabilities_t capabilities;
+	serverinfo_t serverInfo;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
-		ar & CEREAL_NVP(capabilities);
-		ar & CEREAL_NVP(serverinfo);
+//		ar & CEREAL_NVP(capabilities);
+		ar & CEREAL_NVP(serverInfo);
 	}
 } initializeparams2_t;
 

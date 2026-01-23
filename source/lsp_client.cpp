@@ -60,7 +60,7 @@ void InitLspClient(const std::string &dir) {
 	send<initializerequest_t>(initializeRequest);
 	auto response = WaitForRequest<initializeresponse_t>(&lspclient.userMessages, 10000);
 
-	if (response.result.serverinfo.name.empty() || response.result.serverinfo.version.empty()) {
+	if (response.result.serverInfo.name.empty() || response.result.serverInfo.version.empty()) {
 		LOG(INFO) << "cant get initialize response from lsp server";
 		lspclient.isReady = false;
 		return;

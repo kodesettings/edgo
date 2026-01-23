@@ -32,21 +32,22 @@ protected:
 		InitLspClient(currentdir);
 
 		// reading file content
-		auto filepath = strcat(currentdir, "/../lsp_client_test.cpp");
+		filepath.append(currentdir);
+		filepath.append("/../lsp_client_test.cpp");
 		content = ReadFileToString(filepath);
 
 		// accessing didOpen event
-		DidOpen(file, &content);
+		DidOpen(filepath, &content);
 	}
 public:
 	static bool started;             // flag whether the server started
-	static std::string file;         // direct file path
+	static std::string filepath;     // direct file path
 	static std::string content;      // file content
 };
 
 // defining the test variables
 bool LspTest::started;
-std::string LspTest::file;
+std::string LspTest::filepath;
 std::string LspTest::content;
 
 TEST_F(LspTest, TestLspClientStarted) {
@@ -55,7 +56,7 @@ TEST_F(LspTest, TestLspClientStarted) {
 }
 
 TEST_F(LspTest, TestLspClientHover) {
-	hoverresponse_t response = Hover(file, 27-1, 12);
+	hoverresponse_t response = Hover(filepath, 27-1, 12);
 	EXPECT_NE(response.jsonrpc, "");
 
 	auto expected = "void DidOpen(const std::string &file, std::string *text)";
@@ -64,7 +65,7 @@ TEST_F(LspTest, TestLspClientHover) {
 }
 
 TEST_F(LspTest, TestLspClientCompletion) {
-	completionresponse_t response = Completion(file, 27-1, 12);
+	completionresponse_t response = Completion(filepath, 27-1, 12);
 	EXPECT_NE(response.jsonrpc, "");
 
 	auto expected = "DidOpen";
@@ -76,7 +77,7 @@ TEST_F(LspTest, TestLspClientCompletion) {
 }
 
 TEST_F(LspTest, TestLspClientDefinition) {
-	definitionresponse_t response = Definition(file, 27-1, 12);
+	definitionresponse_t response = Definition(filepath, 27-1, 12);
 	EXPECT_NE(response.jsonrpc, "");
 
 	EXPECT_EQ(response.result.size(), 1);
@@ -87,7 +88,7 @@ TEST_F(LspTest, TestLspClientDefinition) {
 }
 
 TEST_F(LspTest, TestLspClientSignatureHelp) {
-	signaturehelpresponse_t response = SignatureHelp(file, 27-1, 12);
+	signaturehelpresponse_t response = SignatureHelp(filepath, 27-1, 12);
 	EXPECT_NE(response.jsonrpc, "");
 
 	auto expected = "DidOpen(const std::string &file, std::string *text)";
@@ -99,7 +100,7 @@ TEST_F(LspTest, TestLspClientSignatureHelp) {
 }
 
 TEST_F(LspTest, TestLspClientReferences) {
-	referencesresponse_t response = References(file, 27-1, 12);
+	referencesresponse_t response = References(filepath, 27-1, 12);
 	EXPECT_NE(response.jsonrpc, "");
 
 	EXPECT_EQ(response.result.size(), 2);
