@@ -110,49 +110,42 @@ template<typename T> T WaitForRequest(std::queue<std::string> *chan, long int ti
 	return obj;
 }
 
-typedef struct {diagnosticresponse_t dr; std::string message; } diagnostics_t;
-inline static diagnostics_t receiveDiagnostics(bp::ipstream *stdout) {
-	std::string line;
-	if (!std::getline(*stdout, line)) {
+inline static void receiveDiagnostics(bp::ipstream *stdout, std::string *message) {
+	if (!std::getline(*stdout, *message)) {
 		LOG(ERROR) << "io readline error";
-		return diagnostics_t{};
-	}
-
-	if (line.find("Content-Length") == std::string::npos) {
+	} else if (message->find("Content-Length") == std::string::npos) {
 		LOG(ERROR) << "unable to parse header";
-		return diagnostics_t{};
 	} else {
 		// get content length from header
-		auto nbytes_str = line.substr(std::string("Content-Length: ").size());
+		auto nbytes_str = message->substr(16);
 		auto nbytes_conv = std::atoi(nbytes_str.c_str());
 
 		// reading line separator
-		std::getline(*stdout, line);
+		std::getline(*stdout, *message);
 
-		// allocate buffer, reading body content and trimming
-		// the content to the right size to omit closing bytes
-		char temp[nbytes_conv];
-		stdout->read(temp, nbytes_conv);
-		line = std::string(temp, temp + strlen(temp) - 4);
+		// allocate buffer, reading body content
+		std::string temp(nbytes_conv, '\0');
+		stdout->read(&temp[0], nbytes_conv);
+		message->clear();
+		message->append(temp);
 	}
-
-	const auto dr = recvjson<diagnosticresponse_t>(line);
-	return diagnostics_t { dr: dr, message: line };
 }
 
 inline static void receiveLoop(bp::ipstream *stdout) {
 repeat:
-	diagnostics_t diagnostics = receiveDiagnostics(stdout);
-	LOG(INFO) << "recv: " << diagnostics.message;
+	std::string message;
+	receiveDiagnostics(stdout, &message);
+	LOG(INFO) << "recv: " << message;
 
-	if (diagnostics.message.find("publishDiagnostics") != std::string::npos) {
+	if (message.find("publishDiagnostics") != std::string::npos) {
 		lspclient.mtx.lock(); // locking this iteration
-		lspclient.file2diagnostic[diagnostics.dr.params.uri] = diagnostics.dr.params;
-		lspclient.diagnosticsChannel.push(diagnostics.message);
+		auto dr = recvjson<diagnosticresponse_t>(message);
+		lspclient.file2diagnostic[dr.params.uri] = dr.params;
+		lspclient.diagnosticsChannel.push(message);
 		lspclient.mtx.unlock(); // unlocking iteration
-	} else if (diagnostics.message.find("result") != std::string::npos) {
+	} else if (message.find("result") != std::string::npos) {
 		lspclient.mtx.lock(); // locking this iteration
-		lspclient.userMessages.push(diagnostics.message);
+		lspclient.userMessages.push(message);
 		lspclient.mtx.unlock(); // unlocking iteration
 	}
 

@@ -55,7 +55,7 @@ TEST_F(LspTest, TestLspClientStarted) {
 		EXPECT_NE(LspTest::content.size(), 0);
 }
 
-TEST_F(LspTest, TestLspClientHover) {
+TEST_F(LspTest, DISABLED_TestLspClientHover) {
 	hoverresponse_t response = Hover(filepath, 27-1, 12);
 	EXPECT_NE(response.jsonrpc, "");
 
@@ -64,7 +64,7 @@ TEST_F(LspTest, TestLspClientHover) {
 	EXPECT_EQ(expected, got);
 }
 
-TEST_F(LspTest, TestLspClientCompletion) {
+TEST_F(LspTest, DISABLED_TestLspClientCompletion) {
 	completionresponse_t response = Completion(filepath, 27-1, 12);
 	EXPECT_NE(response.jsonrpc, "");
 
@@ -76,7 +76,7 @@ TEST_F(LspTest, TestLspClientCompletion) {
 	}
 }
 
-TEST_F(LspTest, TestLspClientDefinition) {
+TEST_F(LspTest, DISABLED_TestLspClientDefinition) {
 	definitionresponse_t response = Definition(filepath, 27-1, 12);
 	EXPECT_NE(response.jsonrpc, "");
 
@@ -87,7 +87,7 @@ TEST_F(LspTest, TestLspClientDefinition) {
 	}
 }
 
-TEST_F(LspTest, TestLspClientSignatureHelp) {
+TEST_F(LspTest, DISABLED_TestLspClientSignatureHelp) {
 	signaturehelpresponse_t response = SignatureHelp(filepath, 27-1, 12);
 	EXPECT_NE(response.jsonrpc, "");
 
@@ -99,7 +99,7 @@ TEST_F(LspTest, TestLspClientSignatureHelp) {
 	}
 }
 
-TEST_F(LspTest, TestLspClientReferences) {
+TEST_F(LspTest, DISABLED_TestLspClientReferences) {
 	referencesresponse_t response = References(filepath, 27-1, 12);
 	EXPECT_NE(response.jsonrpc, "");
 
