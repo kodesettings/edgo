@@ -23,6 +23,7 @@
 #include "selection.h"
 #include "operations.h"
 #include "lsp_client.h"
+#include "search.h"
 // NOTE: including gnu rope specification, it seems although
 // this is legacy  this is still the best one
 #include <ext/rope>
@@ -66,7 +67,7 @@ typedef struct {
 
 	bool isContentSearch;
 	std::string searchPattern;          // pattern for search in a buffer
-//	searchresult_v searchResults;
+	searchresult_v searchResults;
 	int searchResultIndex;
 
 	// process panel vars

@@ -43,6 +43,8 @@ add_library(edgo SHARED
 	"langs.h"
 	"themes.h"
 	"test_languages.h"
+	"search.cpp"
+	"search.h"
 )
 
 # test case files
@@ -55,6 +57,7 @@ add_executable(edgotest
 	"clipboard_test.cpp"
 	"features_v01_test.cpp"
 	"highlighter_test.cpp"
+	"search_test.cpp"
 )
 
 # tree-sitter language bindings
