@@ -227,4 +227,19 @@
 ] @keyword \
 "
 
+// QUERIES: syntax definition for test identification
+// -------------------------------------------------------------------------
+
+#define QUERY_JAVASCRIPT_TEST "\
+                (expression_statement\
+                (call_expression\
+                  function: (identifier) @method-name\
+                  (#match? @method-name \"^(describe|test|it)\")\
+                  arguments: (arguments [\
+                        ((string) @test-name)\
+                        ((template_string) @test-name)\
+                  ]\
+                )))\
+"
+
 #endif // _LANG_JAVASCRIPT_H

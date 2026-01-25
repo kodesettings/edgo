@@ -144,4 +144,14 @@
 (comment) @comment \
 "
 
+// QUERIES: syntax definition for test identification
+// -------------------------------------------------------------------------
+
+#define QUERY_GO_TEST "\
+         (\
+          function_declaration name: (identifier) @test-name\
+          (#match? @test-name \"Test*\")\
+        )\
+"
+
 #endif // _LANG_GO_H_

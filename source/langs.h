@@ -72,4 +72,15 @@ static std::string MatchQueryLang(enum languages &lang) {
 	return languages[lang];
 }
 
+static std::map<enum languages, std::string> tests = {
+	{JAVASCRIPT, QUERY_JAVASCRIPT_TEST},
+	{JAVA,       QUERY_JAVA_TEST},
+	{PYTHON,     QUERY_PYTHON_TEST},
+	{GO,         QUERY_GO_TEST},
+};
+
+static std::string MatchTestQueryLang(enum languages &lang) {
+	return tests[lang];
+}
+
 #endif // _LANGS_H_

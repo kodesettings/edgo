@@ -244,4 +244,16 @@
 ] @keyword \
 "
 
+// QUERIES: syntax definition for test identification
+// -------------------------------------------------------------------------
+
+#define QUERY_JAVA_TEST "\
+        (method_declaration\
+                  (modifiers \
+                        (marker_annotation\
+                                name: (identifier) @string))\
+                  name: (identifier) @test-name\
+                )\
+"
+
 #endif // _LANG_JAVA_H_
