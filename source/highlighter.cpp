@@ -96,10 +96,8 @@ void RemoveTextEdit(const std::string &code, int offset, int length) {
 	LOG(INFO) << "removetextedit offset:" << offset << " len:" << length;
 }
 
-// TODO: Convinience method from legacy screen logic,
-// why is it needed and where?
 void Parse(const std::string &code) {
-	h.tree = ts_parser_parse_string(h.parser, h.tree, code.c_str(), code.size());
+	h.tree = ts_parser_parse_string(h.parser, nullptr, code.c_str(), code.size());
 }
 
 coloredbyterange_v ColorRanges(const int from, const int to) {
@@ -108,6 +106,7 @@ coloredbyterange_v ColorRanges(const int from, const int to) {
 
 	// setting point range
 	TSQueryCursor *query_cursor = ts_query_cursor_new();
+	ts_query_cursor_exec(query_cursor, h.query, ts_tree_root_node(h.tree));
 	ts_query_cursor_set_point_range(query_cursor, start_point, end_point);
 
 	coloredbyterange_v colors;
@@ -116,7 +115,7 @@ coloredbyterange_v ColorRanges(const int from, const int to) {
 		for (int i = 0; i < match.capture_count; i++) {
 			const TSQueryCapture capture = match.captures[i];
 			uint32_t length;
-			auto name = ts_query_capture_name_for_id(h.query, i, &length);
+			auto name = ts_query_capture_name_for_id(h.query, capture.index, &length);
 			auto name_str = std::string(name);
 			auto split = name_str.substr(0, name_str.find("."));
 			auto color = h.colorsmap[split];

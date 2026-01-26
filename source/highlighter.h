@@ -45,6 +45,7 @@ typedef struct {
 	enum languages        lang;
 	struct TSLanguage     *language;
 	struct TSQuery        *query;
+	struct TSQuery        *testquery;
 	std::map<std::string, std::string> colorsmap;
 	std::string           themepath;
 } treesitterhighlighter_t;

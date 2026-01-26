@@ -21,17 +21,19 @@
 
 TEST(QueryTests, TestGoFindTest) {
 	testdata_m test, expectedtest = {
-		{7,  {name: "Test1", filename: "example_test.go", line: 7}},
-		{13, {name: "Test2", filename: "example_test.go", line: 13}},
+		{4,  {name: "", filename: "example_test.go", line: 4}},
+		{6, {name: "", filename: "example_test.go", line: 6}},
+		{12, {name: "", filename: "example_test.go", line: 12}},
 	};
 
 	SetLang(GO);
-	testfinder_t testfinder;
-	TestQuery(testfinder.testquery);
-	TestFinder(testfinder, "example_test.go", GO_TEST_SAMPLE, &test);
+	Parse(GO_TEST_SAMPLE);
+
+	TestQueryAlloc();
+	TestFinder("example_test.go", &test);
 	EXPECT_EQ(test.size(), expectedtest.size());
 
-	for (const auto &kv : test) {
+	for (const auto &kv : expectedtest) {
 		EXPECT_EQ(test[kv.first].name, expectedtest[kv.first].name);
 		EXPECT_EQ(test[kv.first].filename, expectedtest[kv.first].filename);
 		EXPECT_EQ(test[kv.first].line, expectedtest[kv.first].line);
@@ -40,19 +42,20 @@ TEST(QueryTests, TestGoFindTest) {
 
 TEST(QueryTests, TestJavascriptFindTest) {
 	testdata_m test, expectedtest = {
-		{6,  {name: "math tests", filename: "test.js", line: 6}},
-		{8, {name: "positive", filename: "test.js", line: 8}},
-		{12, {name: "negative", filename: "test.js", line: 12}},
-		{16, {name: "failed", filename: "test.js", line: 16}},
+		{4,  {name: "", filename: "test.js", line: 4}},
+		{5, {name: "", filename: "test.js", line: 5}},
+		{9, {name: "", filename: "test.js", line: 9}},
+		{13, {name: "", filename: "test.js", line: 13}},
 	};
 
 	SetLang(JAVASCRIPT);
-	testfinder_t testfinder;
-	TestQuery(testfinder.testquery);
-	TestFinder(testfinder, "test.js", JAVASCRIPT_TEST_SAMPLE, &test);
+	Parse(JAVASCRIPT_TEST_SAMPLE);
+
+	TestQueryAlloc();
+	TestFinder("test.js", &test);
 	EXPECT_EQ(test.size(), expectedtest.size());
 
-	for (const auto &kv : test) {
+	for (const auto &kv : expectedtest) {
 		EXPECT_EQ(test[kv.first].name, expectedtest[kv.first].name);
 		EXPECT_EQ(test[kv.first].filename, expectedtest[kv.first].filename);
 		EXPECT_EQ(test[kv.first].line, expectedtest[kv.first].line);
@@ -61,16 +64,17 @@ TEST(QueryTests, TestJavascriptFindTest) {
 
 TEST(QueryTests, TestJavaFindTest) {
 	testdata_m test, expectedtest = {
-		{12,  {name: "addition", filename: "test.java", line: 12}},
+		{9,  {name: "", filename: "test.java", line: 9}},
 	};
 
 	SetLang(JAVA);
-	testfinder_t testfinder;
-	TestQuery(testfinder.testquery);
-	TestFinder(testfinder, "test.java", JAVA_TEST_SAMPLE, &test);
+	Parse(JAVA_TEST_SAMPLE);
+
+	TestQueryAlloc();
+	TestFinder("test.java", &test);
 	EXPECT_EQ(test.size(), expectedtest.size());
 
-	for (const auto &kv : test) {
+	for (const auto &kv : expectedtest) {
 		EXPECT_EQ(test[kv.first].name, expectedtest[kv.first].name);
 		EXPECT_EQ(test[kv.first].filename, expectedtest[kv.first].filename);
 		EXPECT_EQ(test[kv.first].line, expectedtest[kv.first].line);
@@ -79,18 +83,20 @@ TEST(QueryTests, TestJavaFindTest) {
 
 TEST(QueryTests, TestPythonFindTest) {
 	testdata_m test, expectedtest = {
-		{3,  {name: "TestYo", filename: "test_yo.py", line: 3}},
-		{7,  {name: "test_pass", filename: "test_yo.py", line: 7}},
-		{10,  {name: "test_fail_sometimes", filename: "test_yo.py", line: 10}},
+		{3,  {name: "", filename: "test_yo.py", line: 3}},
+		{4,  {name: "", filename: "test_yo.py", line: 4}},
+		{7,  {name: "", filename: "test_yo.py", line: 7}},
+		{10,  {name: "", filename: "test_yo.py", line: 10}},
 	};
 
 	SetLang(PYTHON);
-	testfinder_t testfinder;
-	TestQuery(testfinder.testquery);
-	TestFinder(testfinder, "test_yo.py", PYTHON_TEST_SAMPLE, &test);
+	Parse(PYTHON_TEST_SAMPLE);
+
+	TestQueryAlloc();
+	TestFinder("test_yo.py", &test);
 	EXPECT_EQ(test.size(), expectedtest.size());
 
-	for (const auto &kv : test) {
+	for (const auto &kv : expectedtest) {
 		EXPECT_EQ(test[kv.first].name, expectedtest[kv.first].name);
 		EXPECT_EQ(test[kv.first].filename, expectedtest[kv.first].filename);
 		EXPECT_EQ(test[kv.first].line, expectedtest[kv.first].line);

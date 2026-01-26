@@ -21,18 +21,21 @@
 #include "highlighter.h"
 
 typedef struct {
-	std::string name;
+	std::string name; // NOTE: unused for now
 	std::string filename;
 	int line;
 } testdata_t;
 
-typedef struct {
-	TSQuery *testquery;
-	std::string lang;
-} testfinder_t;
-
-void TestQuery(TSQuery *testquery);
 typedef std::map<int, testdata_t> testdata_m;
-void TestFinder(testfinder_t root, std::string filename, std::string code, testdata_m *tests);
+
+// NOTE: initialize with SetLang() first, then apply these functions
+inline void TestQueryAlloc(void) {
+	uint32_t err_offset;
+	TSQueryError err_type;
+	const auto queryLang = MatchTestQueryLang(h.lang);
+	h.testquery = ts_query_new(h.language, queryLang.c_str(), queryLang.size(), &err_offset, &err_type);
+}
+
+void TestFinder(const std::string &filename, testdata_m *tests);
 
 #endif // _QUERY_H_
