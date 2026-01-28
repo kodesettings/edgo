@@ -23,7 +23,6 @@
 #include <map>
 #include <sstream>
 #include <queue>
-#include <thread>
 #include <boost/version.hpp>
 #if BOOST_VERSION < 108800
 #include <boost/process.hpp>
@@ -55,7 +54,7 @@ typedef struct {
 	std::queue<std::string> diagnosticsChannel;
 
 	bp::child c; // child process
-	std::mutex mtx; // mutex
+	bool (*changed)(bp::ipstream *stdout);
 
 	int id;
 	std::map<std::string, diagnosticparams_t> file2diagnostic;
@@ -67,7 +66,7 @@ static lspclient_t lspclient;
 //
 // Method for calling serialization and sending data into stdin
 //
-template<typename T> void send(T obj) {
+template<typename T> void send(T obj, bool skip) {
 	std::ostringstream oss1, oss2;
 	cereal::JSONOutputArchive oar(oss1, cereal::JSONOutputArchive::Options::NoIndent());
 	obj.serialize(oar);
@@ -82,6 +81,9 @@ template<typename T> void send(T obj) {
 	oss2 << "Content-Length: " << json.size() << "\r\n\r\n" << json;
 	lspclient.stdin << oss2.str();
 	lspclient.stdin.flush();
+	if (lspclient.changed && !skip) {
+		lspclient.changed(&lspclient.stdout);
+	}
 }
 
 //
@@ -103,10 +105,8 @@ template<typename T> T recvjson(const std::string &json) {
 template<typename T> T WaitForRequest(std::queue<std::string> *chan, long int timeout) {
 	usleep(timeout); // timeout
 	if (chan->empty()) return T{};
-	lspclient.mtx.lock();
 	T obj = recvjson<T>(chan->front()); // get the item from queue
 	chan->pop(); // removing item from queue
-	lspclient.mtx.unlock();
 	return obj;
 }
 
@@ -131,26 +131,22 @@ inline static void receiveDiagnostics(bp::ipstream *stdout, std::string *message
 	}
 }
 
-inline static void receiveLoop(bp::ipstream *stdout) {
-repeat:
+inline static bool receiveDiagnostics(bp::ipstream *stdout) {
 	std::string message;
 	receiveDiagnostics(stdout, &message);
 	LOG(INFO) << "recv: " << message;
 
 	if (message.find("publishDiagnostics") != std::string::npos) {
-		lspclient.mtx.lock(); // locking this iteration
 		auto dr = recvjson<diagnosticresponse_t>(message);
 		lspclient.file2diagnostic[dr.params.uri] = dr.params;
 		lspclient.diagnosticsChannel.push(message);
-		lspclient.mtx.unlock(); // unlocking iteration
+		return true;
 	} else if (message.find("result") != std::string::npos) {
-		lspclient.mtx.lock(); // locking this iteration
 		lspclient.userMessages.push(message);
-		lspclient.mtx.unlock(); // unlocking iteration
+		return true;
 	}
 
-	usleep(SLEEP_INTERVAL); // sleep for 500ms
-	goto repeat;
+	return false;
 }
 
 // lsp initialization

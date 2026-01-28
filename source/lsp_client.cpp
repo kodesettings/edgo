@@ -25,6 +25,7 @@ bool StartLspClient(const std::string &cmd, std::string args...) {
 
 	std::error_code ec;
 	lspclient.c = bp::child(cmd, bp::std_in < lspclient.stdin, bp::std_out > lspclient.stdout, ec);
+	lspclient.changed = receiveDiagnostics;
 
 	if (ec) {
 		LOG(ERROR) << "error starting lsp err" << ec.message();
@@ -33,9 +34,6 @@ bool StartLspClient(const std::string &cmd, std::string args...) {
 		usleep(SLEEP_INTERVAL); // sleep for 500ms
 		LOG(INFO) << "lsp started success " << cmd << " " << args;
 	}
-
-	static std::thread t(&receiveLoop, &lspclient.stdout);
-	t.detach();
 
 	return true;
 }
@@ -57,7 +55,7 @@ void InitLspClient(const std::string &dir) {
 		},
 	};
 
-	send<initializerequest_t>(initializeRequest);
+	send<initializerequest_t>(initializeRequest, false);
 	auto response = WaitForRequest<initializeresponse_t>(&lspclient.userMessages, 10000);
 
 	if (response.result.serverInfo.name.empty() || response.result.serverInfo.version.empty()) {
@@ -71,7 +69,7 @@ void InitLspClient(const std::string &dir) {
 		params: initializedparams_t{},
 	};
 
-	send<initializedrequest_t>(initializedRequest);
+	send<initializedrequest_t>(initializedRequest, true);
 
 	LOG(INFO) << "lsp initialized";
 	lspclient.isReady = true;
@@ -90,7 +88,7 @@ void DidOpen(const std::string &file, std::string *text) {
 		},
 	};
 
-	send<didopenrequest_t>(didOpenRequest);
+	send<didopenrequest_t>(didOpenRequest, false);
 }
 
 void DidChange(const std::string &file, std::string *text, int version) {
@@ -111,7 +109,7 @@ void DidChange(const std::string &file, std::string *text, int version) {
 		},
 	};
 
-	send<didchangerequest_t>(didChangeRequest);
+	send<didchangerequest_t>(didChangeRequest, false);
 }
 
 void DidClose(const std::string &file) {
@@ -124,5 +122,5 @@ void DidClose(const std::string &file) {
 		},
 	};
 
-	send<didcloserequest_t>(didCloseRequest);
+	send<didcloserequest_t>(didCloseRequest, false);
 }
