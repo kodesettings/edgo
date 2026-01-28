@@ -17,7 +17,7 @@
 
 #include "search.h"
 #include "highlighter.h"
-#include "utils.h"
+#include <boost/algorithm/string.hpp>
 
 searchresult_v Search(const line_v lines, const std::string &pattern) {
 	searchresult_v results;
@@ -72,9 +72,10 @@ void LineCountOnFile(const std::string &filename, int *lines, int *emptylines) {
 
 void ParsePattern(const std::string &pattern, string_v *extensions) {
 	if (pattern.find(" -f ") != std::string::npos) {
-		auto split = SplitString(pattern, " -f ");
-		auto fileExtensions = TrimString(split[0]);
-		*extensions = SplitString(fileExtensions, ",");
+		std::vector<std::string> split;
+		boost::split(split, pattern, boost::is_any_of(" -f "));
+		boost::algorithm::trim_left(split[0]); // file extensions
+		boost::split(*extensions, split[0], boost::is_any_of(","));
 	}
 }
 

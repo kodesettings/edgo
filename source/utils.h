@@ -42,8 +42,6 @@ line_v GetLinesArrayFromData(const std::string &data, int lineNum);
 int LineOffset(const std::string &text, int lineNum);
 std::string RemoveLeadingTabsSpaces(const std::string &s);
 int FindCharacterOccurances(const std::string &s, const char ch);
-string_v SplitString(std::string str, const std::string &delimiter);
-std::string TrimString(const std::string& s);
 bool IsIgnored(const std::string &path, string_v ignorePatterns);
 bool IsMatchExt(const std::string &path, string_v ignoreExts);
 
