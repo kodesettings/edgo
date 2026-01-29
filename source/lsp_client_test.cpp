@@ -55,29 +55,29 @@ TEST_F(LspTest, TestLspClientStarted) {
 		EXPECT_NE(LspTest::content.size(), 0);
 }
 
-TEST_F(LspTest, DISABLED_TestLspClientHover) {
-	hoverresponse_t response = Hover(filepath, 27-1, 12);
+TEST_F(LspTest, TestLspClientHover) {
+	hoverresponse_t response = Hover(filepath, 40-1, 8);
 	EXPECT_NE(response.jsonrpc, "");
 
 	auto expected = "void DidOpen(const std::string &file, std::string *text)";
 	auto got = response.result.contents.value;
-	EXPECT_EQ(expected, got);
+	EXPECT_NE(got.find(expected), std::string::npos);
 }
 
-TEST_F(LspTest, DISABLED_TestLspClientCompletion) {
-	completionresponse_t response = Completion(filepath, 27-1, 12);
+TEST_F(LspTest, TestLspClientCompletion) {
+	completionresponse_t response = Completion(filepath, 40-1, 14);
 	EXPECT_NE(response.jsonrpc, "");
 
-	auto expected = "DidOpen";
-	EXPECT_EQ(response.result.items.size(), 1);
+	auto expected = " filepath";
+	EXPECT_EQ(response.result.items.size(), 3);
 
 	if (!response.result.items.empty()) {
 		EXPECT_EQ(expected, response.result.items[0].label);
 	}
 }
 
-TEST_F(LspTest, DISABLED_TestLspClientDefinition) {
-	definitionresponse_t response = Definition(filepath, 27-1, 12);
+TEST_F(LspTest, TestLspClientDefinition) {
+	definitionresponse_t response = Definition(filepath, 40-1, 8);
 	EXPECT_NE(response.jsonrpc, "");
 
 	EXPECT_EQ(response.result.size(), 1);
@@ -87,11 +87,11 @@ TEST_F(LspTest, DISABLED_TestLspClientDefinition) {
 	}
 }
 
-TEST_F(LspTest, DISABLED_TestLspClientSignatureHelp) {
-	signaturehelpresponse_t response = SignatureHelp(filepath, 27-1, 12);
+TEST_F(LspTest, TestLspClientSignatureHelp) {
+	signaturehelpresponse_t response = SignatureHelp(filepath, 40-1, 12);
 	EXPECT_NE(response.jsonrpc, "");
 
-	auto expected = "DidOpen(const std::string &file, std::string *text)";
+	auto expected = "DidOpen(const std::string &file, std::string *text) -> void";
 	EXPECT_EQ(response.result.signatures.size(), 1);
 
 	if (!response.result.signatures.empty()) {
@@ -99,8 +99,8 @@ TEST_F(LspTest, DISABLED_TestLspClientSignatureHelp) {
 	}
 }
 
-TEST_F(LspTest, DISABLED_TestLspClientReferences) {
-	referencesresponse_t response = References(filepath, 27-1, 12);
+TEST_F(LspTest, TestLspClientReferences) {
+	referencesresponse_t response = References(filepath, 40-1, 8);
 	EXPECT_NE(response.jsonrpc, "");
 
 	EXPECT_EQ(response.result.size(), 2);

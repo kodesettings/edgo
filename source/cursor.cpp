@@ -40,7 +40,7 @@ void FocusCenter(void) {
 		e.y += e.row - e.y - centerRow;
 	}
 }
-
+#ifdef PROCESS_PANEL
 void FocusProcessPanel(void) {
 //	e.Screen.Show()
 	if (e.processPanelCursorY > e.processPanelScroll + e.ROWS) {
@@ -60,3 +60,4 @@ void FocusProcessPanel(void) {
 		e.processPanelScroll += e.processPanelCursorY - e.processPanelScroll - centerRow;
 	}
 }
+#endif

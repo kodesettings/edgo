@@ -60,7 +60,11 @@ typedef struct {
 	std::map<std::string, diagnosticparams_t> file2diagnostic;
 } lspclient_t;
 
-static lspclient_t lspclient;
+extern lspclient_t lspclient;
+
+// sleep interval between consecutive lsp process startups,
+// this is to prevent parallel processes from being spawned
+// if the editor is restarted shoftly after exiting.
 #define SLEEP_INTERVAL 500000
 
 //

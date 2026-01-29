@@ -24,6 +24,8 @@
 #include "operations.h"
 #include "lsp_client.h"
 #include "search.h"
+#include "highlighter.h"
+#include "query.h"
 // NOTE: including gnu rope specification, it seems although
 // this is legacy  this is still the best one
 #include <ext/rope>
@@ -69,7 +71,7 @@ typedef struct {
 	std::string searchPattern;          // pattern for search in a buffer
 	searchresult_v searchResults;
 	int searchResultIndex;
-
+#ifdef PROCESS_PANEL
 	// process panel vars
 	int processPanelHeight;
 	int processPanelWidth;
@@ -78,28 +80,24 @@ typedef struct {
 	int processPanelHScroll;
 	bool isProcessPanelMoving;
 	bool isProcessPanelFocused;
-//	process *process;
+	process *process;
 	int processPanelSpacing;
 	int processPanelCursorX;
 	int processPanelCursorY;
 	selection processPanelSelection;
 	bool isProcessPanelSearch;
 	std::string processPanelSearchPattern; // pattern for search in a buffer
-//	searchresult_v processPanelSearchResults;
+	searchresult_v processPanelSearchResults;
 	int processPanelSearchResultIndex;
-
+#endif
 	std::map<std::string, lspclient_t> lsp2lang;
 	std::map<std::string, int> lspver; // version number sequencing
 
-//	treesitterhighlighter *treeSitterHighlighter;
+	treesitterhighlighter_t h;
 	rope<char> code; // storing a rope node element
 	std::string code_str(void) { return std::string(code.begin(), code.end()); }
 
-//	std::map<int, testdata_t> tests;
-//	testfinder testFinder;
-//	test       test;
-
-//	path *treePath;
+	std::map<int, testdata_t> tests;
 } editor_t;
 
 extern editor_t e;
@@ -116,8 +114,9 @@ bool MaybeAddPair(int line, int pos, char ch, char *ret);
 // cursor routines
 void Focus(void);
 void FocusCenter(void);
+#ifdef PROCESS_PANEL
 void FocusProcessPanel(void);
-
+#endif
 // clipboard routines
 void set_update_parameters(bool changed);
 void OnCopy(void);

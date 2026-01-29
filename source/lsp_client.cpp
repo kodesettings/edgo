@@ -17,6 +17,8 @@
 #include "lsp_client.h"
 #include "logging.h"
 
+lspclient_t lspclient;
+
 bool StartLspClient(const std::string &cmd, std::string args...) {
     LOG(INFO) << "starting lsp cmd:" << cmd << " args:" << args;
 
