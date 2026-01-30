@@ -37,11 +37,9 @@ void AddCharacter(char ch) {
 	}
 
 	e.update = true;
-// TODO: implement this function
-//	e.UpdateLsp(false, e.code); // io.cpp
+//	UpdateLsp(false, e.code_str());
 	e.isContentChanged = true;
-// TODO: implement this function
-//	e.FindTests(); // tests.cpp
+	FindTests();
 }
 
 void InsertCharacter(int line, int pos, char ch) {

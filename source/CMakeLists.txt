@@ -47,6 +47,7 @@ add_library(edgo SHARED
 	"search.h"
 	"query.cpp"
 	"query.h"
+	"io.cpp"
 )
 
 # test case files

@@ -15,29 +15,25 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef _QUERY_H_
-#define _QUERY_H_
+#include "editor.h"
+#include "query.h"
 
-#include "highlighter.h"
+void UpdateLsp(bool isOpen, std::string text) {
+	if (!lspclient.isReady) return;
 
-typedef struct {
-	std::string name; // NOTE: unused for now
-	std::string filename;
-	int line;
-} testdata_t;
-
-typedef std::map<int, testdata_t> testdata_m;
-
-// NOTE: initialize with SetLang() first, then apply these functions
-inline bool TestQueryAlloc(void) {
-	uint32_t err_offset;
-	TSQueryError err_type;
-	const auto queryLang = MatchTestQueryLang(h.lang);
-	if (queryLang.empty()) return false;
-	h.testquery = ts_query_new(h.language, queryLang.c_str(), queryLang.size(), &err_offset, &err_type);
-	return true;
+	if (!isOpen) {
+		e.lspver[e.absoluteFilePath]++;
+		auto version = e.lspver[e.absoluteFilePath];
+		DidChange(e.absoluteFilePath, &text, version);
+	} else {
+		e.lspver[e.absoluteFilePath] = 1;
+		DidOpen(e.absoluteFilePath, &text);
+	}
 }
 
-void TestFinder(const std::string &filename, testdata_m *tests);
-
-#endif // _QUERY_H_
+void FindTests(void) {
+	e.tests.clear();
+	bool alloc = TestQueryAlloc();
+	if (!alloc) return;
+	TestFinder(e.absoluteFilePath, &e.tests);
+}

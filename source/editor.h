@@ -131,4 +131,8 @@ void OnCommentLine(void);
 void OnSwapLinesUp(void);
 void OnSwapLinesDown(void);
 
+// io routines
+void UpdateLsp(bool isOpen, std::string text);
+void FindTests(void);
+
 #endif // _EDITOR_H_
