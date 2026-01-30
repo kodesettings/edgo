@@ -37,7 +37,7 @@ void AddCharacter(char ch) {
 	}
 
 	e.update = true;
-//	UpdateLsp(false, e.code_str());
+	UpdateLsp(false, e.code_str());
 	e.isContentChanged = true;
 	FindTests();
 }

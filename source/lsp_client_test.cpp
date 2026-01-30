@@ -39,6 +39,7 @@ protected:
 		// accessing didOpen event
 		DidOpen(filepath, &content);
 	}
+    static void TearDownTestSuite() { lspclient.isReady = false; }
 public:
 	static bool started;             // flag whether the server started
 	static std::string filepath;     // direct file path

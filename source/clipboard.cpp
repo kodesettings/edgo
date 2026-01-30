@@ -81,7 +81,7 @@ void Cut(bool isCopySelected) {
 
 	e.undo.push_back({operation_t{DELETE, std::string(text.c_str()), sxd, cursormove_t{e.row, e.col}}});
 	e.__selection.CleanSelection();
-//	UpdateLsp(false, e.code_str());
+	UpdateLsp(false, e.code_str());
 	set_update_parameters(true);
 }
 
@@ -101,7 +101,7 @@ void Duplicate(void) {
 
 	InsertTextEdit(e.code_str(), syd, duplicatedSlice.size());
 	e.undo.push_back({operation_t{INSERT, std::string(duplicatedSlice.c_str()), eyd, cursormove_t{e.row, e.col}}});
-//	UpdateLsp(false, e.code_str());
+	UpdateLsp(false, e.code_str());
 	set_update_parameters(true);
 }
 
@@ -136,7 +136,7 @@ undo:
 	if (index > 0) { index--; goto undo; }
 exit:
 	e.redo.push_back(lastOperation);
-//	UpdateLsp(false, e.code_str());
+	UpdateLsp(false, e.code_str());
 	set_update_parameters(true);
 }
 
@@ -171,6 +171,6 @@ redo:
 	if (index < (int)lastRedoOperation.size() - 1) { index++; goto redo; }
 exit:
 	e.undo.push_back(lastRedoOperation);
-//	UpdateLsp(false, e.code_str());
+	UpdateLsp(false, e.code_str());
 	set_update_parameters(true);
 }

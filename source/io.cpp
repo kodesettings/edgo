@@ -21,7 +21,7 @@
 void UpdateLsp(bool isOpen, std::string text) {
 	if (!lspclient.isReady) return;
 
-	if (!isOpen) {
+	if (isOpen) {
 		e.lspver[e.absoluteFilePath]++;
 		auto version = e.lspver[e.absoluteFilePath];
 		DidChange(e.absoluteFilePath, &text, version);
