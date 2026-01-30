@@ -1,64 +1,11 @@
-.TH edgo 1 "2025-09-10"
+.TH edgo 1 "2026-01-30"
 .SH NAME
-edgo \- Yet another console text editor, but with native lsp support
-.SH SYNOPSIS
-.B edgo
-.RB [OPTIONS]
-[FILE]\&...
+edgo \- text editor library with native lsp support
 
 .SH DESCRIPTION
 
-Edgo is a terminal-based classic text editor that is providing user experience of the usual and simple
-workflows needed for the user. It works solely in the terminal and provides full support for language
-server protocol (LSP).
-
-Use Control + q to quit, Control + s to save, Control + r for reference over symbols and Control + g
-to jump to sources.
-
-Use Control + f, type prefix and then Control + g to global find text in your source directory.
-
-.SH KEY BINDINGS
-
-Below are the usual key bindings that are used for editing source files.
-
-.TS
-left tab(#);
-Lb Lb
-L L.
-Key#Description of function
-Arrows#move the cursor around
-Shift + arrows#move and select text
-PageUp#move cursor up one page
-PageDown#move cursor down one page
-Control + Shift + down/up#lines swap
-
-Control + q#quit
-Control + d#duplicate line
-Control + x#cut
-Control + c#copy
-Control + v#paste
-Control + z#undo
-Control + y#redo
-Control + f#find
-Control + b#comment line
-Control + o#lines count report
-Control + j#cursor to the top
-Control + k#cursor to the bottom
-Control + l#line number - cursor to the line
-
-mouse selection#select text
-mouse double click#select word
-mouse triple click#select line
-
-Control + space#lsp completion
-Control + h#lsp hover
-Control + p#lsp signature help
-Control + g / Control + mouse click#lsp definition
-Control + r / Option + mouse click#lsp references
-Control + e#lsp diagnostic (errors)
-Shift + F6#lsp rename
-Control + w#method extraction
-.TE
+Edgo is a library for text editors providing syntax highlighting and language server protocol (LSP).
+It is also providing functionality for text manipulation, search, selection and language queries.
 
 .SH CONFIGURATION
 
@@ -77,7 +24,7 @@ Some of the themes are darcula, edgo, edgo-new, material-darker, vesper.
 Following lsp features are supported: completion, hover, signature help, definition,
 references, rename, method extraction and diagnostic information.
 
-Install your language server for interaction with the edgo text editor.
+Install your language server for interaction with your text editor.
 
 .SH SYNTAX HIGHLIGHTING
 
