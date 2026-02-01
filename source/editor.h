@@ -120,7 +120,6 @@ void FocusCenter(void);
 void FocusProcessPanel(void);
 #endif
 // clipboard routines
-void set_update_parameters(bool changed);
 void OnCopy(void);
 void OnPaste(void);
 void Cut(bool isCopySelected);

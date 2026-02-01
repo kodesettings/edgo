@@ -49,6 +49,9 @@ add_library(edgo SHARED
 	"query.h"
 	"io.cpp"
 	"keyboard.cpp"
+	"napi.cpp"
+	"napi.h"
+	"intfreg.cpp" # interface register
 )
 
 # test case files
@@ -80,5 +83,5 @@ set(TS_LANGUAGE_LIBS
 )
 
 # target and test builds
-target_link_libraries(edgo PUBLIC glog pthread boost_filesystem SDL2 tree-sitter ${TS_LANGUAGE_LIBS})
+target_link_libraries(edgo PUBLIC glog pthread boost_filesystem SDL2 tree-sitter ${TS_LANGUAGE_LIBS} node)
 target_link_libraries(edgotest PUBLIC ${GTEST_LIBRARIES} gtest_main pthread edgo)
