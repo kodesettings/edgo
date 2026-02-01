@@ -48,6 +48,7 @@ add_library(edgo SHARED
 	"query.cpp"
 	"query.h"
 	"io.cpp"
+	"keyboard.cpp"
 )
 
 # test case files

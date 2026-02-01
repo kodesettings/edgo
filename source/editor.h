@@ -135,4 +135,18 @@ void OnSwapLinesDown(void);
 void UpdateLsp(bool isOpen, std::string text);
 void FindTests(void);
 
+// keyboard routines
+void OnDown(bool isPaging);
+void OnUp(bool isPaging);
+void OnLeft(void);
+void OnRight(void);
+void GoTop(void);
+void GoBottom(void);
+void OnScrollUp(void);
+void OnScrollDown(void);
+void OnEnter(void);
+void OnDelete(void);
+void OnTab(void);
+void OnBackTab(void);
+
 #endif // _EDITOR_H_
