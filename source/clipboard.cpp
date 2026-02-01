@@ -21,13 +21,6 @@
 #include "sdl2_init.h"
 #include "highlighter.h"
 
-// this function sets the required parameters to validate updates
-void set_update_parameters(bool changed) {
-	e.update = true;
-	e.isContentChanged = changed;
-	FindTests();
-}
-
 void OnCopy(void) {
 	auto selectionString = e.__selection.GetSelectionString(e.code_str());
 	__set_clipboard_text(selectionString.c_str());
@@ -43,7 +36,7 @@ void OnPaste(void) {
 	if (strlen(text) == 0) { return; }
 	InsertString(e.row, e.col, std::string(text));
 	__free_clipboard(text);
-	set_update_parameters(true);
+	FindTests();
 }
 
 void Cut(bool isCopySelected) {
@@ -82,7 +75,7 @@ void Cut(bool isCopySelected) {
 	e.undo.push_back({operation_t{DELETE, std::string(text.c_str()), sxd, cursormove_t{e.row, e.col}}});
 	e.__selection.CleanSelection();
 	UpdateLsp(false, e.code_str());
-	set_update_parameters(true);
+	FindTests();
 }
 
 void Duplicate(void) {
@@ -102,7 +95,7 @@ void Duplicate(void) {
 	InsertTextEdit(e.code_str(), syd, duplicatedSlice.size());
 	e.undo.push_back({operation_t{INSERT, std::string(duplicatedSlice.c_str()), eyd, cursormove_t{e.row, e.col}}});
 	UpdateLsp(false, e.code_str());
-	set_update_parameters(true);
+	FindTests();
 }
 
 void OnUndo(void) {
@@ -137,7 +130,7 @@ undo:
 exit:
 	e.redo.push_back(lastOperation);
 	UpdateLsp(false, e.code_str());
-	set_update_parameters(true);
+	FindTests();
 }
 
 void OnRedo(void) {
@@ -172,5 +165,5 @@ redo:
 exit:
 	e.undo.push_back(lastRedoOperation);
 	UpdateLsp(false, e.code_str());
-	set_update_parameters(true);
+	FindTests();
 }

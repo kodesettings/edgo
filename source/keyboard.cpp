@@ -19,7 +19,6 @@
 #include "operations.h"
 
 void OnDown(bool isPaging) {
-	e.update = false;
 	int numberOfLines;
 	if (e.ROWS / 3 < 30) { numberOfLines = 30; } else { numberOfLines = e.ROWS / 3; } // adjustment
 	if (!isPaging) { numberOfLines = 1; } // normal scroll
@@ -39,14 +38,10 @@ void OnDown(bool isPaging) {
 	if (e.col > (int)e.lines[e.row].buf.size()) { e.col = e.lines[e.row].buf.size(); } // fit to e.Lines
 	if (e.row < e.y) { e.y = e.row; }
 	if (e.row >= e.y + e.ROWS) { e.y = e.row - e.ROWS + 1; }
-
-	e.update = true;
 }
 
 void OnUp(bool isPaging) {
-	e.update = false;
 	int numberOfLines;
-
 	if (e.ROWS / 3 < 30) { numberOfLines = 30; } else { numberOfLines = e.ROWS / 3; } // adjustment
 	if (!isPaging) { numberOfLines = 1; } // normal scroll
 
@@ -56,37 +51,27 @@ void OnUp(bool isPaging) {
 	if (e.col > (int)e.lines[e.row].buf.size()) { e.col = e.lines[e.row].buf.size(); } // fit to e.Lines
 	if (e.row < e.y) { e.y = e.row; }
 	if (e.row > e.y + e.ROWS) { e.y = e.row - e.ROWS + 1; }
-
-	e.update = true;
 }
 
 void OnLeft(void) {
-	e.update = false;
 	if (e.lines.empty()) { return; }
-
 	if (e.col > 0) {
 		e.col--;
-		e.update = true;
 	} else if (e.row > 0) {
 		e.row--;
 		e.col = e.lines[e.row].buf.size(); // fit to e.Lines
 		if (e.row < e.y) { e.y = e.row; }
-		e.update = true;
 	}
 }
 
 void OnRight(void) {
-	e.update = false;
 	if (e.lines.empty()) { return; }
-
 	if (e.col < (int)e.lines[e.row].buf.size()) {
 		e.col++;
-		e.update = true;
 	} else if (e.row < (int)e.lines.size() - 1) {
 		e.row++;
 		e.col = 0;
 		if (e.row > e.y + e.ROWS) { e.y++;  }
-		e.update = true;
 	}
 }
 
@@ -106,19 +91,15 @@ void GoBottom(void) {
 }
 
 void OnScrollUp(void) {
-	e.update = false;
 	if (e.lines.empty()) { return; }
 	if (e.y == 0) { return; }
 	e.y--;
-	e.update = true;
 }
 
 void OnScrollDown(void) {
-	e.update = false;
 	if (e.lines.empty()) { return; }
 	if (e.y + e.ROWS >= (int)e.lines.size()) { return; }
 	e.y++;
-	e.update = true;
 }
 
 void OnEnter(void) {
@@ -134,9 +115,7 @@ void OnEnter(void) {
 	if (e.row - e.y == e.ROWS) { OnScrollDown(); }
 	if (!e.redo.empty()) { e.redo.clear(); }
 
-	e.update = true;
 	UpdateLsp(false, e.code_str());
-	e.isContentChanged = true;
 	FindTests();
 }
 
@@ -151,9 +130,7 @@ void OnDelete(void) {
 
 	Focus();
 	if (!e.redo.empty()) { e.redo.clear(); }
-	e.update = true;
 	UpdateLsp(false, e.code_str());
-	e.isContentChanged = true;
 	FindTests();
 }
 
@@ -165,16 +142,12 @@ void OnTab(void) {
 	if (selectedLines.empty()) {
 		InsertCharacter(e.row, e.col, '\t');
 		e.col++;
-		UpdateLsp(false, e.code_str());
 	} else  {
 		ShiftWithTabsToRight(e.row, e.col, selectedLines);
-		UpdateLsp(false, e.code_str());
 	}
 
 	if (!e.redo.empty()) { e.redo.clear(); }
-	e.update = true;
 	UpdateLsp(false, e.code_str());
-	e.isContentChanged = true;
 	FindTests();
 }
 
@@ -201,8 +174,6 @@ void OnBackTab(void) {
 	}
 
 	if (!e.redo.empty()) { e.redo.clear(); }
-	e.update = true;
 	UpdateLsp(false, e.code_str());
-	e.isContentChanged = true;
 	FindTests();
 }

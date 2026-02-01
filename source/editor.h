@@ -32,7 +32,7 @@
 // using the namespace for simplicity
 using __gnu_cxx::rope;
 
-typedef struct {
+typedef struct editor_t {
 	int COLUMNS;                        // terminal size columns
 	int ROWS;                           // terminal size rows
 	int LINES_WIDTH;                    // draw file lines number
@@ -61,9 +61,8 @@ typedef struct {
 	std::string inputFile;              // exact user input
 	std::string filename;               // current file name
 	std::string absoluteFilePath;       // current file name and directory
-	bool isContentChanged;              // shows * if file is changed
+	bool (*isContentChanged)(void);     // shows * if file is changed
 	bool isColorize;                    // colorize text is true by default
-	bool update;                        // for Screen updates,  if false it will not draw
 	bool isOverlay;                     // true if overlay is active (completion, hover, errors...)
 	bool isStartupScreen;               // true if no file was opened
 
@@ -71,6 +70,9 @@ typedef struct {
 	std::string searchPattern;          // pattern for search in a buffer
 	searchresult_v searchResults;
 	int searchResultIndex;
+
+	// registering callback for content change
+	editor_t() { isContentChanged = { /* registering dummy callback */ };}
 #ifdef PROCESS_PANEL
 	// process panel vars
 	int processPanelHeight;

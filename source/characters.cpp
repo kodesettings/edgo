@@ -36,10 +36,10 @@ void AddCharacter(char ch) {
 		InsertCharacter(e.row, e.col, val);
 	}
 
-	e.update = true;
-	UpdateLsp(false, e.code_str());
-	e.isContentChanged = true;
-	FindTests();
+	if (e.isContentChanged) {
+		UpdateLsp(false, e.code_str());
+		FindTests();
+	}
 }
 
 void InsertCharacter(int line, int pos, char ch) {

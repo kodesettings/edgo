@@ -48,7 +48,7 @@ void OnCommentLine(void) {
 	e.undo.push_back({operation_t{INSERT, e.langConf.comment, offset, cursormove_t{e.row, 0}}});
 exit:
 	UpdateLsp(false, e.code_str());
-	set_update_parameters(true);
+	FindTests();
 }
 
 void OnSwapLinesUp(void) {
@@ -77,7 +77,7 @@ void OnSwapLinesUp(void) {
 
 	e.row--;
 	UpdateLsp(false, e.code_str());
-	set_update_parameters(true);
+	FindTests();
 }
 
 void OnSwapLinesDown(void) {
@@ -109,5 +109,5 @@ void OnSwapLinesDown(void) {
 
 	e.row++;
 	UpdateLsp(false, e.code_str());
-	set_update_parameters(true);
+	FindTests();
 }
