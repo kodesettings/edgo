@@ -279,6 +279,11 @@ napi_value report(napi_env env, napi_callback_info info) {
 	size_t length;
 	napi_get_value_string_utf8(env, args[0], dirpath, sizeof(dirpath), &length);
 
+	if (!length) {
+		napi_throw_type_error(env, NULL, "provide dir path");
+		return NULL;
+	}
+
 	std::string report = OnLangLinesCount(dirpath);
 	return __export_screen(env, report, 0);
 }

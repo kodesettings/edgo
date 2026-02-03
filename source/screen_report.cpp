@@ -22,7 +22,7 @@
 #include <iomanip>
 using namespace std;
 
-std::string OnLangLinesCount(const std::string &dirpath) {
+string OnLangLinesCount(const string &dirpath) {
 	int filesprocessedcount, totallinescount;
 
 	// fetch all the files for the provided directory path
@@ -34,15 +34,15 @@ std::string OnLangLinesCount(const std::string &dirpath) {
 	LangCount(files, &results);
 
 	stringstream report;
-	report << setw(10) << "Language Lines Report" << std::endl;
-	report << setw(10) << "Total Files : " << setw(5) << filesprocessedcount << std::endl;
-	report << setw(10) << "Total Rows  : " << setw(5) << totallinescount << std::endl;
+	report << setw(10) << "Language Lines Report" << endl;
+	report << setw(10) << "Total Files : " << setw(5) << filesprocessedcount << endl;
+	report << setw(10) << "Total Rows  : " << setw(5) << totallinescount << endl;
 	report << setw(10) << "Language" << setw(10) << "Files" << setw(10) << "Lines" << setw(10) << "Empty/Code" << endl;
 	report << endl;
 	int index = 0;
 row:
 	auto r = results[index];
 	report << setw(10) << r.lang << setw(10) << r.filescount << setw(10) << r.linescount << setw(10) << r.emptylinescount << endl;
-	if (index < (int)files.size()) { index++; goto row; }
+	if (index < (int)results.size()) { index++; goto row; }
 	return report.str();
 }
