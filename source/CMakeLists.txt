@@ -20,6 +20,7 @@ add_library(edgo SHARED
 	"utils.h"
 	"editor.h"
 	"screen_logo.h"
+	"screen_report.cpp"
 	"characters.cpp"
 	"cursor.cpp"
 	"highlighter.cpp"

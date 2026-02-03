@@ -45,6 +45,8 @@ napi_value register_napi(napi_env env, napi_value exports) {
 	napi_create_function(env, "key_tab", NAPI_AUTO_LENGTH, key_tab, NULL, &fn);
 	napi_create_function(env, "key_backtab", NAPI_AUTO_LENGTH, key_backtab, NULL, &fn);
 
+	napi_create_function(env, "screen_report", NAPI_AUTO_LENGTH, screen_report, NULL, &fn);
+
 	napi_set_named_property(env, exports, "add_text", fn);
 	napi_set_named_property(env, exports, "del_character", fn);
 	napi_set_named_property(env, exports, "shift_with_tabs", fn);
@@ -70,6 +72,8 @@ napi_value register_napi(napi_env env, napi_value exports) {
 	napi_set_named_property(env, exports, "key_delete", fn);
 	napi_set_named_property(env, exports, "key_tab", fn);
 	napi_set_named_property(env, exports, "key_backtab", fn);
+
+	napi_set_named_property(env, exports, "screen_report", fn);
 
 	return exports;
 }

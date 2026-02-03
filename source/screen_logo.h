@@ -26,13 +26,6 @@
                                  \
 "
 
-#define DESCRIPTION "\
-Yet another console text editor, but with native lsp support \
-\
-HINT: To open a file supply the file path argument in command line. \
-      such as ./edgo <path_to_file> \
-\
-Press Ctrl + Q to quit and for key bindings read the manual. \
-"
+#define DESCRIPTION "editor engine for Node based clients v0.0.2"
 
 #endif // _SCREEN_LOGO_H_

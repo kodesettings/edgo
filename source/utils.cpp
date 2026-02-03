@@ -54,9 +54,9 @@ line_v __build_line_vec(const std::string &data, int lineNum) {
 	return lines;
 }
 
-napi_value __export_screen(napi_env env, int offset) {
+napi_value __export_screen(napi_env env, const std::string &s, int offset) {
 	napi_value result;
-	line_v lines = __build_line_vec(e.code_str(), -1);
+	line_v lines = __build_line_vec(s, -1);
 	napi_create_array_with_length(env, lines.size(), &result);
 	int index = offset;
 nxl:

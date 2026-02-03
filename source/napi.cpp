@@ -37,7 +37,7 @@ napi_value add_text(napi_env env, napi_callback_info info) {
 	default: InsertString(line, pos, buffer); break;
 	}
 
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value del_character(napi_env env, napi_callback_info info) {
@@ -50,7 +50,7 @@ napi_value del_character(napi_env env, napi_callback_info info) {
 	napi_get_value_int32(env, args[1], &pos);
 
 	DeleteCharacter(line, pos);
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value replace_text(napi_env env, napi_callback_info info) {
@@ -67,7 +67,7 @@ napi_value replace_text(napi_env env, napi_callback_info info) {
 	napi_get_value_string_utf8(env, args[3], buffer, sizeof(buffer), &length);
 
 	if (length > 0) { ReplaceString(line, from, end, buffer); }
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value shift_with_tabs(napi_env env, napi_callback_info info) {
@@ -92,7 +92,7 @@ napi_value shift_with_tabs(napi_env env, napi_callback_info info) {
 		ShiftWithTabsToRight(line, pos, lines);
 	}
 
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value copy(napi_env env, napi_callback_info info) {
@@ -108,7 +108,7 @@ napi_value paste(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnPaste(); // TODO: input text
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value cut(napi_env env, napi_callback_info info) {
@@ -119,7 +119,7 @@ napi_value cut(napi_env env, napi_callback_info info) {
 	bool isCopySelected;
 	napi_get_value_bool(env, args[0], &isCopySelected);
 	Cut(isCopySelected);
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value duplicate(napi_env env, napi_callback_info info) {
@@ -127,7 +127,7 @@ napi_value duplicate(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	Duplicate(); // TODO: input text
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value undo(napi_env env, napi_callback_info info) {
@@ -135,7 +135,7 @@ napi_value undo(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnUndo();
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value redo(napi_env env, napi_callback_info info) {
@@ -143,7 +143,7 @@ napi_value redo(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnRedo();
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value commentline(napi_env env, napi_callback_info info) {
@@ -151,7 +151,7 @@ napi_value commentline(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnCommentLine(); // TODO: add input
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value swaplinesup(napi_env env, napi_callback_info info) {
@@ -159,7 +159,7 @@ napi_value swaplinesup(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnSwapLinesUp(); // TODO: add input
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value swaplinesdn(napi_env env, napi_callback_info info) {
@@ -167,7 +167,7 @@ napi_value swaplinesdn(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnSwapLinesDown(); // TODO: add input
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value key_down(napi_env env, napi_callback_info info) {
@@ -177,7 +177,7 @@ napi_value key_down(napi_env env, napi_callback_info info) {
 	bool isPaging;
 	napi_get_value_bool(env, args[0], &isPaging);
 	OnDown(isPaging);
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value key_up(napi_env env, napi_callback_info info) {
@@ -187,7 +187,7 @@ napi_value key_up(napi_env env, napi_callback_info info) {
 	bool isPaging;
 	napi_get_value_bool(env, args[0], &isPaging);
 	OnUp(isPaging);
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value key_left(napi_env env, napi_callback_info info) {
@@ -211,7 +211,7 @@ napi_value go_top(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	GoTop();
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value go_bottom(napi_env env, napi_callback_info info) {
@@ -219,7 +219,7 @@ napi_value go_bottom(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	GoBottom();
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value scroll_up(napi_env env, napi_callback_info info) {
@@ -227,7 +227,7 @@ napi_value scroll_up(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnScrollUp();
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value scroll_dn(napi_env env, napi_callback_info info) {
@@ -235,7 +235,7 @@ napi_value scroll_dn(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnScrollDown();
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value key_enter(napi_env env, napi_callback_info info) {
@@ -243,7 +243,7 @@ napi_value key_enter(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnEnter();
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value key_delete(napi_env env, napi_callback_info info) {
@@ -251,7 +251,7 @@ napi_value key_delete(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnDelete();
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value key_tab(napi_env env, napi_callback_info info) {
@@ -259,7 +259,7 @@ napi_value key_tab(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnTab();
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
 }
 
 napi_value key_backtab(napi_env env, napi_callback_info info) {
@@ -267,5 +267,18 @@ napi_value key_backtab(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnBackTab();
-	return __export_screen(env, e.y);
+	return __export_screen(env, e.code_str(), e.y);
+}
+
+napi_value screen_report(napi_env env, napi_callback_info info) {
+	size_t argc = 1;
+	napi_value args[1];
+	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+	char dirpath[1024];
+	size_t length;
+	napi_get_value_string_utf8(env, args[0], dirpath, sizeof(dirpath), &length);
+
+	std::string report = OnLangLinesCount(dirpath);
+	return __export_screen(env, report, 0);
 }

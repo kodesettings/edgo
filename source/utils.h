@@ -40,7 +40,7 @@ typedef std::vector<std::string> string_v;
 
 std::string ReadFileToString(const std::string &filepath);
 line_v __build_line_vec(const std::string &data, int lineNum);
-napi_value __export_screen(napi_env env, int offset);
+napi_value __export_screen(napi_env env, const std::string &s, int offset);
 std::vector<int> __import_int_array(napi_env env, napi_value array);
 napi_value __export_none(napi_env env);
 
