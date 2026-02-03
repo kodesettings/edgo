@@ -62,6 +62,6 @@ napi_value key_tab(napi_env env, napi_callback_info info);
 napi_value key_backtab(napi_env env, napi_callback_info info);
 
 // Screen report
-napi_value screen_report(napi_env env, napi_callback_info info);
+napi_value report(napi_env env, napi_callback_info info);
 
 #endif // _NAPI_H_

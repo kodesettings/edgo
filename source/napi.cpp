@@ -270,7 +270,7 @@ napi_value key_backtab(napi_env env, napi_callback_info info) {
 	return __export_screen(env, e.code_str(), e.y);
 }
 
-napi_value screen_report(napi_env env, napi_callback_info info) {
+napi_value report(napi_env env, napi_callback_info info) {
 	size_t argc = 1;
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
