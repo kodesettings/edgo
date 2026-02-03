@@ -20,7 +20,7 @@
 
 TEST(UtilsTests, TestGetLinesArrayFromData) {
 	const std::string data = "some data\nmore data\nand more data";
-	line_v output = GetLinesArrayFromData(data, 3);
+	line_v output = __build_line_vec(data, 3);
 
 	EXPECT_EQ(output.size(), 3);
 }

@@ -17,6 +17,7 @@
 
 #include "napi.h"
 #include "editor.h"
+#include "utils.h"
 
 napi_value add_text(napi_env env, napi_callback_info info) {
 	size_t argc = 3;
@@ -36,9 +37,7 @@ napi_value add_text(napi_env env, napi_callback_info info) {
 	default: InsertString(line, pos, buffer); break;
 	}
 
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value del_character(napi_env env, napi_callback_info info) {
@@ -51,10 +50,7 @@ napi_value del_character(napi_env env, napi_callback_info info) {
 	napi_get_value_int32(env, args[1], &pos);
 
 	DeleteCharacter(line, pos);
-
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value replace_text(napi_env env, napi_callback_info info) {
@@ -71,10 +67,7 @@ napi_value replace_text(napi_env env, napi_callback_info info) {
 	napi_get_value_string_utf8(env, args[3], buffer, sizeof(buffer), &length);
 
 	if (length > 0) { ReplaceString(line, from, end, buffer); }
-
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value shift_with_tabs(napi_env env, napi_callback_info info) {
@@ -93,26 +86,13 @@ napi_value shift_with_tabs(napi_env env, napi_callback_info info) {
 		return NULL;
 	}
 
-	uint32_t length = 0, index = 0;
-	status = napi_get_array_length(env, args[2], &length);
-	if (status != napi_ok) return NULL;
-loop:
-	napi_value element;
-	status = napi_get_element(env, args[2], index, &element);
-	if (status != napi_ok) return NULL;
-
-	int lx = 0;
-	status = napi_get_value_int32(env, element, &lx);
-	if (status != napi_ok) {
-		napi_throw_type_error(env, NULL, "array elements must be numbers");
-		return NULL;
+	auto arr = __import_int_array(env, args[2]);
+	if (!arr.empty()) {
+		auto lines = std::set<int>(arr.begin(), arr.end());
+		ShiftWithTabsToRight(line, pos, lines);
 	}
 
-	if (index < length) goto loop;
-
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value copy(napi_env env, napi_callback_info info) {
@@ -120,9 +100,7 @@ napi_value copy(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnCopy(); // TODO: select text
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_none(env);
 }
 
 napi_value paste(napi_env env, napi_callback_info info) {
@@ -130,9 +108,7 @@ napi_value paste(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnPaste(); // TODO: input text
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value cut(napi_env env, napi_callback_info info) {
@@ -143,10 +119,7 @@ napi_value cut(napi_env env, napi_callback_info info) {
 	bool isCopySelected;
 	napi_get_value_bool(env, args[0], &isCopySelected);
 	Cut(isCopySelected);
-
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value duplicate(napi_env env, napi_callback_info info) {
@@ -154,9 +127,7 @@ napi_value duplicate(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	Duplicate(); // TODO: input text
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value undo(napi_env env, napi_callback_info info) {
@@ -164,9 +135,7 @@ napi_value undo(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnUndo();
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value redo(napi_env env, napi_callback_info info) {
@@ -174,9 +143,7 @@ napi_value redo(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnRedo();
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value commentline(napi_env env, napi_callback_info info) {
@@ -184,9 +151,7 @@ napi_value commentline(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnCommentLine(); // TODO: add input
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value swaplinesup(napi_env env, napi_callback_info info) {
@@ -194,9 +159,7 @@ napi_value swaplinesup(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnSwapLinesUp(); // TODO: add input
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value swaplinesdn(napi_env env, napi_callback_info info) {
@@ -204,37 +167,27 @@ napi_value swaplinesdn(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnSwapLinesDown(); // TODO: add input
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value key_down(napi_env env, napi_callback_info info) {
 	size_t argc = 1;
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
-
 	bool isPaging;
 	napi_get_value_bool(env, args[0], &isPaging);
 	OnDown(isPaging);
-
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value key_up(napi_env env, napi_callback_info info) {
 	size_t argc = 1;
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
-
 	bool isPaging;
 	napi_get_value_bool(env, args[0], &isPaging);
 	OnUp(isPaging);
-
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value key_left(napi_env env, napi_callback_info info) {
@@ -242,9 +195,7 @@ napi_value key_left(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnLeft();
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_none(env);
 }
 
 napi_value key_right(napi_env env, napi_callback_info info) {
@@ -252,9 +203,7 @@ napi_value key_right(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnRight();
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_none(env);
 }
 
 napi_value go_top(napi_env env, napi_callback_info info) {
@@ -262,9 +211,7 @@ napi_value go_top(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	GoTop();
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value go_bottom(napi_env env, napi_callback_info info) {
@@ -272,9 +219,7 @@ napi_value go_bottom(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	GoBottom();
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value scroll_up(napi_env env, napi_callback_info info) {
@@ -282,9 +227,7 @@ napi_value scroll_up(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnScrollUp();
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value scroll_dn(napi_env env, napi_callback_info info) {
@@ -292,9 +235,7 @@ napi_value scroll_dn(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnScrollDown();
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value key_enter(napi_env env, napi_callback_info info) {
@@ -302,9 +243,7 @@ napi_value key_enter(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnEnter();
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value key_delete(napi_env env, napi_callback_info info) {
@@ -312,9 +251,7 @@ napi_value key_delete(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnDelete();
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value key_tab(napi_env env, napi_callback_info info) {
@@ -322,9 +259,7 @@ napi_value key_tab(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnTab();
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
 
 napi_value key_backtab(napi_env env, napi_callback_info info) {
@@ -332,7 +267,5 @@ napi_value key_backtab(napi_env env, napi_callback_info info) {
 	napi_value args[1];
 	napi_get_cb_info(env, info, &argc, args, NULL, NULL);
 	OnBackTab();
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
+	return __export_screen(env, e.y);
 }
