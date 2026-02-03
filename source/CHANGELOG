@@ -3,10 +3,10 @@ CHANGELOG
 -------------------------------------------------------------------
 Version 0.0.2 - WIP
 
-== complete refactor and rewrite in cpp in source folder
-== omit process, runner and in-editor test functionalities from future versions????
+== complete refactor and rewrite in cpp for node clients
+== we add highlighter in a separate node call and we need input
 == some user input cursor positions have to be fixed on the undo stack
-== tree-sitter highlighter breaks on special ascii characters
+== tree-sitter highlighter breaks on special ascii characters???
 == implement functionality to create and write to new empty files
 
 -------------------------------------------------------------------
