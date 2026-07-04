@@ -54,6 +54,18 @@ line_v __build_line_vec(const std::string &data, int lineNum) {
 	return lines;
 }
 
+char* __export_screen(const std::string &s, const int offset) {
+	line_v lines = __build_line_vec(s, -1);
+	int index = offset;
+	std::stringstream ss;
+nxl:
+	ss << lines[index].buf << "\n";
+
+	if (index < (int)lines.size() && index < offset + e.ROWS) {
+		index++; goto nxl;
+	}
+	return ss.str().data();
+}
 napi_value __export_screen(napi_env env, const std::string &s, int offset) {
 	napi_value result;
 	line_v lines = __build_line_vec(s, -1);

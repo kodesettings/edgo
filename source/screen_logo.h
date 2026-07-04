@@ -26,6 +26,6 @@
                                  \
 "
 
-#define DESCRIPTION "editor engine for Node based clients v0.0.2"
+#define DESCRIPTION "editor library for client applications v0.0.2"
 
 #endif // _SCREEN_LOGO_H_

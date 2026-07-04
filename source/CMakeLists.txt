@@ -50,9 +50,10 @@ add_library(edgo SHARED
 	"query.h"
 	"io.cpp"
 	"keyboard.cpp"
-	"napi.cpp"
-	"napi.h"
-	"intfreg.cpp" # interface register
+
+# interface register
+	"../include/edgo.h"
+	"intfreg.cpp"
 )
 
 # test case files

@@ -3,11 +3,11 @@ CHANGELOG
 -------------------------------------------------------------------
 Version 0.0.2 - WIP
 
-== complete refactor and rewrite in cpp for node clients
-== we add highlighter in a separate node call and we need input
+== complete refactor and rewrite in cpp as a library module
 == some user input cursor positions have to be fixed on the undo stack
 == tree-sitter highlighter breaks on special ascii characters???
 == implement functionality to create and write to new empty files
+== add highlighter rendering output into utilities
 
 -------------------------------------------------------------------
 Version 0.0.1 - Modifications done on the original Go repository

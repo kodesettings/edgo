@@ -15,67 +15,106 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "napi.h"
+#include "../include/edgo.h"
+#include "editor.h"
+#include "utils.h"
 
-napi_value register_napi(napi_env env, napi_value exports) {
-	napi_value fn;
-	napi_create_function(env, "add_text", NAPI_AUTO_LENGTH, add_text, NULL, &fn);
-	napi_create_function(env, "del_character", NAPI_AUTO_LENGTH, del_character, NULL, &fn);
-	napi_create_function(env, "shift_with_tabs", NAPI_AUTO_LENGTH, shift_with_tabs, NULL, &fn);
-	napi_create_function(env, "cut", NAPI_AUTO_LENGTH, cut, NULL, &fn);
-	napi_create_function(env, "copy", NAPI_AUTO_LENGTH, copy, NULL, &fn);
-	napi_create_function(env, "paste", NAPI_AUTO_LENGTH, paste, NULL, &fn);
-	napi_create_function(env, "duplicate", NAPI_AUTO_LENGTH, duplicate, NULL, &fn);
-	napi_create_function(env, "undo", NAPI_AUTO_LENGTH, undo, NULL, &fn);
-	napi_create_function(env, "redo", NAPI_AUTO_LENGTH, redo, NULL, &fn);
-	napi_create_function(env, "commentline", NAPI_AUTO_LENGTH, commentline, NULL, &fn);
-	napi_create_function(env, "swaplinesup", NAPI_AUTO_LENGTH, swaplinesup, NULL, &fn);
-	napi_create_function(env, "swaplinesdn", NAPI_AUTO_LENGTH, swaplinesdn, NULL, &fn);
+char* add_text(size_t line, size_t pos, const char* buf, size_t length) {
+	switch (length) {
+	case 0: break;
+	case 1: AddCharacter(buf[0]); break; // line and pos ignored
+	default: InsertString(line, pos, buf); break;
+	}
 
-	napi_create_function(env, "key_down", NAPI_AUTO_LENGTH, key_down, NULL, &fn);
-	napi_create_function(env, "key_up", NAPI_AUTO_LENGTH, key_up, NULL, &fn);
-	napi_create_function(env, "key_left", NAPI_AUTO_LENGTH, key_left, NULL, &fn);
-	napi_create_function(env, "key_right", NAPI_AUTO_LENGTH, key_right, NULL, &fn);
-	napi_create_function(env, "go_top", NAPI_AUTO_LENGTH, go_top, NULL, &fn);
-	napi_create_function(env, "go_bottom", NAPI_AUTO_LENGTH, go_bottom, NULL, &fn);
-	napi_create_function(env, "scroll_up", NAPI_AUTO_LENGTH, scroll_up, NULL, &fn);
-	napi_create_function(env, "scroll_dn", NAPI_AUTO_LENGTH, scroll_dn, NULL, &fn);
-	napi_create_function(env, "key_enter", NAPI_AUTO_LENGTH, key_enter, NULL, &fn);
-	napi_create_function(env, "key_delete", NAPI_AUTO_LENGTH, key_delete, NULL, &fn);
-	napi_create_function(env, "key_tab", NAPI_AUTO_LENGTH, key_tab, NULL, &fn);
-	napi_create_function(env, "key_backtab", NAPI_AUTO_LENGTH, key_backtab, NULL, &fn);
-
-	napi_create_function(env, "report", NAPI_AUTO_LENGTH, report, NULL, &fn);
-
-	napi_set_named_property(env, exports, "add_text", fn);
-	napi_set_named_property(env, exports, "del_character", fn);
-	napi_set_named_property(env, exports, "shift_with_tabs", fn);
-	napi_set_named_property(env, exports, "cut", fn);
-	napi_set_named_property(env, exports, "copy", fn);
-	napi_set_named_property(env, exports, "paste", fn);
-	napi_set_named_property(env, exports, "duplicate", fn);
-	napi_set_named_property(env, exports, "undo", fn);
-	napi_set_named_property(env, exports, "redo", fn);
-	napi_set_named_property(env, exports, "commentline", fn);
-	napi_set_named_property(env, exports, "swaplinesup", fn);
-	napi_set_named_property(env, exports, "swaplinesdn", fn);
-
-	napi_set_named_property(env, exports, "key_down", fn);
-	napi_set_named_property(env, exports, "key_up", fn);
-	napi_set_named_property(env, exports, "key_left", fn);
-	napi_set_named_property(env, exports, "key_right", fn);
-	napi_set_named_property(env, exports, "go_top", fn);
-	napi_set_named_property(env, exports, "go_bottom", fn);
-	napi_set_named_property(env, exports, "scroll_up", fn);
-	napi_set_named_property(env, exports, "scroll_dn", fn);
-	napi_set_named_property(env, exports, "key_enter", fn);
-	napi_set_named_property(env, exports, "key_delete", fn);
-	napi_set_named_property(env, exports, "key_tab", fn);
-	napi_set_named_property(env, exports, "key_backtab", fn);
-
-	napi_set_named_property(env, exports, "report", fn);
-
-	return exports;
+	return __export_screen(e.code_str(), e.y);
 }
 
-NAPI_MODULE(NODE_GYP_MODULE_NAME, register_napi)
+char* del_character(size_t line, size_t pos) {
+	DeleteCharacter(line, pos);
+	return __export_screen(e.code_str(), e.y);
+}
+
+char* replace_text(size_t line, size_t from, size_t end, const char* buf, size_t length) {
+	if (length > 0) { ReplaceString(line, from, end, buf); }
+	return __export_screen(e.code_str(), e.y);
+}
+
+char* shift_with_tabs(size_t line, size_t pos, int *arr, size_t arr_len) {
+	if (!arr_len) {
+		printf("third argument must be an array");
+		return NULL;
+	} else {
+		auto lines = std::set<int>(arr, arr + arr_len);
+		ShiftWithTabsToRight(line, pos, lines);
+	}
+
+	return __export_screen(e.code_str(), e.y);
+}
+
+char* display_screen_report(const char* dirpath, size_t length) {
+	if (!length) {
+		printf("provide dir path");
+		return NULL;
+	}
+
+	std::string report = OnLangLinesCount(dirpath);
+	return __export_screen(report, 0);
+}
+
+char* clipboard(enum clipboard_ops ops, bool *is_copy_selected) {
+	switch (ops) {
+	case COPY: OnCopy(); break;
+	case PASTE: OnPaste(); break;
+	case CUT: Cut(is_copy_selected); break;
+	case UNDO: OnUndo(); break;
+	case REDO: OnRedo(); break;
+	default: break;
+	}
+	return __export_screen(e.code_str(), e.y);
+}
+
+char* duplicate(void) {
+	Duplicate();
+	return __export_screen(e.code_str(), e.y);
+}
+
+char* commentline(void) {
+	OnCommentLine();
+	return __export_screen(e.code_str(), e.y);
+}
+
+char* swaplinesup(void) {
+	OnSwapLinesUp();
+	return __export_screen(e.code_str(), e.y);
+}
+
+char* swaplinesdn(void) {
+	OnSwapLinesDown();
+	return __export_screen(e.code_str(), e.y);
+}
+
+char* on_keypress(enum nav_keys keys, bool *is_paging) {
+	switch (keys) {
+	case DOWN: OnDown(is_paging); break;
+	case UP: OnUp(is_paging); break;
+	case LEFT: OnLeft(); break;
+	case RIGHT: OnRight(); break;
+	case TOP: GoTop(); break;
+	case BOTTOM: GoBottom(); break;
+	case ENTER: OnEnter(); break;
+	case DEL: OnDelete(); break;
+	case TAB: OnTab(); break;
+	case BACKTAB: OnBackTab(); break;
+	default: break;
+	}
+	return __export_screen(e.code_str(), e.y);
+}
+
+char* on_scroll(enum nav_keys keys) {
+	switch (keys) {
+	case UP: OnScrollUp(); break;
+	case DOWN: OnScrollDown(); break;
+	default: break;
+	}
+	return __export_screen(e.code_str(), e.y);
+}
