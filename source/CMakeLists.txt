@@ -85,5 +85,5 @@ set(TS_LANGUAGE_LIBS
 )
 
 # target and test builds
-target_link_libraries(edgo PUBLIC glog pthread boost_filesystem SDL2 tree-sitter ${TS_LANGUAGE_LIBS} node)
+target_link_libraries(edgo PUBLIC glog pthread boost_filesystem SDL2 tree-sitter ${TS_LANGUAGE_LIBS})
 target_link_libraries(edgotest PUBLIC ${GTEST_LIBRARIES} gtest_main pthread edgo)

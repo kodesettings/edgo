@@ -22,7 +22,6 @@
 #include <string>
 #include <fnmatch.h>
 #include <boost/filesystem.hpp>
-#include <node/node_api.h>
 
 // Matched characters
 static std::vector<char> matched {
@@ -41,10 +40,6 @@ typedef std::vector<std::string> string_v;
 std::string ReadFileToString(const std::string &filepath);
 line_v __build_line_vec(const std::string &data, int lineNum);
 char* __export_screen(const std::string &s, const int offset);
-napi_value __export_screen(napi_env env, const std::string &s, int offset);
-std::vector<int> __import_int_array(napi_env env, napi_value array);
-napi_value __export_none(napi_env env);
-
 int LineOffset(const std::string &text, int lineNum);
 std::string RemoveLeadingTabsSpaces(const std::string &s);
 int FindCharacterOccurances(const std::string &s, const char ch);

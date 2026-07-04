@@ -66,53 +66,6 @@ nxl:
 	}
 	return ss.str().data();
 }
-napi_value __export_screen(napi_env env, const std::string &s, int offset) {
-	napi_value result;
-	line_v lines = __build_line_vec(s, -1);
-	napi_create_array_with_length(env, lines.size(), &result);
-	int index = offset;
-nxl:
-	napi_value str;
-	const char* lnstr = lines[index].buf.c_str();
-	const int len = lines[index].buf.length();
-
-	napi_create_string_utf8(env, lnstr, len, &str);
-	napi_set_element(env, result, index, str);
-
-	if (index < (int)lines.size() && index < offset + e.ROWS) {
-		offset++; goto nxl;
-	}
-	return result;
-}
-
-std::vector<int> __import_int_array(napi_env env, napi_value array) {
-	std::vector<int> result;
-	uint32_t length = 0, index = 0;
-	napi_status status = napi_get_array_length(env, array, &length);
-	if (status != napi_ok) return result;
-nxl:
-	napi_value element;
-	status = napi_get_element(env, array, index, &element);
-	if (status != napi_ok) return result;
-
-	int lx = 0;
-	status = napi_get_value_int32(env, element, &lx);
-	if (status != napi_ok) {
-		napi_throw_type_error(env, NULL, "array elements must be numbers");
-		return result;
-	} else {
-		result.push_back(lx);
-	}
-
-	if (index < length) { index++; goto nxl; }
-	return result;
-}
-
-napi_value __export_none(napi_env env) {
-	napi_value undefined;
-	napi_get_undefined(env, &undefined);
-	return undefined;
-}
 
 // ------------------------------------------------------------------
 // editor helper methods
