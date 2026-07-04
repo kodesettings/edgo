@@ -62,10 +62,11 @@ char* display_screen_report(const char* dirpath, size_t length) {
 }
 
 char* clipboard(enum clipboard_ops ops, bool *is_copy_selected) {
+	bool ics = is_copy_selected == NULL ? false : *is_copy_selected;
 	switch (ops) {
 	case COPY: OnCopy(); break;
 	case PASTE: OnPaste(); break;
-	case CUT: Cut(is_copy_selected); break;
+	case CUT: Cut(ics); break;
 	case UNDO: OnUndo(); break;
 	case REDO: OnRedo(); break;
 	default: break;
@@ -94,9 +95,10 @@ char* swaplinesdn(void) {
 }
 
 char* on_keypress(enum nav_keys keys, bool *is_paging) {
+	bool isp = is_paging == NULL ? false : *is_paging;
 	switch (keys) {
-	case DOWN: OnDown(is_paging); break;
-	case UP: OnUp(is_paging); break;
+	case DOWN: OnDown(isp); break;
+	case UP: OnUp(isp); break;
 	case LEFT: OnLeft(); break;
 	case RIGHT: OnRight(); break;
 	case TOP: GoTop(); break;
