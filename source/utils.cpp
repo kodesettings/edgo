@@ -129,3 +129,17 @@ bool IsMatchExt(const std::string &path, string_v ignoreExts) {
 
 	return false;
 }
+
+void HexToRGB(const std::string &hex, int *r, int *g, int *b) {
+	std::string h = hex[0] == '#' ? hex.substr(1) : hex;
+
+	*r = std::strtol(h.substr(0, 2).c_str(), nullptr, 16);
+	*g = std::strtol(h.substr(2, 2).c_str(), nullptr, 16);
+	*b = std::strtol(h.substr(4, 2).c_str(), nullptr, 16);
+}
+
+void ColorizeTextChunk(int r, int g, int b, std::string *str) {
+	std::stringstream ss;
+	ss << "\033[38;2;" << r << ";" << g << ";" << b << "m" << *str << "\033[0m\n";
+	*str = ss.str();
+}

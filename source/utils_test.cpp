@@ -45,3 +45,21 @@ TEST(UtilsTests, TestFoundCharacterOccurances) {
 
 	EXPECT_EQ(val, 2);
 }
+
+TEST(UtilsTests, TestHexToRGB) {
+	std::string hex("#FFAA33");
+	int r, g, b;
+	HexToRGB(hex, &r, &g, &b);
+
+	EXPECT_EQ(r, 255);
+	EXPECT_EQ(g, 170);
+	EXPECT_EQ(b, 51);
+}
+
+TEST(UtilsTests, TestColorizeTextChunk) {
+	std::string str("some text");
+	int r = 250, g = 88, b = 75;
+	ColorizeTextChunk(r, g, b, &str);
+
+	EXPECT_EQ(str, "\x1B[38;2;250;88;75msome text\x1B[0m\n");
+}
