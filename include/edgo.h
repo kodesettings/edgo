@@ -18,7 +18,7 @@
 #pragma once
 #include <unistd.h>
 
-#if __cpluscplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 //
@@ -74,6 +74,6 @@ enum nav_keys {
 char* on_keypress(enum nav_keys keys, bool *is_paging);
 char* on_scroll(enum nav_keys keys);
 
-#if __cpluscplus
+#ifdef __cplusplus
 }
 #endif

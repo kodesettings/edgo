@@ -8,6 +8,7 @@ Version 0.0.2 - WIP
 == tree-sitter highlighter breaks on special ascii characters???
 == implement functionality to create and write to new empty files
 == add highlighter rendering output into utilities
+== add missing lsp function calls into C API
 
 -------------------------------------------------------------------
 Version 0.0.1 - Modifications done on the original Go repository
