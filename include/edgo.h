@@ -25,7 +25,7 @@ extern "C" {
 // Text manipulators
 //
 char* add_text(size_t line, size_t pos, const char* buf, size_t length);
-char* del_character(size_t line, size_t pos);
+char* remove_text(size_t line, size_t pos, size_t length);
 char* replace_text(size_t line, size_t from, size_t end, const char* buf, size_t length);
 char* shift_with_tabs(size_t line, size_t pos, bool is_array);
 
@@ -45,7 +45,7 @@ enum clipboard_ops {
 //
 // Clipboard operations
 //
-char* clipboard(enum clipboard_ops ops, bool *is_copy_selected);
+char* clipboard(enum clipboard_ops ops);
 
 //
 // Editor features
@@ -71,7 +71,7 @@ enum nav_keys {
 //
 // Navigation keys
 //
-char* on_keypress(enum nav_keys keys, bool *is_paging);
+char* on_keypress(enum nav_keys keys, void* is_paging);
 char* on_scroll(enum nav_keys keys);
 
 #ifdef __cplusplus

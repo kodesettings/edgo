@@ -29,8 +29,12 @@ char* add_text(size_t line, size_t pos, const char* buf, size_t length) {
 	return __export_screen(e.code_str(), e.y);
 }
 
-char* del_character(size_t line, size_t pos) {
-	DeleteCharacter(line, pos);
+char* remove_text(size_t line, size_t pos, size_t length) {
+	switch (length) {
+	case 0: break;
+	case 1: DeleteCharacter(line, pos); break;
+	default: Cut(false); break;
+	}
 	return __export_screen(e.code_str(), e.y);
 }
 
@@ -61,12 +65,11 @@ char* display_screen_report(const char* dirpath, size_t length) {
 	return __export_screen(report, 0);
 }
 
-char* clipboard(enum clipboard_ops ops, bool *is_copy_selected) {
-	bool ics = is_copy_selected == NULL ? false : *is_copy_selected;
+char* clipboard(enum clipboard_ops ops) {
 	switch (ops) {
 	case COPY: OnCopy(); break;
 	case PASTE: OnPaste(); break;
-	case CUT: Cut(ics); break;
+	case CUT: Cut(true); break;
 	case UNDO: OnUndo(); break;
 	case REDO: OnRedo(); break;
 	default: break;
@@ -94,8 +97,8 @@ char* swaplinesdn(void) {
 	return __export_screen(e.code_str(), e.y);
 }
 
-char* on_keypress(enum nav_keys keys, bool *is_paging) {
-	bool isp = is_paging == NULL ? false : *is_paging;
+char* on_keypress(enum nav_keys keys, void* is_paging) {
+	bool isp = is_paging == NULL ? false : static_cast<bool>(is_paging);
 	switch (keys) {
 	case DOWN: OnDown(isp); break;
 	case UP: OnUp(isp); break;
