@@ -57,7 +57,7 @@ config_t GetConfig(void) {
 
 	const char *conffilename = getenv("EDGO_CONF");
 	if (conffilename == NULL) {
-		conffilename = "config.json";
+		conffilename = "/etc/edgo.ini";
 	}
 
 	std::ifstream file(conffilename);
@@ -66,12 +66,13 @@ config_t GetConfig(void) {
 	}
 
 	ptree pt;
-	config_t json_config = ParseLang(pt);
+	read_ini(conffilename, pt);
+	config_t ini_config = ParseLang(pt);
 
 	// read json config and override
-	OverrideDefaultConfig(&json_config);
+	OverrideDefaultConfig(&ini_config);
 
-	if (json_config.theme != "") { default_config.theme = json_config.theme; }
+	if (ini_config.theme != "") { default_config.theme = ini_config.theme; }
 
 	return default_config;
 }

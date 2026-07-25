@@ -24,7 +24,7 @@
 #include <map>
 
 #include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ini_parser.hpp>
 
 typedef struct {
 	std::string name;
@@ -49,6 +49,7 @@ static config_t default_config { .langs = {
 	{ "vue",        { lsp: "vscode-html-language-server --stdio" }},
 	{ "rust",       { lsp: "rust-analyzer", tabwidth: 4}},
 	{ "c",          { lsp: "clangd" }},
+	{ "cpp",        { lsp: "clangd" }},
 	{ "c++",        { lsp: "clangd" }},
 	{ "d",          { lsp: "serve-d", cmd: "dmd", cmdargs: "-run"}},
 	{ "java",       { lsp: "jdtls", tabwidth: 4, cmd: "java" }},
