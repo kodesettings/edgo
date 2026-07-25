@@ -20,7 +20,7 @@
 
 TEST(UtilsTests, TestGetLinesArrayFromData) {
 	const std::string data = "some data\nmore data\nand more data";
-	line_v output = __build_line_vec(data, 3);
+	line_v output = __build_line_vec(data, 3, false);
 
 	EXPECT_EQ(output.size(), 3);
 }
@@ -61,5 +61,5 @@ TEST(UtilsTests, TestColorizeTextChunk) {
 	int r = 250, g = 88, b = 75;
 	ColorizeTextChunk(r, g, b, &str);
 
-	EXPECT_EQ(str, "\x1B[38;2;250;88;75msome text\x1B[0m\n");
+	EXPECT_EQ(str, "\x1B[38;2;250;88;75msome text\x1B[0m");
 }

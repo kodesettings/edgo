@@ -33,7 +33,7 @@ char* remove_text(size_t line, size_t pos, size_t length) {
 	switch (length) {
 	case 0: break;
 	case 1: DeleteCharacter(line, pos); break;
-	default: Cut(false); break;
+	default: Cut(false); break; // don't copy to clipboard
 	}
 	return __export_screen(e.code_str(), e.y);
 }
@@ -100,6 +100,7 @@ char* swaplinesdn(void) {
 char* on_keypress(enum nav_keys keys, void* is_paging) {
 	bool isp = is_paging == NULL ? false : static_cast<bool>(is_paging);
 	switch (keys) {
+	default: e.lines = __build_line_vec(e.code_str(), -1, false);
 	case DOWN: OnDown(isp); break;
 	case UP: OnUp(isp); break;
 	case LEFT: OnLeft(); break;
@@ -110,7 +111,6 @@ char* on_keypress(enum nav_keys keys, void* is_paging) {
 	case DEL: OnDelete(); break;
 	case TAB: OnTab(); break;
 	case BACKTAB: OnBackTab(); break;
-	default: break;
 	}
 	return __export_screen(e.code_str(), e.y);
 }

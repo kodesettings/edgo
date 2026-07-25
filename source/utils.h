@@ -38,7 +38,7 @@ typedef std::vector<line_t> line_v;
 typedef std::vector<std::string> string_v;
 
 std::string ReadFileToString(const std::string &filepath);
-line_v __build_line_vec(const std::string &data, int lineNum);
+line_v __build_line_vec(const std::string &data, int lineNum, bool colorize);
 char* __export_screen(const std::string &s, const int offset);
 int LineOffset(const std::string &text, int lineNum);
 std::string RemoveLeadingTabsSpaces(const std::string &s);

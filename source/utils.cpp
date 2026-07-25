@@ -38,7 +38,7 @@ std::string ReadFileToString(const std::string &filepath) {
 // ------------------------------------------------------------------
 // screen helper methods
 
-line_v __build_line_vec(const std::string &data, int lineNum) {
+line_v __build_line_vec(const std::string &data, int lineNum, bool colorize) {
 	line_v lines = line_v(lineNum);
 	int row = 0;
 	for (auto b : data) {
@@ -48,6 +48,7 @@ line_v __build_line_vec(const std::string &data, int lineNum) {
 		} else if (row == lineNum) {
 			break;
 		} else {
+			if (colorize) {} // TODO: apply ColorRanges for each character here
 			lines[row].buf.append(&b);
 		}
 	}
@@ -55,7 +56,7 @@ line_v __build_line_vec(const std::string &data, int lineNum) {
 }
 
 char* __export_screen(const std::string &s, const int offset) {
-	line_v lines = __build_line_vec(s, -1);
+	line_v lines = __build_line_vec(s, -1, true);
 	int index = offset;
 	std::stringstream ss;
 nxl:
@@ -140,6 +141,6 @@ void HexToRGB(const std::string &hex, int *r, int *g, int *b) {
 
 void ColorizeTextChunk(int r, int g, int b, std::string *str) {
 	std::stringstream ss;
-	ss << "\033[38;2;" << r << ";" << g << ";" << b << "m" << *str << "\033[0m\n";
+	ss << "\033[38;2;" << r << ";" << g << ";" << b << "m" << *str << "\033[0m";
 	*str = ss.str();
 }
