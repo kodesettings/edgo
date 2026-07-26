@@ -57,7 +57,7 @@ config_t GetConfig(void) {
 
 	const char *conffilename = getenv("EDGO_CONF");
 	if (conffilename == NULL) {
-		conffilename = "/etc/edgo.ini";
+		conffilename = "/etc/edgo.conf";
 	}
 
 	std::ifstream file(conffilename);
