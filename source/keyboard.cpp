@@ -20,14 +20,18 @@
 
 void OnDown(bool isPaging) {
 	int numberOfLines;
-	if (e.ROWS / 3 < 30) { numberOfLines = 30; } else { numberOfLines = e.ROWS / 3; } // adjustment
-	if (!isPaging) { numberOfLines = 1; } // normal scroll
+
+	if (!isPaging) {
+		numberOfLines = 1; // normal scroll
+	} else {
+		numberOfLines = e.ROWS / 3 < 30 ? 30 : e.ROWS / 3;
+	}
 
 	if (e.lines.empty()) { return; }
 	if (e.row + numberOfLines >= (int)e.lines.size()) {
 		if (!isPaging) {
 			e.y = e.row - e.ROWS + 1;
-			if (e.y < 0) { e.y = 0; }
+			if (e.y < 0) e.y = 0; // reset
 			return;
 		} else {
 			numberOfLines = e.lines.size() - e.row - 1;
@@ -35,48 +39,89 @@ void OnDown(bool isPaging) {
 	}
 
 	e.row += numberOfLines;
-	if (e.col > (int)e.lines[e.row].buf.size()) { e.col = e.lines[e.row].buf.size(); } // fit to e.Lines
-	if (e.row < e.y) { e.y = e.row; }
-	if (e.row >= e.y + e.ROWS) { e.y = e.row - e.ROWS + 1; }
+	if (e.col > (int)e.lines[e.row].buf.size()) {
+		e.col = e.lines[e.row].buf.size();  // fit to e.lines
+	}
+
+	if (e.row < e.y) {
+		e.y = e.row;
+	} else if (e.row >= e.y + e.ROWS) {
+		e.y = e.row - e.ROWS + 1;
+	}
 }
 
 void OnUp(bool isPaging) {
 	int numberOfLines;
-	if (e.ROWS / 3 < 30) { numberOfLines = 30; } else { numberOfLines = e.ROWS / 3; } // adjustment
-	if (!isPaging) { numberOfLines = 1; } // normal scroll
 
-	if (e.lines.size() == 0) { return; }
-	if (e.row == 0) { e.y = 0; return; }
-	if (e.row - numberOfLines <= 0) {e.row = 0; } else { e.row -= numberOfLines; }
-	if (e.col > (int)e.lines[e.row].buf.size()) { e.col = e.lines[e.row].buf.size(); } // fit to e.Lines
-	if (e.row < e.y) { e.y = e.row; }
-	if (e.row > e.y + e.ROWS) { e.y = e.row - e.ROWS + 1; }
+	if (!isPaging) {
+		numberOfLines = 1; // normal scroll
+	} else {
+		numberOfLines = e.ROWS / 3 < 30 ? 30 : e.ROWS / 3;
+	}
+
+	if (e.lines.size() == 0) {
+		return;
+	}
+
+	if (e.row == 0) {
+		e.y = 0;
+		return;
+	}
+
+	if (e.row - numberOfLines <= 0) {
+		e.row = 0;
+	} else {
+		e.row -= numberOfLines;
+	}
+
+	if (e.col > (int)e.lines[e.row].buf.size()) {
+		e.col = e.lines[e.row].buf.size(); // fit to e.lines
+	}
+
+	if (e.row < e.y) {
+		e.y = e.row;
+	} else if (e.row > e.y + e.ROWS) {
+		e.y = e.row - e.ROWS + 1;
+	}
 }
 
 void OnLeft(void) {
-	if (e.lines.empty()) { return; }
+	if (e.lines.empty()) {
+		return;
+	}
+
 	if (e.col > 0) {
 		e.col--;
 	} else if (e.row > 0) {
 		e.row--;
 		e.col = e.lines[e.row].buf.size(); // fit to e.Lines
-		if (e.row < e.y) { e.y = e.row; }
+		if (e.row < e.y) {
+			e.y = e.row;
+		}
 	}
 }
 
 void OnRight(void) {
-	if (e.lines.empty()) { return; }
+	if (e.lines.empty()) {
+		return;
+	}
+
 	if (e.col < (int)e.lines[e.row].buf.size()) {
 		e.col++;
 	} else if (e.row < (int)e.lines.size() - 1) {
 		e.row++;
 		e.col = 0;
-		if (e.row > e.y + e.ROWS) { e.y++;  }
+		if (e.row > e.y + e.ROWS) {
+			e.y++;
+		}
 	}
 }
 
 void GoTop(void) {
-	e.row = 0; e.col = 0; e.x = 0; e.y = 0;
+	e.row = 0;
+	e.col = 0;
+	e.x = 0;
+	e.y = 0;
 }
 
 void GoBottom(void) {
@@ -85,20 +130,36 @@ void GoBottom(void) {
 	} else {
 		e.row = e.lines.size() - 1; e.col = 0;
 		e.x = 0;
-		if (e.row > e.TERMINAL_HEIGHT) { FocusCenter(); }
+
+		if (e.row > e.TERMINAL_HEIGHT) {
+			FocusCenter();
+		}
+
 		OnDown(false);
 	}
 }
 
 void OnScrollUp(void) {
-	if (e.lines.empty()) { return; }
-	if (e.y == 0) { return; }
+	if (e.lines.empty()) {
+		return;
+	}
+
+	if (e.y == 0) {
+		return;
+	}
+
 	e.y--;
 }
 
 void OnScrollDown(void) {
-	if (e.lines.empty()) { return; }
-	if (e.y + e.ROWS >= (int)e.lines.size()) { return; }
+	if (e.lines.empty()) {
+		return;
+	}
+
+	if (e.y + e.ROWS >= (int)e.lines.size()) {
+		return;
+	}
+
 	e.y++;
 }
 
@@ -108,13 +169,18 @@ void OnEnter(void) {
 	}
 
 	InsertCharacter(e.row, e.col, '\n');
-	Focus();
 	e.row++;
 	e.col = 0;
 
-	if (e.row - e.y == e.ROWS) { OnScrollDown(); }
-	if (!e.redo.empty()) { e.redo.clear(); }
+	if (e.row - e.y == e.ROWS) {
+		OnScrollDown();
+	}
 
+	if (!e.redo.empty()) {
+		e.redo.clear();
+	}
+
+	Focus();
 	UpdateLsp(false, e.code_str());
 	FindTests();
 }
@@ -126,17 +192,21 @@ void OnDelete(void) {
 	}
 
 	DeleteCharacter(e.row, e.col);
-	if (e.col > 0) { e.col--; } else if (e.row > 0) { e.row--; }
+	if (e.col > 0) {
+		e.col--;
+	} else if (e.row > 0) {
+		e.row--;
+	}
+
+	if (!e.redo.empty())
+		e.redo.clear();
 
 	Focus();
-	if (!e.redo.empty()) { e.redo.clear(); }
 	UpdateLsp(false, e.code_str());
 	FindTests();
 }
 
 void OnTab(void) {
-	Focus();
-
 	auto selectedLines = e.__selection.GetSelectedLines(e.code_str());
 
 	if (selectedLines.empty()) {
@@ -146,14 +216,15 @@ void OnTab(void) {
 		ShiftWithTabsToRight(e.row, e.col, selectedLines);
 	}
 
-	if (!e.redo.empty()) { e.redo.clear(); }
+	if (!e.redo.empty())
+		e.redo.clear();
+
+	Focus();
 	UpdateLsp(false, e.code_str());
 	FindTests();
 }
 
 void OnBackTab(void) {
-	Focus();
-
 	auto selectedLines = e.__selection.GetSelectedLines(e.code_str());
 
 	// deleting tabs from beginning
@@ -173,7 +244,10 @@ void OnBackTab(void) {
 		}
 	}
 
-	if (!e.redo.empty()) { e.redo.clear(); }
+	if (!e.redo.empty())
+		e.redo.clear();
+
+	Focus();
 	UpdateLsp(false, e.code_str());
 	FindTests();
 }
