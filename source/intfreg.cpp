@@ -39,7 +39,10 @@ char* remove_text(size_t line, size_t pos, size_t length) {
 }
 
 char* replace_text(size_t line, size_t from, size_t end, const char* buf, size_t length) {
-	if (length > 0) { ReplaceString(line, from, end, buf); }
+	switch (length) {
+	case 0: break;
+	default: ReplaceString(line, from, end, buf);
+	}
 	return __export_screen(e.code_str(), e.y);
 }
 

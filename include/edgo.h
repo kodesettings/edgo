@@ -27,7 +27,7 @@ extern "C" {
 char* add_text(size_t line, size_t pos, const char* buf, size_t length);
 char* remove_text(size_t line, size_t pos, size_t length);
 char* replace_text(size_t line, size_t from, size_t end, const char* buf, size_t length);
-char* shift_with_tabs(size_t line, size_t pos, bool is_array);
+char* shift_with_tabs(size_t line, size_t pos, int* arr, size_t arr_len);
 
 //
 // Screen report
