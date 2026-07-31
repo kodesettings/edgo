@@ -18,16 +18,18 @@
 #include "editor.h"
 
 void Focus(void) {
-	if (e.row > e.y + e.ROWS) { e.y = e.row + e.ROWS; }
-	if (e.row < e.y) { e.y = e.row; }
+	if (e.row > e.y + e.ROWS) {
+		e.y = e.row + e.ROWS;
+	} else if (e.row < e.y) {
+		e.y = e.row;
+	}
 }
 
 void FocusCenter(void) {
 //	e.Screen.Show()
 	if (e.row > e.y + e.ROWS) {
 		e.y = e.row + e.ROWS;
-	}
-	if (e.row < e.y) {
+	} else if (e.row < e.y) {
 		e.y = e.row;
 	}
 
@@ -40,24 +42,3 @@ void FocusCenter(void) {
 		e.y += e.row - e.y - centerRow;
 	}
 }
-#ifdef PROCESS_PANEL
-void FocusProcessPanel(void) {
-//	e.Screen.Show()
-	if (e.processPanelCursorY > e.processPanelScroll + e.ROWS) {
-		e.processPanelScroll = e.processPanelCursorY + e.ROWS;
-	}
-	if (e.processPanelCursorY < e.processPanelScroll) {
-		e.processPanelScroll = e.processPanelCursorY;
-	}
-
-	e.processPanelScroll -= e.processPanelHeight / 2;
-	if (e.processPanelScroll < 0) { e.processPanelScroll = 0; }
-
-	int centerRow = e.processPanelHeight / 2;
-
-	// Update the cursor row to the center row if necessary
-	if (e.processPanelCursorY - e.processPanelScroll > centerRow) {
-		e.processPanelScroll += e.processPanelCursorY - e.processPanelScroll - centerRow;
-	}
-}
-#endif

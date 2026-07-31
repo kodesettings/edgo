@@ -73,25 +73,6 @@ typedef struct editor_t {
 
 	// registering callback for content change
 	editor_t() { isContentChanged = { /* registering dummy callback */ };}
-#ifdef PROCESS_PANEL
-	// process panel vars
-	int processPanelHeight;
-	int processPanelWidth;
-	line_v processContent;
-	int processPanelScroll;
-	int processPanelHScroll;
-	bool isProcessPanelMoving;
-	bool isProcessPanelFocused;
-	process *process;
-	int processPanelSpacing;
-	int processPanelCursorX;
-	int processPanelCursorY;
-	selection processPanelSelection;
-	bool isProcessPanelSearch;
-	std::string processPanelSearchPattern; // pattern for search in a buffer
-	searchresult_v processPanelSearchResults;
-	int processPanelSearchResultIndex;
-#endif
 	std::map<std::string, lspclient_t> lsp2lang;
 	std::map<std::string, int> lspver; // version number sequencing
 
