@@ -7,7 +7,6 @@ Version 0.0.2 - WIP
 == TODO:some user input cursor positions have to be fixed on the undo stack
 == TODO:tree-sitter highlighter breaks on special ascii characters???
 == TODO:implement functionality to create and write to new empty files
-== TODO:add highlighter rendering output into utilities
 == TODO:add missing lsp function calls into C API
 
 -------------------------------------------------------------------

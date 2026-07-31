@@ -45,7 +45,6 @@ std::string RemoveLeadingTabsSpaces(const std::string &s);
 int FindCharacterOccurances(const std::string &s, const char ch);
 bool IsIgnored(const std::string &path, string_v ignorePatterns);
 bool IsMatchExt(const std::string &path, string_v ignoreExts);
-void HexToRGB(const std::string &hex, int *r, int *g, int *b);
-void ColorizeTextChunk(int r, int g, int b, std::string *str);
+void ColorizeTextChunk(uint32_t color, std::string *str);
 
 #endif // _UTILS_H_

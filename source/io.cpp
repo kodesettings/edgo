@@ -17,6 +17,7 @@
 
 #include "editor.h"
 #include "query.h"
+#include "highlighter.h"
 
 void UpdateLsp(bool isOpen, std::string text) {
 	if (!lspclient.isReady) return;
@@ -36,4 +37,30 @@ void FindTests(void) {
 	bool alloc = TestQueryAlloc();
 	if (!alloc) return;
 	TestFinder(e.absoluteFilePath, &e.tests);
+}
+
+uint32_t GetColor(char ch, int col, int row, uint32_t *bytesCounter) {
+	coloredbyterange_v coloredByteRanges;
+	coloredByteRanges = ColorRanges(e.y, e.y + e.TERMINAL_HEIGHT);
+	uint32_t style;
+
+	for (auto i : coloredByteRanges) {
+		if (i.startbyte <= *bytesCounter && *bytesCounter < i.endbyte) {
+			style = i.color;
+			break;
+		}
+	}
+
+	if (e.__selection.IsUnderSelection(col, row)) {
+		style = SELECTIONCOLOR;
+	}
+
+	if (ch == '\t' && e.x == 0) { // draw big cursor for tab
+		if (row == e.row && col == e.col) {
+			style = ACCENTCOLOR;
+		}
+	}
+
+	bytesCounter += sizeof(ch);
+	return style;
 }

@@ -53,6 +53,14 @@ typedef struct {
 /* memory variable for treesitterhighlighter_t */
 extern treesitterhighlighter_t h;
 
+/* some hard coded colors */
+#define SELECTIONCOLOR 246 // gray
+#define HIGHLIGHTCOLOR 238 // gray
+#define OVERLAYCOLOR -1 // transparent
+#define ACCENTCOLOR 303 // pink
+#define ACCENTCOLOR2 = 30 // aqua
+#define ACCENTCOLOR3 -1 // aqua
+
 inline treesitterhighlighter_t NewTreeSitter(void) {
 	auto parser = ts_parser_new();
 

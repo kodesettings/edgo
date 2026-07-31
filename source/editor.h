@@ -116,6 +116,7 @@ void OnSwapLinesDown(void);
 // io routines
 void UpdateLsp(bool isOpen, std::string text);
 void FindTests(void);
+uint32_t GetColor(char ch, int col, int row, uint32_t *bytesCounter);
 
 // keyboard routines
 void OnDown(bool isPaging);

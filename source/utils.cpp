@@ -19,7 +19,6 @@
 #include "editor.h"
 #include "screen_logo.h"
 
-
 // ------------------------------------------------------------------
 // io helper methods
 
@@ -41,6 +40,7 @@ std::string ReadFileToString(const std::string &filepath) {
 line_v __build_line_vec(const std::string &data, int lineNum, bool colorize) {
 	line_v lines = line_v(lineNum);
 	int row = 0;
+	uint32_t bytesCounter = 0, style = 0;
 	for (auto b : data) {
 		if (b == '\n') {
 			row++;
@@ -48,8 +48,14 @@ line_v __build_line_vec(const std::string &data, int lineNum, bool colorize) {
 		} else if (row == lineNum) {
 			break;
 		} else {
-			if (colorize) {} // TODO: apply ColorRanges for each character here
-			lines[row].buf.append(&b);
+			if (colorize) {
+				std::string str;
+				style = GetColor(b, e.col, e.row, &bytesCounter);
+				ColorizeTextChunk(style, &str);
+				lines[row].buf.append(str);
+			} else {
+				lines[row].buf.append(&b);
+			}
 		}
 	}
 	return lines;
@@ -63,7 +69,8 @@ nxl:
 	ss << lines[index].buf << "\n";
 
 	if (index < (int)lines.size() && index < offset + e.ROWS) {
-		index++; goto nxl;
+		index++;
+		goto nxl;
 	}
 	return ss.str().data();
 }
@@ -131,16 +138,14 @@ bool IsMatchExt(const std::string &path, string_v ignoreExts) {
 	return false;
 }
 
-void HexToRGB(const std::string &hex, int *r, int *g, int *b) {
-	std::string h = hex[0] == '#' ? hex.substr(1) : hex;
-
-	*r = std::strtol(h.substr(0, 2).c_str(), nullptr, 16);
-	*g = std::strtol(h.substr(2, 2).c_str(), nullptr, 16);
-	*b = std::strtol(h.substr(4, 2).c_str(), nullptr, 16);
-}
-
-void ColorizeTextChunk(int r, int g, int b, std::string *str) {
+void ColorizeTextChunk(uint32_t color, std::string *str) {
+	int r, g, b;
 	std::stringstream ss;
+
+	r = (color >> 16) & 0xFF;
+	g = (color >> 8) & 0xFF;
+	b = color & 0xFF;
+
 	ss << "\033[38;2;" << r << ";" << g << ";" << b << "m" << *str << "\033[0m";
 	*str = ss.str();
 }
