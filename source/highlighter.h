@@ -81,7 +81,7 @@ inline uint32_t GetColorCode(std::string colorcode) {
 	return std::strtol(str, NULL, 16); // converting hex to int
 }
 
-std::string DetectLang(const std::string &filename);
+std::string DetectLang(const std::string &filepath);
 void SetTheme(const std::string &themepath);
 void GetSitterLang(enum languages lang, bool *parsed);
 void SetLang(enum languages lang);

@@ -20,7 +20,7 @@
 
 treesitterhighlighter_t h;
 
-std::string DetectLang(const std::string &filename) { return ""; /* get language name */ }
+std::string DetectLang(const std::string &filepath) { return ""; /* get language name */ }
 void SetTheme(const std::string &themepath) {/* setting theme if needed */ }
 
 void GetSitterLang(enum languages lang, bool *parsed) {

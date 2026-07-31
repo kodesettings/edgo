@@ -37,13 +37,13 @@ typedef struct editor_t {
 	int ROWS;                           // terminal size rows
 	int LINES_WIDTH;                    // draw file lines number
 
-	int TERMINAL_HEIGHT;
-	int TERMINAL_WIDHT;
+#define TERMINAL_HEIGHT ROWS
+#define TERMINAL_WIDTH COLUMNS
 
-	int row;                            // cursor position row
-	int col;                            // cursor position column
-	int y;                              // row offset for scrolling
-	int x;                              // col offset for scrolling
+	int row = 0;                        // cursor position row
+	int col = 0;                        // cursor position column
+	int y   = 0;                        // row offset for scrolling
+	int x   = 0;                        // col offset for scrolling
 
 	line_v lines;                       // Lines of text characters
 
@@ -62,14 +62,14 @@ typedef struct editor_t {
 	std::string filename;               // current file name
 	std::string absoluteFilePath;       // current file name and directory
 	bool (*isContentChanged)(void);     // shows * if file is changed
-	bool isColorize;                    // colorize text is true by default
+	bool isColorize = true;             // colorize text is true by default
 	bool isOverlay;                     // true if overlay is active (completion, hover, errors...)
 	bool isStartupScreen;               // true if no file was opened
 
 	bool isContentSearch;
 	std::string searchPattern;          // pattern for search in a buffer
 	searchresult_v searchResults;
-	int searchResultIndex;
+	int searchResultIndex = 0;
 
 	// registering callback for content change
 	editor_t() { isContentChanged = { /* registering dummy callback */ };}
@@ -117,6 +117,8 @@ void OnSwapLinesDown(void);
 void UpdateLsp(bool isOpen, std::string text);
 void FindTests(void);
 uint32_t GetColor(char ch, int col, int row, uint32_t *bytesCounter);
+bool OpenFile(const std::string &filepath);
+void SaveFile(void);
 
 // keyboard routines
 void OnDown(bool isPaging);

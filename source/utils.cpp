@@ -34,6 +34,18 @@ std::string ReadFileToString(const std::string &filepath) {
 	return fcontent;
 }
 
+bool SaveToFile(const std::string &filepath, const std::string &content) {
+	std::ofstream file(filepath, std::ios::app);
+
+	if (!file.is_open()) {
+		return false;
+	}
+
+	file << content;
+	file.close();
+	return true;
+}
+
 // ------------------------------------------------------------------
 // screen helper methods
 

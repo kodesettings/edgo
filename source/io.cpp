@@ -64,3 +64,54 @@ uint32_t GetColor(char ch, int col, int row, uint32_t *bytesCounter) {
 	bytesCounter += sizeof(ch);
 	return style;
 }
+
+bool OpenFile(const std::string &filepath) {
+	// finding current working directory
+	char currentdir[PATH_MAX];
+	getcwd(currentdir, sizeof(currentdir));
+	e.cwd = currentdir;
+
+	// reading file content
+	std::string content;
+	content = ReadFileToString(filepath);
+
+	boost::filesystem::path p(filepath);
+	e.filename = p.filename().string();
+	e.absoluteFilePath = filepath;
+
+	LOG(INFO) << "open file:" << e.absoluteFilePath;
+
+	e.lang = DetectLang(e.absoluteFilePath);
+	switch (e.lang.empty()) {
+	case true:
+		LOG(INFO) << "unknown language";
+		return false;
+	break;
+	case false:
+		LOG(INFO) << "new language is " << e.lang;
+		config_t config = GetConfig();
+		lang_t lsp = config.langs[e.lang];
+		StartLspClient(lsp.cmd, lsp.lsp);
+		InitLspClient(e.cwd);
+
+		// TODO: set language:
+		// SetLang(JAVASCRIPT);
+		Parse(content);
+		SetTheme(e.config.theme);
+	break;
+	}
+
+	// Opening file for LSP
+	UpdateLsp(true, e.code_str());
+	FindTests();
+	return true;
+}
+
+void SaveFile(void) {
+	if (!SaveToFile(e.absoluteFilePath, e.code_str())) {
+		LOG(ERROR) << "unable to save to file " << e.absoluteFilePath;
+	}
+
+	UpdateLsp(false, e.code_str());
+	FindTests();
+}

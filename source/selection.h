@@ -24,11 +24,11 @@
 
 class selection {
 public:
-	int ssx;          // selection Start x
-	int ssy;          // selection Start y
-	int sex;          // selection end x
-	int sey;          // selection end y
-	bool is_selected; // true if selection is active
+	int ssx = 0;          // selection Start x
+	int ssy = 0;          // selection Start y
+	int sex = 0;          // selection end x
+	int sey = 0;          // selection end y
+	bool is_selected;     // true if selection is active
 private:
 	typedef struct {int x = 0; int y = 0; } indices_t;
 public:
