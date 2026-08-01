@@ -126,3 +126,19 @@ char* on_scroll(enum nav_keys keys) {
 	}
 	return __export_screen(e.code_str(), e.y);
 }
+
+char* open_file(const char* filepath) {
+	if (!HandleFile(filepath, true)) {
+		LOG(ERROR) << "cannot open filepath";
+	}
+
+	return __export_screen(e.code_str(), e.y);
+}
+
+int new_file(const char* filename) {
+	return (int)HandleFile(filename, false) == 1;
+}
+
+int save_file(void) {
+	return (int)SaveFile() == 1;
+}

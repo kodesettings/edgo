@@ -74,6 +74,12 @@ enum nav_keys {
 char* on_keypress(enum nav_keys keys, void* is_paging);
 char* on_scroll(enum nav_keys keys);
 
+//
+// File handling
+//
+char* open_file(const char* filepath);
+int new_file(const char* filename);
+int save_file(void);
 #ifdef __cplusplus
 }
 #endif

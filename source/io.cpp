@@ -120,19 +120,13 @@ bool HandleFile(const std::string &filepath, bool isopen) {
 	return true;
 }
 
-bool OpenFile(const std::string &filepath) {
-	return HandleFile(filepath, true);
-}
-
-bool NewFile(const std::string &filename) {
-	return HandleFile(filename, false);
-}
-
-void SaveFile(void) {
+bool SaveFile(void) {
 	if (!SaveToFile(e.absoluteFilePath, e.code_str())) {
 		LOG(ERROR) << "unable to save to file " << e.absoluteFilePath;
+		return false;
 	}
 
 	UpdateLsp(false, e.code_str());
 	FindTests();
+	return true;
 }
