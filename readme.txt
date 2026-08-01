@@ -1,11 +1,31 @@
 About this project
 ------------------
-Edgo is a library for text editors, offering features such as text manipulation,
-syntax highlighting, LSP support, and more.
+Edgo is a library for building modern text editors. It provides the core functionality required by code and text editing applications,
+including efficient text manipulation, syntax highlighting, Language Server Protocol (LSP) integration, and other editor features.
+The library is designed to separate editor logic from the user interface. All editing functionality is exposed through a C API,
+allowing client applications to implement their own rendering, input handling, and overall user experience while relying on Edgo
+for the underlying editor behavior. This architecture makes it suitable for integrating into desktop applications, custom IDEs,
+terminal editors, or other tools that require advanced text editing capabilities.
 
-Text manipulation and editor features are provided via C API, allowing client
-applications to focus solely on design and rendering. This project is building on
-previous version of work of a standalone text editor.
+Current features include:
+
+* Fast and efficient text buffer manipulation
+* Undo and redo support
+* Cursor and selection management
+* Syntax highlighting
+* Language Server Protocol (LSP) integration
+* Extensible editor functionality through a stable C API
+
+Project history
+---------------
+Edgo originated from an earlier standalone text editor project. During development, the editor core was refactored and generalized into a
+reusable library, making it possible to share the editing engine across multiple applications. This redesign focuses on modularity, portability,
+and maintainability, enabling developers to build custom editors without reimplementing common editing functionality.
+
+Purpose
+-------
+The long-term goal of Edgo is to provide a lightweight, embeddable, and extensible foundation for text editing applications, while remaining
+independent of any particular rendering backend, windowing toolkit, or platform-specific UI framework.
 
 NOTICE:
 WORK IN PROGRESS, PROJECT IS IN DEVELOPMENT STATE
