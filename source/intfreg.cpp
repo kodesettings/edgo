@@ -18,7 +18,9 @@
 #include "../include/edgo.h"
 #include "editor.h"
 #include "utils.h"
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 char* add_text(size_t line, size_t pos, const char* buf, size_t length) {
 	switch (length) {
 	case 0: break;
@@ -129,7 +131,8 @@ char* on_scroll(enum nav_keys keys) {
 
 char* open_file(const char* filepath) {
 	if (!HandleFile(filepath, true)) {
-		LOG(ERROR) << "cannot open filepath";
+		printf("cannot open filepath");
+		return NULL;
 	}
 
 	return __export_screen(e.code_str(), e.y);
@@ -142,3 +145,6 @@ int new_file(const char* filename) {
 int save_file(void) {
 	return (int)SaveFile() == 1;
 }
+#ifdef __cplusplus
+}
+#endif

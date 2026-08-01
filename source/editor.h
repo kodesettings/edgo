@@ -97,9 +97,7 @@ bool MaybeAddPair(int line, int pos, char ch, char *ret);
 // cursor routines
 void Focus(void);
 void FocusCenter(void);
-#ifdef PROCESS_PANEL
-void FocusProcessPanel(void);
-#endif
+
 // clipboard routines
 void OnCopy(void);
 void OnPaste(void);

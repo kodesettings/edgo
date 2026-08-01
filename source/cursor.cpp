@@ -34,7 +34,9 @@ void FocusCenter(void) {
 	}
 
 	e.y -= e.ROWS / 2;
-	if (e.y < 0) { e.y = 0; }
+	if (e.y < 0) {
+		e.y = 0;
+	}
 
 	int centerRow = e.ROWS / 2;
 	// Update the cursor row to the center row if necessary
