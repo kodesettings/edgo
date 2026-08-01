@@ -1,8 +1,10 @@
+> NOTICE: WORK IN PROGRESS, PROJECT IS IN DEVELOPMENT STATE
+
 ## About this project
 
 **Edgo** is a library for building modern text editors. It provides the core functionality required by code and text editing applications, including efficient text manipulation, syntax highlighting, Language Server Protocol (LSP) integration, and other editor features.
 
-The library is designed to separate editor logic from the user interface. All editing functionality is exposed through a C API, allowing client applications to implement their own rendering, input handling, and overall user experience while relying on Edgo for the underlying editor behavior. This architecture makes it suitable for integrating into desktop applications, custom IDEs, terminal editors, or other tools that require advanced text editing capabilities.
+The library is designed to separate editor logic from the user interface. All editing functionality is exposed through a C API, allowing client applications to implement their own rendering, input handling, and overall user experience while relying on **Edgo** for the underlying editor behavior. This architecture makes it suitable for integrating into desktop applications, custom IDEs, terminal editors, or other tools that require advanced text editing capabilities.
 
 Current features include:
 
@@ -20,6 +22,3 @@ Current features include:
 ## Purpose
 
 The long-term goal of **Edgo** is to provide a lightweight, embeddable, and extensible foundation for text editing applications, while remaining independent of any particular rendering backend, windowing toolkit, or platform-specific UI framework.
-
-> NOTICE:
-WORK IN PROGRESS, PROJECT IS IN DEVELOPMENT STATE
