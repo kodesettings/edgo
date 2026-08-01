@@ -65,21 +65,34 @@ uint32_t GetColor(char ch, int col, int row, uint32_t *bytesCounter) {
 	return style;
 }
 
-bool OpenFile(const std::string &filepath) {
-	// finding current working directory
+void SetFileAttributes(const std::string &file, std::string *content, bool isopen) {
 	char currentdir[PATH_MAX];
 	getcwd(currentdir, sizeof(currentdir));
 	e.cwd = currentdir;
 
-	// reading file content
+	if (isopen) {
+		boost::filesystem::path p(file);
+		e.filename = p.filename().string();
+		e.absoluteFilePath = p.parent_path().string();;
+		*content = ReadFileToString(e.absoluteFilePath);
+	} else {
+		std::string absFilePath;
+		absFilePath.append("/");
+		absFilePath.append(currentdir);
+		absFilePath.append(file);
+		e.filename = file;
+		e.absoluteFilePath = absFilePath;;
+		if (!SaveToFile(e.absoluteFilePath, e.code_str())) {
+			LOG(ERROR) << "unable to save to file " << e.absoluteFilePath;
+		}
+	}
+}
+
+bool HandleFile(const std::string &filepath, bool isopen) {
 	std::string content;
-	content = ReadFileToString(filepath);
-
-	boost::filesystem::path p(filepath);
-	e.filename = p.filename().string();
-	e.absoluteFilePath = filepath;
-
-	LOG(INFO) << "open file:" << e.absoluteFilePath;
+	SetFileAttributes(filepath, &content, isopen);
+	std::string log_text = isopen ? "open file:" : "new file:";
+	LOG(INFO) << log_text << e.absoluteFilePath;
 
 	e.lang = DetectLang(e.absoluteFilePath);
 	switch (e.lang.empty()) {
@@ -105,6 +118,14 @@ bool OpenFile(const std::string &filepath) {
 	UpdateLsp(true, e.code_str());
 	FindTests();
 	return true;
+}
+
+bool OpenFile(const std::string &filepath) {
+	return HandleFile(filepath, true);
+}
+
+bool NewFile(const std::string &filename) {
+	return HandleFile(filename, false);
 }
 
 void SaveFile(void) {

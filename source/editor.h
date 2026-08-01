@@ -117,7 +117,10 @@ void OnSwapLinesDown(void);
 void UpdateLsp(bool isOpen, std::string text);
 void FindTests(void);
 uint32_t GetColor(char ch, int col, int row, uint32_t *bytesCounter);
+void SetFileAttributes(const std::string &file, std::string *content, bool isopen);
+bool HandleFile(const std::string &filepath, bool isopen);
 bool OpenFile(const std::string &filepath);
+bool NewFile(const std::string &filename);
 void SaveFile(void);
 
 // keyboard routines
