@@ -77,8 +77,8 @@ void SetFileAttributes(const std::string &file, std::string *content, bool isope
 		*content = ReadFileToString(e.absoluteFilePath);
 	} else {
 		std::string absFilePath;
-		absFilePath.append("/");
 		absFilePath.append(currentdir);
+		absFilePath.append("/");
 		absFilePath.append(file);
 		e.filename = file;
 		e.absoluteFilePath = absFilePath;;
