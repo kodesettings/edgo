@@ -53,6 +53,7 @@ add_library(edgo SHARED
 
 # interface register
 	"../include/edgo.h"
+	"../include/lsp.h"
 	"intfreg.cpp"
 )
 

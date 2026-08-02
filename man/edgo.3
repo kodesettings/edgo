@@ -1,8 +1,10 @@
-.TH edgo 3 "2026-08-01"
+.TH edgo 3 "2026-08-02"
 .SH NAME
 edgo \- text editor library with native lsp support
 .SH SYNOPSIS
 .B #include <edgo.h>
+.PP
+Screen printing functions
 .PP
 char* \f3add_text\fP(size_t \fIline\fP, size_t \fIpos\fP, const char* \fIbuf\fP, size_t \fIlength\fP);
 .br
@@ -27,12 +29,32 @@ char* \f3swaplinesdn\fP(void);
 char* \f3on_keypress\fP(enum nav_keys \fIkeys\fP, void* \fIis_paging\fP);
 .br
 char* \f3on_scroll\fP(enum nav_keys \fIkeys\fP);
-.br
+.PP
+File operations
+.PP
 char* \f3open_file\fP(const char* \fIfilepath\fP);
 .br
 int \f3new_file\fP(const char* \fIfilename\fP);
 .br
 int \f3save_file\fP(void);
+.PP
+LSP related functions
+.PP
+struct lsp_hover \f3lsp_client_hover\fP(void);
+.br
+struct lsp_completion \f3lsp_client_completion\fP(void);
+.br
+struct lsp_definition \f3lsp_client_definition\fP(void);
+.br
+struct lsp_signature_help \f3lsp_client_signature_help\fP(void);
+.br
+struct lsp_references \f3lsp_client_references\fP(void);
+.br
+struct lsp_prepare_rename \f3lsp_client_prepare_rename\fP(void);
+.br
+struct lsp_rename \f3lsp_client_rename\fP(const char* \fInewname\fP);
+.br
+struct lsp_code_action \f3lsp_client_code_action\fP(void);
 .SH PARAMETERS
 .TP
 \f2ops\fP
@@ -67,7 +89,7 @@ Some of the themes are darcula, edgo, edgo-new, material-darker, vesper.
 .SH LSP SUPPORT
 Following lsp features are supported: completion, hover, signature help, definition,
 references, rename, method extraction and diagnostic information.
-
+.PP
 Install your language server for interaction with your text editor.
 .SH SYNTAX HIGHLIGHTING
 Following languages are currently supported: bash, c/c++, go, html, css, java, javascript,
