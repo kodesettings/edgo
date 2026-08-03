@@ -1,66 +1,91 @@
-.TH edgo 3 "2026-08-02"
+.TH edgo 3 "2026-08-03"
 .SH NAME
 edgo \- text editor library with native lsp support
 .SH SYNOPSIS
 .B #include <edgo.h>
-.PP
-Screen printing functions
-.PP
+.SH MODULE OVERVIEW
+.SS Screen printing functions
+Functions that are manipulating the text buffer while printing the screen content as a return value.
+.TP
 char* \f3add_text\fP(size_t \fIline\fP, size_t \fIpos\fP, const char* \fIbuf\fP, size_t \fIlength\fP);
-.br
+Adds character or text to the buffer.
+.TP
 char* \f3remove_text\fP(size_t \fIline\fP, size_t \fIpos\fP, size_t \fIlength\fP);
-.br
+Removes character or text from the buffer.
+.TP
 char* \f3replace_text\fP(size_t \fIline\fP, size_t \fIfrom\fP, size_t \fIend\fP, const char* \fIbuf\fP, size_t \fIlength\fP);
-.br
+Replaces text between ranges.
+.TP
 char* \f3shift_with_tabs\fP(size_t \fIline\fP, size_t \fIpos\fP, int* \fIarr\fP, size_t \fIarr_len\fP);
-.br
+Shifting with tabs to the right using integer array of lines.
+.TP
 char* \f3display_screen_report\fP(const char* \fIdirpath\fP, size_t \fIlength\fP);
-.br
+Displaying screen report of the current working folder.
+.TP
 char* \f3clipboard\fP(enum clipboard_ops \fIops\fP);
-.br
+Clipboard operations are handled according the parameter.
+.TP
 char* \f3duplicate\fP(void);
-.br
+Duplicates the currently selected line under cursor.
+.TP
 char* \f3commentline\fP(void);
-.br
+Adds comment character(s) to the beginning of the line.
+.TP
 char* \f3swaplinesup\fP(void);
-.br
+Moves current line up under the cursor.
+.TP
 char* \f3swaplinesdn\fP(void);
-.PP
-Navigation keys
-.PP
+Moves current line down under the cursor.
+.SS Navigation keys
+Methods return screen output while handling navigation.
+.TP
 char* \f3on_keypress\fP(enum nav_keys \fIkeys\fP, void* \fIis_paging\fP);
-.br
+Handles key presses according to the parameter.
+.TP
 char* \f3on_scroll\fP(enum nav_keys \fIkeys\fP);
-.PP
-File operations
-.PP
+This method is only for UP and DOWN scrolling for mouse inputs.
+.SS File operations
+All file operations have to be handled at the start as they are initializing the library.
+.TP
 char* \f3open_file\fP(const char* \fIfilepath\fP);
-.br
+Opens file providing the file path in the argument.
+.TP
 int \f3new_file\fP(const char* \fIfilename\fP);
-.br
+Creates a new file in the current working directory by providing the name only.
+.TP
 int \f3save_file\fP(void);
-.PP
-LSP client functions
-.PP
+Saves the file currently being opened.
+.SS LSP client functions
+Commands initiated by the user for interaction with the language server.
+.TP
 void \f3lsp_client_hover\fP(struct lsp_hover*);
-.br
+Displays information when hovering the cursor under a text.
+.TP
 void \f3lsp_client_completion\fP(struct lsp_completion*);
-.br
+Provides auto-complete suggestions.
+.TP
 void \f3lsp_client_definition\fP(struct lsp_definition*);
-.br
+Jumps to the definition or declaration under the cursor.
+.TP
 void \f3lsp_client_signature_help\fP(struct lsp_signature_help*);
-.br
+Displays signature information of the current method.
+.TP
 void \f3lsp_client_references\fP(struct lsp_references*);
-.br
+Retrieves the list of references in the working directory.
+.TP
 void \f3lsp_client_prepare_rename\fP(struct lsp_prepare_rename*);
-.br
+Determines if a symbol can be renamed safely before it is being renamed.
+.TP
 void \f3lsp_client_rename\fP(const char* \fInewname\fP, struct lsp_rename*);
-.br
+Renames a symbol under cursor.
+.TP
 void \f3lsp_client_code_action\fP(struct lsp_code_action*);
-.PP
-LSP diagnostics
-.PP
+Returns a list of possible actions for the file being opened.
+.SS LSP diagnostics
+This command has to be issued whenever the user needs diagnostics.
+.TP
 void \f3lsp_diagnostics\fP(struct lsp_publish_diagnostics*);
+Retrieves diagnostics from the currently opened file.
 .SH PARAMETERS
 .TP
 \f2ops\fP
@@ -79,8 +104,12 @@ Specifies the navigation keys pressed such as
 \%\f3DOWN\fP,
 \%\f3LEFT\fP,
 \%\f3RIGHT\fP,
+\%\f3TOP\fP,
+\%\f3BOTTOM\fP,
 \%\f3ENTER\fP,
-etc.
+\%\f3DEL\fP,
+\%\f3TAB\fP,
+\%\f3BACKTAB\fP.
 .SH DESCRIPTION
 Edgo is a library for text editors providing syntax highlighting and language server protocol (LSP).
 It is also providing functionality for text manipulation, search, selection and language queries.
