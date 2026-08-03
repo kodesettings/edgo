@@ -179,6 +179,27 @@ void lsp_client_code_action(struct lsp_code_action* lsp_code_action) {
 		lsp_code_action->items[i] = lsp_code_action_item;
 	}
 }
+
+void lsp_diagnostics(struct lsp_publish_diagnostics* lsp_publish_diagnostics) {
+	// TODO: we only take the first entry here, as we handle only one file
+	// per session. Currently multifile support is implemented in the lsp using
+	// channels, but not in the API session.
+	auto it = lspclient.file2diagnostic.begin();
+
+	diagnosticparams_t diagnosticparams = it->second;
+	lsp_publish_diagnostics->count = diagnosticparams.diagnostics.size();
+	lsp_publish_diagnostics->uri = diagnosticparams.uri.c_str();
+
+	for (int i = 0; i < (int)lsp_publish_diagnostics->count; i++) {
+		struct lsp_diagnostic lsp_diagnostic;
+		diagnostic_t diagnostic = diagnosticparams.diagnostics[i];
+		CONVERT_LSP_RANGE(lsp_diagnostic.range, diagnostic.range);
+		lsp_diagnostic.severity = (lsp_diagnostic_severity)diagnostic.severity;
+		lsp_diagnostic.source = diagnostic.source.c_str();
+		lsp_diagnostic.message = diagnostic.message.c_str();
+		lsp_publish_diagnostics->diagnostics[i] = lsp_diagnostic;
+	}
+}
 #ifdef __cplusplus
 }
 #endif

@@ -7,7 +7,7 @@ Version 0.0.2 - WIP
 == TODO:some user input cursor positions have to be fixed on the undo stack
 == TODO:tree-sitter highlighter breaks on special ascii characters???
 == TODO:debug C API functions
-== TODO:we should return lsp diagnostics beside screen as well
+== TODO:add multifile support for diagnostics??
 
 -------------------------------------------------------------------
 Version 0.0.1 - Modifications done on the original Go repository
