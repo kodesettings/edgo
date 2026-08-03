@@ -88,17 +88,23 @@ int new_file(const char* filename);
 int save_file(void);
 
 //
-// Lsp functions
+// LSP functions
 //
 
-struct lsp_hover lsp_client_hover(void);
-struct lsp_completion lsp_client_completion(void);
-struct lsp_definition lsp_client_definition(void);
-struct lsp_signature_help lsp_client_signature_help(void);
-struct lsp_references lsp_client_references(void);
-struct lsp_prepare_rename lsp_client_prepare_rename(void);
-struct lsp_rename lsp_client_rename(const char* newname);
-struct lsp_code_action lsp_client_code_action(void);
+void lsp_client_hover(struct lsp_hover*);
+void lsp_client_completion(struct lsp_completion*);
+void lsp_client_definition(struct lsp_definition*);
+void lsp_client_signature_help(struct lsp_signature_help*);
+void lsp_client_references(struct lsp_references*);
+void lsp_client_prepare_rename(struct lsp_prepare_rename*);
+void lsp_client_rename(const char* newname, struct lsp_rename*);
+void lsp_client_code_action(struct lsp_code_action*);
+
+//
+// LSP diagnostics
+//
+
+void lsp_diagnostics(struct lsp_publish_diagnostics*);
 #ifdef __cplusplus
 }
 #endif

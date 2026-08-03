@@ -25,7 +25,9 @@ char* \f3commentline\fP(void);
 char* \f3swaplinesup\fP(void);
 .br
 char* \f3swaplinesdn\fP(void);
-.br
+.PP
+Navigation keys
+.PP
 char* \f3on_keypress\fP(enum nav_keys \fIkeys\fP, void* \fIis_paging\fP);
 .br
 char* \f3on_scroll\fP(enum nav_keys \fIkeys\fP);
@@ -38,23 +40,27 @@ int \f3new_file\fP(const char* \fIfilename\fP);
 .br
 int \f3save_file\fP(void);
 .PP
-LSP related functions
+LSP client functions
 .PP
-struct lsp_hover \f3lsp_client_hover\fP(void);
+void \f3lsp_client_hover\fP(struct lsp_hover*);
 .br
-struct lsp_completion \f3lsp_client_completion\fP(void);
+void \f3lsp_client_completion\fP(struct lsp_completion*);
 .br
-struct lsp_definition \f3lsp_client_definition\fP(void);
+void \f3lsp_client_definition\fP(struct lsp_definition*);
 .br
-struct lsp_signature_help \f3lsp_client_signature_help\fP(void);
+void \f3lsp_client_signature_help\fP(struct lsp_signature_help*);
 .br
-struct lsp_references \f3lsp_client_references\fP(void);
+void \f3lsp_client_references\fP(struct lsp_references*);
 .br
-struct lsp_prepare_rename \f3lsp_client_prepare_rename\fP(void);
+void \f3lsp_client_prepare_rename\fP(struct lsp_prepare_rename*);
 .br
-struct lsp_rename \f3lsp_client_rename\fP(const char* \fInewname\fP);
+void \f3lsp_client_rename\fP(const char* \fInewname\fP, struct lsp_rename*);
 .br
-struct lsp_code_action \f3lsp_client_code_action\fP(void);
+void \f3lsp_client_code_action\fP(struct lsp_code_action*);
+.PP
+LSP diagnostics
+.PP
+void \f3lsp_diagnostics\fP(struct lsp_publish_diagnostics*);
 .SH PARAMETERS
 .TP
 \f2ops\fP
