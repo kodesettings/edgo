@@ -140,11 +140,6 @@ struct lsp_hover {
 // Definition
 //
 
-struct lsp_definition_params {
-	struct lsp_text_document_position position;
-	bool include_declaration;
-};
-
 struct lsp_definition {
 	size_t count;
 	struct lsp_location *locations;
@@ -177,11 +172,6 @@ struct lsp_signature_help {
 // References
 //
 
-struct lsp_reference_params {
-	struct lsp_text_document_position position;
-	bool include_declaration;
-};
-
 struct lsp_references {
 	size_t count;
 	struct lsp_location *locations;
@@ -192,10 +182,6 @@ struct lsp_references {
 // Prepare Rename
 //
 
-struct lsp_prepare_rename_params {
-	struct lsp_text_document_position position;
-};
-
 struct lsp_prepare_rename {
 	bool valid;
 	struct lsp_range range;
@@ -205,11 +191,6 @@ struct lsp_prepare_rename {
 //
 // Rename
 //
-
-struct lsp_rename_params {
-	struct lsp_text_document_position position;
-	const char *new_name;
-};
 
 struct lsp_rename_document_change {
 	struct lsp_versioned_text_document_identifier text_document;
@@ -224,19 +205,6 @@ struct lsp_rename {
 //
 // Code Action
 //
-
-struct lsp_code_action_context {
-	size_t diagnostic_count;
-	struct lsp_diagnostic *diagnostics;
-	size_t only_count;
-	const char **only;
-};
-
-struct lsp_code_action_params {
-	struct lsp_text_document_identifier text_document;
-	struct lsp_range range;
-	struct lsp_code_action_context context;
-};
 
 struct lsp_code_action_item {
 	const char *title;
