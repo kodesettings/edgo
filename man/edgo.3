@@ -5,7 +5,7 @@ edgo \- text editor library with native lsp support
 .B #include <edgo.h>
 .SH MODULE OVERVIEW
 .SS Screen printing functions
-Functions that are manipulating the text buffer while printing the screen content as a return value.
+Functions that are manipulating the text buffer while printing the screen content.
 .TP
 char* \f3add_text\fP(size_t \fIline\fP, size_t \fIpos\fP, const char* \fIbuf\fP, size_t \fIlength\fP);
 Adds character or text to the buffer.
@@ -37,15 +37,15 @@ Moves current line up under the cursor.
 char* \f3swaplinesdn\fP(void);
 Moves current line down under the cursor.
 .SS Navigation keys
-Methods return screen output while handling navigation.
+Navigation handler functions are also printing screen content.
 .TP
 char* \f3on_keypress\fP(enum nav_keys \fIkeys\fP, void* \fIis_paging\fP);
 Handles key presses according to the parameter.
 .TP
 char* \f3on_scroll\fP(enum nav_keys \fIkeys\fP);
-This method is only for UP and DOWN scrolling for mouse inputs.
+This is only for UP and DOWN scrolling for mouse inputs.
 .SS File operations
-All file operations have to be handled at the start as they are initializing the library.
+File operations have to be invoked at the start for initializing the library.
 .TP
 char* \f3open_file\fP(const char* \fIfilepath\fP);
 Opens file providing the file path in the argument.
@@ -82,7 +82,7 @@ Renames a symbol under cursor.
 void \f3lsp_client_code_action\fP(struct lsp_code_action*);
 Returns a list of possible actions for the file being opened.
 .SS LSP diagnostics
-This command has to be issued whenever the user needs diagnostics.
+This function can be called whenever the user needs diagnostics.
 .TP
 void \f3lsp_diagnostics\fP(struct lsp_publish_diagnostics*);
 Retrieves diagnostics from the currently opened file.
@@ -104,12 +104,8 @@ Specifies the navigation keys pressed such as
 \%\f3DOWN\fP,
 \%\f3LEFT\fP,
 \%\f3RIGHT\fP,
-\%\f3TOP\fP,
-\%\f3BOTTOM\fP,
 \%\f3ENTER\fP,
-\%\f3DEL\fP,
-\%\f3TAB\fP,
-\%\f3BACKTAB\fP.
+etc.
 .SH DESCRIPTION
 Edgo is a library for text editors providing syntax highlighting and language server protocol (LSP).
 It is also providing functionality for text manipulation, search, selection and language queries.
