@@ -6,8 +6,8 @@ Version 0.0.2 - WIP
 == complete refactor and rewrite in cpp as a library module
 == TODO:some user input cursor positions have to be fixed on the undo stack
 == TODO:tree-sitter highlighter breaks on special ascii characters???
-== TODO:add missing lsp function calls into C API
 == TODO:debug C API functions
+== TODO:we should return lsp diagnostics beside screen as well
 
 -------------------------------------------------------------------
 Version 0.0.1 - Modifications done on the original Go repository

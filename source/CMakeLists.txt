@@ -51,10 +51,9 @@ add_library(edgo SHARED
 	"io.cpp"
 	"keyboard.cpp"
 
-# interface register
-	"../include/edgo.h"
-	"../include/lsp.h"
+# interface registers
 	"intfreg.cpp"
+	"lsp.cpp"
 )
 
 # test case files

@@ -772,19 +772,8 @@ typedef struct {
 } didsaverequest_t;
 
 typedef struct {
-	position_t start;
-	position_t end;
-
-	template <class Archive>
-	void serialize(Archive& ar) {
-		ar & CEREAL_NVP(start);
-		ar & CEREAL_NVP(end);
-	}
-} span_t;
-
-typedef struct {
 	string_t uri;
-	span_t   range;
+	range_t  range;
 
 	template <class Archive>
 	void serialize(Archive& ar) {

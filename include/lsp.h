@@ -113,10 +113,10 @@ struct lsp_completion_item {
 	const char *detail;
 	const char *documentation;
 	const char *insert_text;
-	struct lsp_text_edit *text_edit;
+	struct lsp_text_edit text_edit;
 };
 
-struct lsp_completion_list {
+struct lsp_completion {
 	bool is_incomplete;
 	size_t count;
 	struct lsp_completion_item *items;
@@ -132,9 +132,8 @@ struct lsp_marked_string {
 };
 
 struct lsp_hover {
-	size_t count;
-	struct lsp_marked_string *contents;
-	struct lsp_range *range;
+	struct lsp_marked_string contents;
+	struct lsp_range range;
 };
 
 //
@@ -143,6 +142,7 @@ struct lsp_hover {
 
 struct lsp_definition_params {
 	struct lsp_text_document_position position;
+	bool include_declaration;
 };
 
 struct lsp_definition {
@@ -211,8 +211,14 @@ struct lsp_rename_params {
 	const char *new_name;
 };
 
-struct lsp_rename {
+struct lsp_rename_document_change {
+	struct lsp_versioned_text_document_identifier text_document;
 	struct lsp_workspace_edit edit;
+};
+
+struct lsp_rename {
+	size_t document_change_count;
+	struct lsp_rename_document_change *document_changes;
 };
 
 //
@@ -232,17 +238,16 @@ struct lsp_code_action_params {
 	struct lsp_code_action_context context;
 };
 
-struct lsp_code_action {
+struct lsp_code_action_item {
 	const char *title;
 	const char *kind;
 	bool is_preferred;
 	size_t diagnostic_count;
 	struct lsp_diagnostic *diagnostics;
-	struct lsp_workspace_edit *edit;
-	struct lsp_command *command;
+	struct lsp_workspace_edit edit;
 };
 
-struct lsp_code_actions {
-	size_t count;
-	struct lsp_code_action *items;
+struct lsp_code_action {
+	size_t code_action_count;
+	struct lsp_code_action_item *items;
 };
