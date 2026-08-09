@@ -65,6 +65,14 @@ uint32_t GetColor(char ch, int col, int row, uint32_t *bytesCounter) {
 	return style;
 }
 
+void SetTerminalDims(int *rows, int *cols) {
+	struct winsize size;
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
+	*rows = size.ws_row;
+	*cols = size.ws_col;
+	LOG(INFO) << "refresh terminal dimensions " << *cols << "x" << *rows;
+}
+
 void SetFileAttributes(const std::string &file, std::string *content, bool isOpen) {
 	char currentdir[PATH_MAX];
 	getcwd(currentdir, sizeof(currentdir));
@@ -94,7 +102,10 @@ bool HandleFile(const std::string &filepath, bool isOpen) {
 	std::string log_text = isOpen ? "open file:" : "new file:";
 	LOG(INFO) << log_text << e.absoluteFilePath;
 
+
+	// Set language and content
 	e.lang = DetectLang(e.absoluteFilePath);
+	e.code = rope<char>(content.c_str());
 	switch (e.lang.name.empty()) {
 	case true:
 		LOG(INFO) << "unknown language";
@@ -106,6 +117,7 @@ bool HandleFile(const std::string &filepath, bool isOpen) {
 		lang_t lsp = config.langs[e.lang.name];
 		StartLspClient(lsp.cmd, lsp.lsp);
 		InitLspClient(e.cwd);
+		SetTerminalDims(&e.ROWS, &e.COLUMNS);
 		SetLang(e.lang.lang);
 		Parse(content);
 		SetTheme(e.config.theme);

@@ -23,7 +23,7 @@
 // io helper methods
 
 std::string ReadFileToString(const std::string &filepath) { 
-	std::ifstream file(filepath, std::ios_base::in);
+	std::ifstream file(filepath, std::ios::in);
 	std::string str, fcontent;
 
 	while (std::getline(file, str)) {
@@ -35,7 +35,7 @@ std::string ReadFileToString(const std::string &filepath) {
 }
 
 bool SaveToFile(const std::string &filepath, const std::string &content) {
-	std::ofstream file(filepath, std::ios::app);
+	std::ofstream file(filepath, std::ios::out);
 
 	if (!file.is_open()) {
 		return false;
@@ -50,41 +50,41 @@ bool SaveToFile(const std::string &filepath, const std::string &content) {
 // screen helper methods
 
 line_v __build_line_vec(const std::string &data, int lineNum, bool colorize) {
-	line_v lines = line_v(lineNum);
-	int row = 0;
+	std::string line;
 	uint32_t bytesCounter = 0, style = 0;
+	line_v lines;
+
 	for (auto b : data) {
 		if (b == '\n') {
-			row++;
-			continue;
-		} else if (row == lineNum) {
+			lines.push_back(line_t{line});
+			line.erase();
+		} else if (lineNum == (int)lines.size()) {
 			break;
 		} else {
-			if (colorize) {
-				std::string str;
-				style = GetColor(b, e.col, e.row, &bytesCounter);
-				ColorizeTextChunk(style, &str);
-				lines[row].buf.append(str);
-			} else {
-				lines[row].buf.append(&b);
-			}
+			std::string str;
+			style = GetColor(b, e.col, e.row, &bytesCounter);
+			ColorizeTextChunk(style, &str);
+			line.append(colorize ? str : std::string(1, b));
 		}
 	}
+
 	return lines;
 }
 
 char* __export_screen(const std::string &s, const int offset) {
 	line_v lines = __build_line_vec(s, -1, true);
-	int index = offset;
 	std::stringstream ss;
-nxl:
-	ss << lines[index].buf << "\n";
 
-	if (index < (int)lines.size() && index < offset + e.ROWS) {
-		index++;
-		goto nxl;
+	for (int index = offset;
+		index < (int)lines.size() && index < offset + e.ROWS;
+		index++) {
+		ss << lines[index].buf << "\n";
 	}
-	return ss.str().data();
+
+	std::string out = ss.str();
+	static char output[256000];
+	strcpy(output, out.c_str());
+	return output;
 }
 
 // ------------------------------------------------------------------
