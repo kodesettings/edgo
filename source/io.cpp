@@ -22,7 +22,7 @@
 void UpdateLsp(const std::string &text, bool isOpen) {
 	if (!lspclient.isReady) return;
 
-	if (isOpen) {
+	if (!isOpen) {
 		e.lspver[e.absoluteFilePath]++;
 		auto version = e.lspver[e.absoluteFilePath];
 		DidChange(e.absoluteFilePath, text, version);
@@ -95,20 +95,18 @@ bool HandleFile(const std::string &filepath, bool isOpen) {
 	LOG(INFO) << log_text << e.absoluteFilePath;
 
 	e.lang = DetectLang(e.absoluteFilePath);
-	switch (e.lang.empty()) {
+	switch (e.lang.name.empty()) {
 	case true:
 		LOG(INFO) << "unknown language";
 		return false;
 	break;
 	case false:
-		LOG(INFO) << "new language is " << e.lang;
+		LOG(INFO) << "new language is " << e.lang.name;
 		config_t config = GetConfig();
-		lang_t lsp = config.langs[e.lang];
+		lang_t lsp = config.langs[e.lang.name];
 		StartLspClient(lsp.cmd, lsp.lsp);
 		InitLspClient(e.cwd);
-
-		// TODO: set language:
-		// SetLang(JAVASCRIPT);
+		SetLang(e.lang.lang);
 		Parse(content);
 		SetTheme(e.config.theme);
 	break;

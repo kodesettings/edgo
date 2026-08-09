@@ -47,7 +47,7 @@ typedef struct editor_t {
 
 	line_v lines;                       // Lines of text characters
 
-	std::string lang;                   // current file language
+	langsbyname_t lang;                 // current file language
 	config_t config;                    // config, lsp, tabs, comments, etc
 	lang_t langConf;                    // current lang conf
 	int langTabWidth;                   // current lang tabs indentation  '\t' -> "    "

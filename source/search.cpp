@@ -153,9 +153,9 @@ void LangCount(linescountresult_v files, langlinescountresult_v *results) {
 
 	for (auto lcresult : files) {
 		auto lang = DetectLang(lcresult.file);
-		linescountresults[lang] += lcresult.count;
-		emptylinescountresults[lang] += lcresult.emptycount;
-		filescountresults[lang]++;
+		linescountresults[lang.name] += lcresult.count;
+		emptylinescountresults[lang.name] += lcresult.emptycount;
+		filescountresults[lang.name]++;
 	}
 
 	// adding all the results

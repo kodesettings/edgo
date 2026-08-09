@@ -83,4 +83,31 @@ static std::string MatchTestQueryLang(enum languages &lang) {
 	return tests[lang];
 }
 
+typedef struct {
+	enum languages lang;
+	std::string name;
+} langsbyname_t;
+
+static std::map<std::string, langsbyname_t> extensions = {
+	{".js",   langsbyname_t{.lang = JAVASCRIPT, .name = "javascript"}},
+	{".ts",   langsbyname_t{.lang = TYPESCRIPT, .name = "typescript"}},
+	{".py",   langsbyname_t{.lang = PYTHON, .name = "python"}},
+	{".rs",   langsbyname_t{.lang = RUST, .name = "rust"}},
+	{".go",   langsbyname_t{.lang = GO, .name = "go"}},
+	{".c",    langsbyname_t{.lang = C, .name = "c"}},
+	{".h",    langsbyname_t{.lang = C, .name = "c"}},
+	{".cpp",  langsbyname_t{.lang = CPP, .name = "cpp"}},
+	{".hpp",  langsbyname_t{.lang = CPP, .name = "cpp"}},
+	{".cxx",  langsbyname_t{.lang = CPP, .name = "cpp"}},
+	{".c++",  langsbyname_t{.lang = CPP, .name = "cpp"}},
+	{".css",  langsbyname_t{.lang = CSS, .name = "css"}},
+	{".html", langsbyname_t{.lang = HTML, .name = "html"}},
+	{".java", langsbyname_t{.lang = JAVA, .name = "java"}},
+	{".sh",   langsbyname_t{.lang = BASH, .name = "bash"}},
+};
+
+static langsbyname_t MatchExtension(const std::string &ext) {
+	return extensions[ext];
+}
+
 #endif // _LANGS_H_

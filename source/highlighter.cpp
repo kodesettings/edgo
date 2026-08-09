@@ -17,10 +17,16 @@
 
 #include "highlighter.h"
 #include "logging.h"
+#include "editor.h"
 
 treesitterhighlighter_t h;
 
-std::string DetectLang(const std::string &filepath) { return ""; /* get language name */ }
+langsbyname_t DetectLang(const std::string &filepath) {
+	boost::filesystem::path p(filepath);
+	auto ext = p.extension().string();
+	return MatchExtension(ext);
+}
+
 void SetTheme(const std::string &themepath) {/* setting theme if needed */ }
 
 void GetSitterLang(enum languages lang, bool *parsed) {
