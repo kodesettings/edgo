@@ -61,18 +61,23 @@ line_v __build_line_vec(const std::string &data, int lineNum, bool colorize) {
 		} else if (lineNum == (int)lines.size()) {
 			break;
 		} else {
-			std::string str;
-			style = GetColor(b, e.col, e.row, &bytesCounter);
-			ColorizeTextChunk(style, &str);
-			line.append(colorize ? str : std::string(1, b));
+			if (colorize) {
+				std::string str;
+				style = GetColor(b, e.col, e.row, &bytesCounter);
+				ColorizeTextChunk(style, &str);
+				line.append(str);
+			} else {
+				line.append(std::string(1, b));
+			}
 		}
 	}
 
+	lines.push_back(line_t{line}); // add last line
 	return lines;
 }
 
 char* __export_screen(const std::string &s, const int offset) {
-	line_v lines = __build_line_vec(s, -1, true);
+	line_v lines = __build_line_vec(s, -1, false);
 	std::stringstream ss;
 
 	for (int index = offset;
