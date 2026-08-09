@@ -72,7 +72,9 @@ line_v __build_line_vec(const std::string &data, int lineNum, bool colorize) {
 		}
 	}
 
-	lines.push_back(line_t{line}); // add last line
+	if (!line.empty())
+		lines.push_back(line_t{line}); // add last line
+
 	return lines;
 }
 
@@ -86,7 +88,7 @@ char* __export_screen(const std::string &s, const int offset) {
 		ss << lines[index].buf << "\n";
 	}
 
-	std::string out = ss.str();
+	const std::string out = ss.str();
 	static char output[256000];
 	strcpy(output, out.c_str());
 	return output;
