@@ -77,13 +77,13 @@ void InitLspClient(const std::string &dir) {
 	lspclient.isReady = true;
 }
 
-void DidOpen(const std::string &file, std::string *text) {
+void DidOpen(const std::string &file, const std::string &text) {
 	auto didOpenRequest = didopenrequest_t {
 		jsonrpc: "2.0", method: "textDocument/didOpen",
 		params: didopentextdocumentparams_t {
 			textDocument: textdocument_t {
 				languageId: lspclient.lang,
-				text: *text,
+				text: text,
 				uri: "file://" + file,
 				version: 1,
 			},
@@ -93,7 +93,7 @@ void DidOpen(const std::string &file, std::string *text) {
 	send<didopenrequest_t>(didOpenRequest, false);
 }
 
-void DidChange(const std::string &file, std::string *text, int version) {
+void DidChange(const std::string &file, const std::string &text, int version) {
 	auto didChangeRequest = didchangerequest_t {
 		jsonrpc: "2.0", method: "textDocument/didChange",
 		params: didchangetextdocumentparams_t {
@@ -102,7 +102,7 @@ void DidChange(const std::string &file, std::string *text, int version) {
 //					start: position_t{line: spl, character: spc},
 //					end: position_t{line: epl, character: epc},
 //				},
-				text: *text,
+				text: text,
 			}},
 			textDocument: versionedtextdocumentidentifier_t {
 				uri: "file://" + file,

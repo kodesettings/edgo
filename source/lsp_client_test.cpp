@@ -37,7 +37,7 @@ protected:
 		content = ReadFileToString(filepath);
 
 		// accessing didOpen event
-		DidOpen(filepath, &content);
+		DidOpen(filepath, content);
 	}
     static void TearDownTestSuite() { lspclient.isReady = false; }
 public:
@@ -60,7 +60,7 @@ TEST_F(LspTest, TestLspClientHover) {
 	hoverresponse_t response = Hover(filepath, 40-1, 8);
 	EXPECT_NE(response.jsonrpc, "");
 
-	auto expected = "void DidOpen(const std::string &file, std::string *text)";
+	auto expected = "void DidOpen(const std::string &file, const std::string &text)";
 	auto got = response.result.contents.value;
 	EXPECT_NE(got.find(expected), std::string::npos);
 }
@@ -92,7 +92,7 @@ TEST_F(LspTest, TestLspClientSignatureHelp) {
 	signaturehelpresponse_t response = SignatureHelp(filepath, 40-1, 12);
 	EXPECT_NE(response.jsonrpc, "");
 
-	auto expected = "DidOpen(const std::string &file, std::string *text) -> void";
+	auto expected = "DidOpen(const std::string &file, const std::string &text) -> void";
 	EXPECT_EQ(response.result.signatures.size(), 1);
 
 	if (!response.result.signatures.empty()) {

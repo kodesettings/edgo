@@ -20,7 +20,6 @@
 #include "utils.h"
 #include "highlighter.h"
 
-// initialize global editor variable
 editor_t e;
 
 void AddCharacter(char ch) {
@@ -37,7 +36,7 @@ void AddCharacter(char ch) {
 	}
 
 	if (e.isContentChanged) {
-		UpdateLsp(false, e.code_str());
+		UpdateLsp(e.code_str(), false);
 		FindTests();
 	}
 }

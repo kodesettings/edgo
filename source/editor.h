@@ -112,11 +112,11 @@ void OnSwapLinesUp(void);
 void OnSwapLinesDown(void);
 
 // io routines
-void UpdateLsp(bool isOpen, std::string text);
+void UpdateLsp(const std::string &text, bool isOpen);
 void FindTests(void);
 uint32_t GetColor(char ch, int col, int row, uint32_t *bytesCounter);
-void SetFileAttributes(const std::string &file, std::string *content, bool isopen);
-bool HandleFile(const std::string &filepath, bool isopen);
+void SetFileAttributes(const std::string &file, std::string *content, bool isOpen);
+bool HandleFile(const std::string &filepath, bool isOpen);
 bool SaveFile(void);
 
 // keyboard routines

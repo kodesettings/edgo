@@ -181,7 +181,7 @@ void OnEnter(void) {
 	}
 
 	Focus();
-	UpdateLsp(false, e.code_str());
+	UpdateLsp(e.code_str(), false);
 	FindTests();
 }
 
@@ -202,7 +202,7 @@ void OnDelete(void) {
 		e.redo.clear();
 
 	Focus();
-	UpdateLsp(false, e.code_str());
+	UpdateLsp(e.code_str(), false);
 	FindTests();
 }
 
@@ -220,7 +220,7 @@ void OnTab(void) {
 		e.redo.clear();
 
 	Focus();
-	UpdateLsp(false, e.code_str());
+	UpdateLsp(e.code_str(), false);
 	FindTests();
 }
 
@@ -248,6 +248,6 @@ void OnBackTab(void) {
 		e.redo.clear();
 
 	Focus();
-	UpdateLsp(false, e.code_str());
+	UpdateLsp(e.code_str(), false);
 	FindTests();
 }

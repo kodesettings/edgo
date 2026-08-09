@@ -19,16 +19,16 @@
 #include "query.h"
 #include "highlighter.h"
 
-void UpdateLsp(bool isOpen, std::string text) {
+void UpdateLsp(const std::string &text, bool isOpen) {
 	if (!lspclient.isReady) return;
 
 	if (isOpen) {
 		e.lspver[e.absoluteFilePath]++;
 		auto version = e.lspver[e.absoluteFilePath];
-		DidChange(e.absoluteFilePath, &text, version);
+		DidChange(e.absoluteFilePath, text, version);
 	} else {
 		e.lspver[e.absoluteFilePath] = 1;
-		DidOpen(e.absoluteFilePath, &text);
+		DidOpen(e.absoluteFilePath, text);
 	}
 }
 
@@ -65,15 +65,15 @@ uint32_t GetColor(char ch, int col, int row, uint32_t *bytesCounter) {
 	return style;
 }
 
-void SetFileAttributes(const std::string &file, std::string *content, bool isopen) {
+void SetFileAttributes(const std::string &file, std::string *content, bool isOpen) {
 	char currentdir[PATH_MAX];
 	getcwd(currentdir, sizeof(currentdir));
 	e.cwd = currentdir;
 
-	if (isopen) {
+	if (isOpen) {
 		boost::filesystem::path p(file);
 		e.filename = p.filename().string();
-		e.absoluteFilePath = p.parent_path().string();;
+		e.absoluteFilePath = p.string();
 		*content = ReadFileToString(e.absoluteFilePath);
 	} else {
 		std::string absFilePath;
@@ -88,10 +88,10 @@ void SetFileAttributes(const std::string &file, std::string *content, bool isope
 	}
 }
 
-bool HandleFile(const std::string &filepath, bool isopen) {
+bool HandleFile(const std::string &filepath, bool isOpen) {
 	std::string content;
-	SetFileAttributes(filepath, &content, isopen);
-	std::string log_text = isopen ? "open file:" : "new file:";
+	SetFileAttributes(filepath, &content, isOpen);
+	std::string log_text = isOpen ? "open file:" : "new file:";
 	LOG(INFO) << log_text << e.absoluteFilePath;
 
 	e.lang = DetectLang(e.absoluteFilePath);
@@ -115,7 +115,7 @@ bool HandleFile(const std::string &filepath, bool isopen) {
 	}
 
 	// Opening file for LSP
-	UpdateLsp(true, e.code_str());
+	UpdateLsp(e.code_str(), true);
 	FindTests();
 	return true;
 }
@@ -126,7 +126,7 @@ bool SaveFile(void) {
 		return false;
 	}
 
-	UpdateLsp(false, e.code_str());
+	UpdateLsp(e.code_str(), false);
 	FindTests();
 	return true;
 }

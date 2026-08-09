@@ -169,8 +169,8 @@ renameresponse_t Rename(std::string file, std::string newname, int line, int cha
 codeactionresponse_t CodeAction(std::string file, int spc, int spl, int epc, int epl);
 
 // basic lsp file events
-void DidOpen(const std::string &file, std::string *text);
-void DidChange(const std::string &file, std::string *text, int version);
+void DidOpen(const std::string &file, const std::string &text);
+void DidChange(const std::string &file, const std::string &text, int version);
 void DidClose(const std::string &file);
 
 #endif // _LSP_CLIENT_H_

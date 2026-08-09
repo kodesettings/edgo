@@ -47,7 +47,7 @@ void OnCommentLine(void) {
 	InsertTextEdit(e.code_str(), offset, e.langConf.comment.size());
 	e.undo.push_back({operation_t{INSERT, e.langConf.comment, offset, cursormove_t{e.row, 0}}});
 exit:
-	UpdateLsp(false, e.code_str());
+	UpdateLsp(e.code_str(), false);
 	FindTests();
 }
 
@@ -76,7 +76,7 @@ void OnSwapLinesUp(void) {
 	});
 
 	e.row--;
-	UpdateLsp(false, e.code_str());
+	UpdateLsp(e.code_str(), false);
 	FindTests();
 }
 
@@ -108,6 +108,6 @@ void OnSwapLinesDown(void) {
 	});
 
 	e.row++;
-	UpdateLsp(false, e.code_str());
+	UpdateLsp(e.code_str(), false);
 	FindTests();
 }
