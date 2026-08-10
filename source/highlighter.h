@@ -50,16 +50,32 @@ typedef struct {
 	std::string           themepath;
 } treesitterhighlighter_t;
 
-/* memory variable for treesitterhighlighter_t */
 extern treesitterhighlighter_t h;
 
-/* some hard coded colors */
+// Hardcoded colors that are fixed in style
 #define SELECTIONCOLOR 246 // gray
 #define HIGHLIGHTCOLOR 238 // gray
 #define OVERLAYCOLOR -1 // transparent
 #define ACCENTCOLOR 303 // pink
 #define ACCENTCOLOR2 = 30 // aqua
 #define ACCENTCOLOR3 -1 // aqua
+
+using colormap = std::map<std::string, std::string>;
+
+//
+// This is the theme map that is matching config parameters
+// with the provided theme maps in themes.h file.
+//
+// If you add any new theme into themes.h, they have
+// to be added here as well.
+//
+static std::map<std::string, colormap> themes = {
+	{"darcula", THEME_DARCULA},
+	{"edgo-new", THEME_EDGO_NEW},
+	{"edgo", THEME_EDGO},
+	{"material-darker", THEME_MATERIAL_DARKER},
+	{"vesper", THEME_VESPER}
+};
 
 inline treesitterhighlighter_t NewTreeSitter(void) {
 	auto parser = ts_parser_new();
@@ -82,7 +98,7 @@ inline uint32_t GetColorCode(std::string colorcode) {
 }
 
 langsbyname_t DetectLang(const std::string &filepath);
-void SetTheme(const std::string &themepath);
+void SetTheme(const std::string &theme);
 void GetSitterLang(enum languages lang, bool *parsed);
 void SetLang(enum languages lang);
 void InsertTextEdit(const std::string &code, int offset, int length);
@@ -125,7 +141,6 @@ typedef struct {
 	uint32_t         current;
 } path_t;
 
-/* memory variable for tree sitter path_t */
 extern path_t p;
 
 //--------------------------------------------------------------------------------

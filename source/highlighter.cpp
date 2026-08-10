@@ -27,7 +27,9 @@ langsbyname_t DetectLang(const std::string &filepath) {
 	return MatchExtension(ext);
 }
 
-void SetTheme(const std::string &themepath) {/* setting theme if needed */ }
+void SetTheme(const std::string &theme) {
+	h.colorsmap = themes[theme];
+}
 
 void GetSitterLang(enum languages lang, bool *parsed) {
 	switch (lang) {
