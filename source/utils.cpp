@@ -50,12 +50,14 @@ bool SaveToFile(const std::string &filepath, const std::string &content) {
 // screen helper methods
 
 line_v __build_line_vec(const std::string &data, int lineNum, bool colorize) {
+	colorindexer_t indexer;
 	line_v lines;
 	std::string line;
 
-	colorindexer_t indexer;
-	indexer.ranges = ColorRanges(e.y, e.y + e.TERMINAL_HEIGHT);
-	indexer.counter = 0;
+	if (colorize) {
+		indexer.ranges = ColorRanges(e.y, e.y + e.TERMINAL_HEIGHT);
+		indexer.counter = 0;
+	}
 
 	for (auto b : data) {
 		if (b == '\n') {
