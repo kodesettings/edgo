@@ -39,13 +39,11 @@ void FindTests(void) {
 	TestFinder(e.absoluteFilePath, &e.tests);
 }
 
-uint32_t GetColor(char ch, int col, int row, uint32_t *bytesCounter) {
-	coloredbyterange_v coloredByteRanges;
-	coloredByteRanges = ColorRanges(e.y, e.y + e.TERMINAL_HEIGHT);
-	uint32_t style;
+int GetColor(char ch, int col, int row, colorindexer_t *indexer) {
+	int style;
 
-	for (auto i : coloredByteRanges) {
-		if (i.startbyte <= *bytesCounter && *bytesCounter < i.endbyte) {
+	for (auto i : indexer->ranges) {
+		if (i.startbyte <= indexer->counter && indexer->counter < i.endbyte) {
 			style = i.color;
 			break;
 		}
@@ -56,13 +54,27 @@ uint32_t GetColor(char ch, int col, int row, uint32_t *bytesCounter) {
 	}
 
 	if (ch == '\t' && e.x == 0) { // draw big cursor for tab
-		if (row == e.row && col == e.col) {
-			style = ACCENTCOLOR;
-		}
+		style = ACCENTCOLOR;
 	}
 
-	bytesCounter += sizeof(ch);
+	indexer->counter += sizeof(ch);
 	return style;
+}
+
+void Colorize(char b, std::string *line, bool colorize, colorindexer_t *indexer) {
+	std::string str;
+	int style;
+
+	if (colorize) {
+		style = GetColor(b, e.col, e.row, indexer);
+		if (style == 0) goto nocolor;
+		str = std::string(1, b);
+		ColorizeTextChunk(style, &str);
+		line->append(str);
+	} else {
+nocolor:
+		line->append(std::string(1, b));
+	}
 }
 
 void SetTerminalDims(int *rows, int *cols) {
@@ -105,6 +117,7 @@ bool HandleFile(const std::string &filepath, bool isOpen) {
 
 	// Set language and content
 	e.lang = DetectLang(e.absoluteFilePath);
+	e.config = GetConfig();
 	e.code = rope<char>(content.c_str());
 	switch (e.lang.name.empty()) {
 	case true:

@@ -50,26 +50,22 @@ bool SaveToFile(const std::string &filepath, const std::string &content) {
 // screen helper methods
 
 line_v __build_line_vec(const std::string &data, int lineNum, bool colorize) {
-	std::string line;
-	uint32_t bytesCounter = 0, style = 0;
 	line_v lines;
+	std::string line;
+
+	colorindexer_t indexer;
+	indexer.ranges = ColorRanges(e.y, e.y + e.TERMINAL_HEIGHT);
+	indexer.counter = 0;
 
 	for (auto b : data) {
 		if (b == '\n') {
 			lines.push_back(line_t{line});
 			line.erase();
+			indexer.counter++;
 		} else if (lineNum == (int)lines.size()) {
 			break;
 		} else {
-			if (colorize) {
-				std::string str;
-				style = GetColor(b, e.col, e.row, &bytesCounter);
-				str = std::string(1, b);
-				ColorizeTextChunk(style, &str);
-				line.append(str);
-			} else {
-				line.append(std::string(1, b));
-			}
+			Colorize(b, &line, colorize, &indexer);
 		}
 	}
 
@@ -162,10 +158,7 @@ void ColorizeTextChunk(uint32_t color, std::string *str) {
 	int r, g, b;
 	std::stringstream ss;
 
-	r = (color >> 16) & 0xFF;
-	g = (color >> 8) & 0xFF;
-	b = color & 0xFF;
-
+	ColorToRGB(color, &r, &g, &b);
 	ss << "\033[38;2;" << r << ";" << g << ";" << b << "m" << *str << "\033[0m";
 	*str = ss.str();
 }

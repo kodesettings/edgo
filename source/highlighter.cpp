@@ -128,10 +128,11 @@ coloredbyterange_v ColorRanges(const int from, const int to) {
 			auto split = name_str.substr(0, name_str.find("."));
 			auto color = h.colorsmap[split];
 
-			if (name_str.find("injection")) {
+			if (name_str.find("injection") != std::string::npos) {
 				// We don't colorize embedded content for different languages in the editor.
 				// Only languages that can be identified for the entire source are colorized.
-				// This usually means markdown or html files or any documentation related content.
+				// This usually means that markdown, html files or any documentation related
+				// content that contains multiple languages aren't colorized separately.
 				continue;
 			}
 

@@ -97,6 +97,12 @@ inline uint32_t GetColorCode(std::string colorcode) {
 	return std::strtol(str, NULL, 16); // converting hex to int
 }
 
+inline void ColorToRGB(uint32_t color, int *r, int *g, int *b) {
+	*r = (color >> 16) & 0xFF;
+	*g = (color >> 8) & 0xFF;
+	*b = color & 0xFF;
+}
+
 langsbyname_t DetectLang(const std::string &filepath);
 void SetTheme(const std::string &theme);
 void GetSitterLang(enum languages lang, bool *parsed);
@@ -111,6 +117,11 @@ void Parse(const std::string &code);
 
 typedef std::vector<coloredbyterange_t> coloredbyterange_v;
 coloredbyterange_v ColorRanges(const int from, const int to);
+
+typedef struct {
+	coloredbyterange_v ranges;
+	uint32_t counter;
+} colorindexer_t;
 
 //--------------------------------------------------------------------------------
 // treesitterhighlighter_t getters
