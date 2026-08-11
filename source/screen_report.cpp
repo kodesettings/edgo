@@ -22,7 +22,7 @@
 #include <iomanip>
 
 #define LONG_W std::setw(20)
-#define SHORT_W std::setw(5)
+#define SHORT_W std::setw(10)
 
 std::string OnLangLinesCount(const std::string &dirpath) {
 	int fpc, tlc;

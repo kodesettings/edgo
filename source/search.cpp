@@ -22,20 +22,26 @@
 searchresult_v Search(const line_v lines, const std::string &pattern) {
 	searchresult_v results;
 
-	if (pattern.empty() || lines.empty()) { return results; }
+	if (pattern.empty() || lines.empty()) {
+		return results;
+	}
 
 	for (int i = 0; i < (int)lines.size(); i++) {
 		int from = 0;
 		auto line = lines[i].buf;
+
 		for (;;) {
 			int pos = line.substr(from).find(pattern);
-			if (pos == (int)std::string::npos) { break; } else {
+			if (pos == (int)std::string::npos) {
+				break;
+			} else {
 				pos = from + pos;
 				results.push_back(searchresult_t{i, pos});
 				from = pos + 1;
 			}
 		}
 	}
+
 	return results;
 }
 
@@ -46,6 +52,7 @@ searchresult_v SearchOnFile(const std::string &filename, const std::string &patt
 
 	*lineindex = 1;
 	std::string line;
+
 	while (std::getline(file, line)) {
 		int pos = line.find(pattern);
 		if (pos != (int)std::string::npos) {
@@ -135,6 +142,7 @@ linescountresult_v LinesCountOnDir(const std::string &dir, int *filesprocessedco
 	if (ec) { return linescountresult_v{}; }
 	linescountresult_v results;
 
+	*totallinescount = 0;
 	for (auto file : files) {
 		int lines;
 		int emptylines;
