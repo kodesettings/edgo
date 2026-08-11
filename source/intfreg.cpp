@@ -67,7 +67,7 @@ char* display_screen_report(const char* dirpath, size_t length) {
 	}
 
 	std::string report = OnLangLinesCount(dirpath);
-	return __export_screen(report, 0);
+	return __export_screen(report, 0, false);
 }
 
 char* clipboard(enum clipboard_ops ops) {

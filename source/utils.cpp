@@ -77,8 +77,8 @@ line_v __build_line_vec(const std::string &data, int lineNum, bool colorize) {
 	return lines;
 }
 
-char* __export_screen(const std::string &s, const int offset) {
-	line_v lines = __build_line_vec(s, -1, true);
+char* __export_screen(const std::string &s, int offset, bool colorize) {
+	line_v lines = __build_line_vec(s, -1, colorize);
 	std::stringstream ss;
 
 	for (int index = offset;
@@ -87,9 +87,9 @@ char* __export_screen(const std::string &s, const int offset) {
 		ss << lines[index].buf << "\n";
 	}
 
-	const std::string out = ss.str();
-	static char output[256000];
-	strcpy(output, out.c_str());
+	memset(output, 0, sizeof(output));
+	strcpy(output, ss.str().c_str());
+
 	return output;
 }
 

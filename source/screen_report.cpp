@@ -20,29 +20,40 @@
 #include "screen_logo.h"
 
 #include <iomanip>
-using namespace std;
 
-string OnLangLinesCount(const string &dirpath) {
-	int filesprocessedcount, totallinescount;
+#define LONG_W std::setw(20)
+#define SHORT_W std::setw(5)
+
+std::string OnLangLinesCount(const std::string &dirpath) {
+	int fpc, tlc;
 
 	// fetch all the files for the provided directory path
-	auto files = LinesCountOnDir(dirpath, &filesprocessedcount, &totallinescount);
+	auto files = LinesCountOnDir(dirpath, &fpc, &tlc);
 
 	langlinescountresult_v results;
 
 	// extract the all the filesystem data for each languages
 	LangCount(files, &results);
 
-	stringstream report;
-	report << setw(10) << "Language Lines Report" << endl;
-	report << setw(10) << "Total Files : " << setw(5) << filesprocessedcount << endl;
-	report << setw(10) << "Total Rows  : " << setw(5) << totallinescount << endl;
-	report << setw(10) << "Language" << setw(10) << "Files" << setw(10) << "Lines" << setw(10) << "Empty/Code" << endl;
-	report << endl;
+	std::stringstream report;
+	report << LONG_W << "Language Lines Report" << std::endl;
+	report << std::endl;
+	report << LONG_W << "Total Files : " << SHORT_W << fpc << std::endl;
+	report << LONG_W << "Total Rows  : " << SHORT_W << tlc << std::endl;
+	report << std::endl;
+	report << LONG_W << "Language" << LONG_W << "Files";
+	report << LONG_W << "Lines" << LONG_W << "Empty/Code" << std::endl;
+	report << std::endl;
+
 	int index = 0;
-row:
+row_0:
 	auto r = results[index];
-	report << setw(10) << r.lang << setw(10) << r.filescount << setw(10) << r.linescount << setw(10) << r.emptylinescount << endl;
-	if (index < (int)results.size()) { index++; goto row; }
+	report << LONG_W << r.lang;
+	report << LONG_W << r.filescount;
+	report << LONG_W << r.linescount;
+	report << LONG_W << r.emptylinescount;
+	report << std::endl;
+
+	if (index < (int)results.size() - 1) { index++; goto row_0; }
 	return report.str();
 }
