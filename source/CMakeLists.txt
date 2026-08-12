@@ -61,6 +61,7 @@ add_executable(edgotest
 	"config_test.cpp"
 	"selection_test.cpp"
 	"lsp_client_test.cpp"
+	"lsp_test.h"
 	"utils_test.cpp"
 	"characters_test.cpp"
 	"clipboard_test.cpp"

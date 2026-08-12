@@ -15,49 +15,19 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "lsp_client.h"
-#include "utils.h"
-#include <gtest/gtest.h>
+#include "lsp_test.h"
 
-// make sure that lsp client is initialized for the entire suite
-class LspTest : public ::testing::Test {
-protected:
-	static void SetUpTestSuite() {
-		lspclient.lang = "cpp";
-		started = StartLspClient("clangd", "");
-
-		// finding current working directory
-		char currentdir[PATH_MAX];
-		getcwd(currentdir, sizeof(currentdir));
-		InitLspClient(currentdir);
-
-		// reading file content
-		filepath.append(currentdir);
-		filepath.append("/../lsp_client_test.cpp");
-		content = ReadFileToString(filepath);
-
-		// accessing didOpen event
-		DidOpen(filepath, content);
-	}
-    static void TearDownTestSuite() { lspclient.isReady = false; }
-public:
-	static bool started;             // flag whether the server started
-	static std::string filepath;     // direct file path
-	static std::string content;      // file content
-};
-
-// defining the test variables
 bool LspTest::started;
 std::string LspTest::filepath;
 std::string LspTest::content;
 
 TEST_F(LspTest, TestLspClientStarted) {
-        EXPECT_EQ(LspTest::started, true);
-		EXPECT_NE(LspTest::content.size(), 0);
+	EXPECT_EQ(LspTest::started, true);
+	EXPECT_NE(LspTest::content.size(), 0);
 }
 
 TEST_F(LspTest, TestLspClientHover) {
-	hoverresponse_t response = Hover(filepath, 40-1, 8);
+	hoverresponse_t response = Hover(filepath, 41-1, 8);
 	EXPECT_NE(response.jsonrpc, "");
 
 	auto expected = "void DidOpen(const std::string &file, const std::string &text)";
@@ -66,7 +36,7 @@ TEST_F(LspTest, TestLspClientHover) {
 }
 
 TEST_F(LspTest, TestLspClientCompletion) {
-	completionresponse_t response = Completion(filepath, 40-1, 14);
+	completionresponse_t response = Completion(filepath, 41-1, 14);
 	EXPECT_NE(response.jsonrpc, "");
 
 	auto expected = " filepath";
@@ -78,7 +48,7 @@ TEST_F(LspTest, TestLspClientCompletion) {
 }
 
 TEST_F(LspTest, TestLspClientDefinition) {
-	definitionresponse_t response = Definition(filepath, 40-1, 8);
+	definitionresponse_t response = Definition(filepath, 41-1, 8);
 	EXPECT_NE(response.jsonrpc, "");
 
 	EXPECT_EQ(response.result.size(), 1);
@@ -89,7 +59,7 @@ TEST_F(LspTest, TestLspClientDefinition) {
 }
 
 TEST_F(LspTest, TestLspClientSignatureHelp) {
-	signaturehelpresponse_t response = SignatureHelp(filepath, 40-1, 12);
+	signaturehelpresponse_t response = SignatureHelp(filepath, 41-1, 12);
 	EXPECT_NE(response.jsonrpc, "");
 
 	auto expected = "DidOpen(const std::string &file, const std::string &text) -> void";
@@ -101,7 +71,7 @@ TEST_F(LspTest, TestLspClientSignatureHelp) {
 }
 
 TEST_F(LspTest, TestLspClientReferences) {
-	referencesresponse_t response = References(filepath, 40-1, 8);
+	referencesresponse_t response = References(filepath, 41-1, 8);
 	EXPECT_NE(response.jsonrpc, "");
 
 	EXPECT_EQ(response.result.size(), 2);
