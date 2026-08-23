@@ -40,7 +40,7 @@ void FindTests(void) {
 }
 
 int GetColor(char ch, int col, int row, colorindexer_t *indexer) {
-	int style;
+	int style = 0;
 
 	for (auto i : indexer->ranges) {
 		if (i.startbyte <= indexer->counter && indexer->counter < i.endbyte) {
