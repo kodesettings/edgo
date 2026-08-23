@@ -17,9 +17,9 @@
 
 #include "search.h"
 #include "utils.h"
-#include "screen_logo.h"
-
-#include <iomanip>
+#include "screen.h"
+#include "highlighter.h"
+#include "editor.h"
 
 #define LONG_W std::setw(20)
 #define SHORT_W std::setw(10)
@@ -56,4 +56,48 @@ row_0:
 
 	if (index < (int)results.size() - 1) { index++; goto row_0; }
 	return report.str();
+}
+
+line_v BuildLineVec(const std::string &data, int lineNum, bool colorize) {
+	colorindexer_t indexer;
+	line_v lines;
+	std::string line;
+
+	if (colorize) {
+		indexer.ranges = ColorRanges(e.y, e.y + e.TERMINAL_HEIGHT);
+		indexer.counter = 0;
+	}
+
+	for (auto b : data) {
+		if (b == '\n') {
+			lines.push_back(line_t{line});
+			line.erase();
+			indexer.counter++;
+		} else if (lineNum == (int)lines.size()) {
+			break;
+		} else {
+			Colorize(b, &line, colorize, &indexer);
+		}
+	}
+
+	if (!line.empty())
+		lines.push_back(line_t{line}); // add last line
+
+	return lines;
+}
+
+char* ExportScreen(const std::string &s, int offset, bool colorize) {
+	line_v lines = __build_line_vec(s, -1, colorize);
+	std::stringstream ss;
+
+	for (int index = offset;
+		index < (int)lines.size() && index < offset + e.ROWS;
+		index++) {
+		ss << lines[index].buf << "\n";
+	}
+
+	memset(output, 0, sizeof(output));
+	strcpy(output, ss.str().c_str());
+
+	return output;
 }

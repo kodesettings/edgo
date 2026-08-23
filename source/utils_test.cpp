@@ -16,6 +16,7 @@
 */
 
 #include "utils.h"
+#include "screen.h"
 #include <gtest/gtest.h>
 
 TEST(UtilsTests, TestGetLinesArrayFromData) {

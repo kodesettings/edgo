@@ -135,7 +135,4 @@ void OnDelete(void);
 void OnTab(void);
 void OnBackTab(void);
 
-// report screen
-std::string OnLangLinesCount(const std::string &dirpath);
-
 #endif // _EDITOR_H_

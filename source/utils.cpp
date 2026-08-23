@@ -17,7 +17,6 @@
 
 #include "utils.h"
 #include "editor.h"
-#include "screen_logo.h"
 
 // ------------------------------------------------------------------
 // io helper methods
@@ -44,53 +43,6 @@ bool SaveToFile(const std::string &filepath, const std::string &content) {
 	file << content;
 	file.close();
 	return true;
-}
-
-// ------------------------------------------------------------------
-// screen helper methods
-
-line_v __build_line_vec(const std::string &data, int lineNum, bool colorize) {
-	colorindexer_t indexer;
-	line_v lines;
-	std::string line;
-
-	if (colorize) {
-		indexer.ranges = ColorRanges(e.y, e.y + e.TERMINAL_HEIGHT);
-		indexer.counter = 0;
-	}
-
-	for (auto b : data) {
-		if (b == '\n') {
-			lines.push_back(line_t{line});
-			line.erase();
-			indexer.counter++;
-		} else if (lineNum == (int)lines.size()) {
-			break;
-		} else {
-			Colorize(b, &line, colorize, &indexer);
-		}
-	}
-
-	if (!line.empty())
-		lines.push_back(line_t{line}); // add last line
-
-	return lines;
-}
-
-char* __export_screen(const std::string &s, int offset, bool colorize) {
-	line_v lines = __build_line_vec(s, -1, colorize);
-	std::stringstream ss;
-
-	for (int index = offset;
-		index < (int)lines.size() && index < offset + e.ROWS;
-		index++) {
-		ss << lines[index].buf << "\n";
-	}
-
-	memset(output, 0, sizeof(output));
-	strcpy(output, ss.str().c_str());
-
-	return output;
 }
 
 // ------------------------------------------------------------------
