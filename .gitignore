@@ -1,4 +1,5 @@
-# ignoring build folder from repo
+# ignoring build target from repo
+edgo
 build/
 
 # ignoring log files
