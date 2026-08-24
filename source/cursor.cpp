@@ -26,7 +26,6 @@ void Focus(void) {
 }
 
 void FocusCenter(void) {
-//	e.Screen.Show()
 	if (e.row > e.y + e.ROWS) {
 		e.y = e.row + e.ROWS;
 	} else if (e.row < e.y) {
@@ -34,11 +33,13 @@ void FocusCenter(void) {
 	}
 
 	e.y -= e.ROWS / 2;
+
 	if (e.y < 0) {
 		e.y = 0;
 	}
 
 	int centerRow = e.ROWS / 2;
+
 	// Update the cursor row to the center row if necessary
 	if (e.row - e.y > centerRow) {
 		e.y += e.row - e.y - centerRow;

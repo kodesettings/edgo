@@ -27,7 +27,10 @@ void OnDown(bool isPaging) {
 		numberOfLines = e.ROWS / 3 < 30 ? 30 : e.ROWS / 3;
 	}
 
-	if (e.lines.empty()) { return; }
+	if (e.lines.empty()) {
+		return;
+	}
+
 	if (e.row + numberOfLines >= (int)e.lines.size()) {
 		if (!isPaging) {
 			e.y = e.row - e.ROWS + 1;
