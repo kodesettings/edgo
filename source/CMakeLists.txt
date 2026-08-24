@@ -2,10 +2,11 @@ cmake_minimum_required(VERSION 3.12)
 
 project(edgo VERSION 0.0.2 LANGUAGES CXX)
 
-# Add your source file to the edgo target.
 add_library(edgo SHARED)
 
-# edgo library files
+# Add your source file to the edgo target. All files
+# must be listed here individually to keep track
+# of the project structure.
 target_sources(edgo PRIVATE config.cpp)
 target_sources(edgo PRIVATE config.h)
 target_sources(edgo PRIVATE selection.cpp)
@@ -57,11 +58,10 @@ target_sources(edgo PRIVATE lsp.cpp)
 
 find_package(GTest REQUIRED)
 
-# Add your source file to the edgotest target. This must come after
-# find_package(GTest) which is required by the test suite.
 add_executable(edgotest)
 
-# test case files
+# Add your source file to the edgotest target. This must come after
+# find_package(GTest) which is required by the test suite.
 target_sources(edgotest PRIVATE config_test.cpp)
 target_sources(edgotest PRIVATE selection_test.cpp)
 target_sources(edgotest PRIVATE lsp_client_test.cpp)
@@ -74,8 +74,12 @@ target_sources(edgotest PRIVATE highlighter_test.cpp)
 target_sources(edgotest PRIVATE search_test.cpp)
 target_sources(edgotest PRIVATE query_test.cpp)
 
-# tree-sitter language bindings
 set(TS_LANGUAGE_LIBS)
+
+# tree-sitter language bindings are going to be
+# listed in this section. With each additional
+# language support we have to add the dependency here
+# for the grammas.
 list(APPEND TS_LANGUAGE_LIBS tree-sitter-java)
 list(APPEND TS_LANGUAGE_LIBS tree-sitter-bash)
 list(APPEND TS_LANGUAGE_LIBS tree-sitter-cpp)

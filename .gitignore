@@ -1,5 +1,6 @@
-# ignoring build target from repo
-edgo
+# ignoring build targets from repo
+edgotest
+libedgo.so
 build/
 
 # ignoring log files
