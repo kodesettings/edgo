@@ -40,6 +40,10 @@ typedef std::vector<std::string> string_v;
 // screen output memory
 static char output[256000];
 
+#include "../include/edgo.h"
+
+static struct screen screen;
+
 // ------------------------------------------------------------------
 // screen helper methods
 

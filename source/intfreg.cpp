@@ -21,7 +21,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-char* add_text(size_t line, size_t pos, const char* buf, size_t length) {
+struct screen add_text(size_t line, size_t pos, const char *buf, size_t length) {
 	switch (length) {
 	case 0: break;
 	case 1: AddCharacter(buf[0]); break; // line and pos ignored
@@ -31,7 +31,7 @@ char* add_text(size_t line, size_t pos, const char* buf, size_t length) {
 	return __export_screen(e.code_str(), e.y);
 }
 
-char* remove_text(size_t line, size_t pos, size_t length) {
+struct screen remove_text(size_t line, size_t pos, size_t length) {
 	switch (length) {
 	case 0: break;
 	case 1: DeleteCharacter(line, pos); break;
@@ -40,7 +40,7 @@ char* remove_text(size_t line, size_t pos, size_t length) {
 	return __export_screen(e.code_str(), e.y);
 }
 
-char* replace_text(size_t line, size_t from, size_t end, const char* buf, size_t length) {
+struct screen replace_text(size_t line, size_t from, size_t end, const char *buf, size_t length) {
 	switch (length) {
 	case 0: break;
 	default: ReplaceString(line, from, end, buf);
@@ -48,10 +48,10 @@ char* replace_text(size_t line, size_t from, size_t end, const char* buf, size_t
 	return __export_screen(e.code_str(), e.y);
 }
 
-char* shift_with_tabs(size_t line, size_t pos, int *arr, size_t arr_len) {
+struct screen shift_with_tabs(size_t line, size_t pos, int *arr, size_t arr_len) {
 	if (!arr_len) {
 		printf("third argument must be an array");
-		return NULL;
+		return screen;
 	} else {
 		auto lines = std::set<int>(arr, arr + arr_len);
 		ShiftWithTabsToRight(line, pos, lines);
@@ -60,17 +60,17 @@ char* shift_with_tabs(size_t line, size_t pos, int *arr, size_t arr_len) {
 	return __export_screen(e.code_str(), e.y);
 }
 
-char* display_screen_report(const char* dirpath, size_t length) {
+struct screen display_screen_report(const char *dirpath, size_t length) {
 	if (!length) {
 		printf("provide dir path");
-		return NULL;
+		return screen;
 	}
 
 	std::string report = OnLangLinesCount(dirpath);
 	return __export_screen(report, 0, false);
 }
 
-char* clipboard(enum clipboard_ops ops) {
+struct screen clipboard(enum clipboard_ops ops) {
 	switch (ops) {
 	case COPY: OnCopy(); break;
 	case PASTE: OnPaste(); break;
@@ -82,27 +82,27 @@ char* clipboard(enum clipboard_ops ops) {
 	return __export_screen(e.code_str(), e.y);
 }
 
-char* duplicate(void) {
+struct screen duplicate(void) {
 	Duplicate();
 	return __export_screen(e.code_str(), e.y);
 }
 
-char* commentline(void) {
+struct screen commentline(void) {
 	OnCommentLine();
 	return __export_screen(e.code_str(), e.y);
 }
 
-char* swaplinesup(void) {
+struct screen swaplinesup(void) {
 	OnSwapLinesUp();
 	return __export_screen(e.code_str(), e.y);
 }
 
-char* swaplinesdn(void) {
+struct screen swaplinesdn(void) {
 	OnSwapLinesDown();
 	return __export_screen(e.code_str(), e.y);
 }
 
-char* on_keypress(enum nav_keys keys, void* is_paging) {
+struct screen on_keypress(enum nav_keys keys, void *is_paging) {
 	bool isp = is_paging == NULL ? false : static_cast<bool>(is_paging);
 	switch (keys) {
 	default: e.lines = __build_line_vec(e.code_str(), -1, false);
@@ -120,7 +120,7 @@ char* on_keypress(enum nav_keys keys, void* is_paging) {
 	return __export_screen(e.code_str(), e.y);
 }
 
-char* on_scroll(enum nav_keys keys) {
+struct screen on_scroll(enum nav_keys keys) {
 	switch (keys) {
 	case UP: OnScrollUp(); break;
 	case DOWN: OnScrollDown(); break;
@@ -129,10 +129,10 @@ char* on_scroll(enum nav_keys keys) {
 	return __export_screen(e.code_str(), e.y);
 }
 
-char* open_file(const char* filepath) {
+struct screen open_file(const char *filepath) {
 	if (!HandleFile(filepath, true)) {
 		printf("cannot open filepath");
-		return NULL;
+		return screen;
 	}
 
 	return __export_screen(e.code_str(), e.y);

@@ -21,20 +21,29 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+struct screen {
+	char *filename;
+	char *language;
+	char *content;
+	int cursor_x;
+	int cursor_y;
+	bool changed;
+};
+
 //
 // Text manipulators
 //
 
-char* add_text(size_t line, size_t pos, const char* buf, size_t length);
-char* remove_text(size_t line, size_t pos, size_t length);
-char* replace_text(size_t line, size_t from, size_t end, const char* buf, size_t length);
-char* shift_with_tabs(size_t line, size_t pos, int* arr, size_t arr_len);
+struct screen add_text(size_t line, size_t pos, const char *buf, size_t length);
+struct screen remove_text(size_t line, size_t pos, size_t length);
+struct screen replace_text(size_t line, size_t from, size_t end, const char *buf, size_t length);
+struct screen shift_with_tabs(size_t line, size_t pos, int *arr, size_t arr_len);
 
 //
 // Screen report
 //
 
-char* display_screen_report(const char* dirpath, size_t length);
+struct screen display_screen_report(const char *dirpath, size_t length);
 
 enum clipboard_ops {
 	COPY  = 0x034FC,
@@ -48,16 +57,16 @@ enum clipboard_ops {
 // Clipboard operations
 //
 
-char* clipboard(enum clipboard_ops ops);
+struct screen clipboard(enum clipboard_ops ops);
 
 //
 // Editor features
 //
 
-char* duplicate(void);
-char* commentline(void);
-char* swaplinesup(void);
-char* swaplinesdn(void);
+struct screen duplicate(void);
+struct screen commentline(void);
+struct screen swaplinesup(void);
+struct screen swaplinesdn(void);
 
 enum nav_keys {
 	UP      = 0x01DF,
@@ -76,15 +85,15 @@ enum nav_keys {
 // Navigation keys
 //
 
-char* on_keypress(enum nav_keys keys, void* is_paging);
-char* on_scroll(enum nav_keys keys);
+struct screen on_keypress(enum nav_keys keys, void *is_paging);
+struct screen on_scroll(enum nav_keys keys);
 
 //
 // File handling
 //
 
-char* open_file(const char* filepath);
-int new_file(const char* filename);
+struct screen open_file(const char *filepath);
+int new_file(const char *filename);
 int save_file(void);
 
 //

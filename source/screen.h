@@ -33,6 +33,6 @@
 
 std::string OnLangLinesCount(const std::string &dirpath);
 line_v BuildLineVec(const std::string &data, int lineNum, bool colorize);
-char* ExportScreen(const std::string &s, int offset, bool colorize = true);
+struct screen ExportScreen(const std::string &s, int offset, bool colorize = true);
 
 #endif // _SCREEN_LOGO_H_

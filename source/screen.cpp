@@ -86,7 +86,7 @@ line_v BuildLineVec(const std::string &data, int lineNum, bool colorize) {
 	return lines;
 }
 
-char* ExportScreen(const std::string &s, int offset, bool colorize) {
+struct screen ExportScreen(const std::string &s, int offset, bool colorize) {
 	line_v lines = __build_line_vec(s, -1, colorize);
 	std::stringstream ss;
 
@@ -96,8 +96,16 @@ char* ExportScreen(const std::string &s, int offset, bool colorize) {
 		ss << lines[index].buf << "\n";
 	}
 
+	// screen content
 	memset(output, 0, sizeof(output));
 	strcpy(output, ss.str().c_str());
 
-	return output;
+	// screen fields
+	screen.filename = e.filename.data();
+	screen.language = e.lang.name.data();
+	screen.content = output;
+	screen.cursor_x = e.col;
+	screen.cursor_y = e.row;
+	screen.changed = e.isContentChanged;
+	return screen;
 }
