@@ -38,10 +38,9 @@ typedef std::vector<line_t> line_v;
 typedef std::vector<std::string> string_v;
 
 // screen output memory
-static char output[256000];
+static char output[44880];
 
 #include "../include/edgo.h"
-
 static struct screen screen;
 
 // ------------------------------------------------------------------
