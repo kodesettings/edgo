@@ -2,89 +2,98 @@ cmake_minimum_required(VERSION 3.12)
 
 project(edgo VERSION 0.0.2 LANGUAGES CXX)
 
-find_package(GTest REQUIRED)
+# Add your source file to the edgo target.
+add_library(edgo SHARED)
 
 # edgo library files
-add_library(edgo SHARED
-	"config.cpp"
-	"config.h"
-	"selection.cpp"
-	"selection.h"
-	"operations.h"
-	"lsp_user_actions.cpp"
-	"lsp_model.h"
-	"lsp_capabilities.h"
-	"lsp_client.cpp"
-	"lsp_client.h"
-	"utils.cpp"
-	"utils.h"
-	"editor.h"
-	"screen.cpp"
-	"screen.h"
-	"characters.cpp"
-	"cursor.cpp"
-	"highlighter.cpp"
-	"highlighter.h"
-	"clipboard.cpp"
-	"sdl2_init.h"
-	"features_v01.cpp"
+target_sources(edgo PRIVATE config.cpp)
+target_sources(edgo PRIVATE config.h)
+target_sources(edgo PRIVATE selection.cpp)
+target_sources(edgo PRIVATE selection.h)
+target_sources(edgo PRIVATE operations.h)
+target_sources(edgo PRIVATE lsp_user_actions.cpp)
+target_sources(edgo PRIVATE lsp_model.h)
+target_sources(edgo PRIVATE lsp_capabilities.h)
+target_sources(edgo PRIVATE lsp_client.cpp)
+target_sources(edgo PRIVATE lsp_client.h)
+target_sources(edgo PRIVATE utils.cpp)
+target_sources(edgo PRIVATE utils.h)
+target_sources(edgo PRIVATE editor.h)
+target_sources(edgo PRIVATE screen.cpp)
+target_sources(edgo PRIVATE screen.h)
+target_sources(edgo PRIVATE characters.cpp)
+target_sources(edgo PRIVATE cursor.cpp)
+target_sources(edgo PRIVATE highlighter.cpp)
+target_sources(edgo PRIVATE highlighter.h)
+target_sources(edgo PRIVATE clipboard.cpp)
+target_sources(edgo PRIVATE sdl2_init.h)
+target_sources(edgo PRIVATE features_v01.cpp)
 
 # embedded scm files
-	"lang_bash.h"
-	"lang_c.h"
-	"lang_cpp.h"
-	"lang_css.h"
-	"lang_go.h"
-	"lang_html.h"
-	"lang_java.h"
-	"lang_javascript.h"
-	"lang_python.h"
-	"lang_rust.h"
+target_sources(edgo PRIVATE lang_bash.h)
+target_sources(edgo PRIVATE lang_c.h)
+target_sources(edgo PRIVATE lang_cpp.h)
+target_sources(edgo PRIVATE lang_css.h)
+target_sources(edgo PRIVATE lang_go.h)
+target_sources(edgo PRIVATE lang_html.h)
+target_sources(edgo PRIVATE lang_java.h)
+target_sources(edgo PRIVATE lang_javascript.h)
+target_sources(edgo PRIVATE lang_python.h)
+target_sources(edgo PRIVATE lang_rust.h)
 
-	"langs.h"
-	"themes.h"
-	"test_languages.h"
-	"search.cpp"
-	"search.h"
-	"query.cpp"
-	"query.h"
-	"io.cpp"
-	"keyboard.cpp"
+target_sources(edgo PRIVATE langs.h)
+target_sources(edgo PRIVATE themes.h)
+target_sources(edgo PRIVATE test_languages.h)
+target_sources(edgo PRIVATE search.cpp)
+target_sources(edgo PRIVATE search.h)
+target_sources(edgo PRIVATE query.cpp)
+target_sources(edgo PRIVATE query.h)
+target_sources(edgo PRIVATE io.cpp)
+target_sources(edgo PRIVATE keyboard.cpp)
 
 # interface registers
-	"intfreg.cpp"
-	"lsp.cpp"
-)
+target_sources(edgo PRIVATE intfreg.cpp)
+target_sources(edgo PRIVATE lsp.cpp)
+
+find_package(GTest REQUIRED)
+
+# Add your source file to the edgotest target. This must come after
+# find_package(GTest) which is required by the test suite.
+add_executable(edgotest)
 
 # test case files
-add_executable(edgotest
-	"config_test.cpp"
-	"selection_test.cpp"
-	"lsp_client_test.cpp"
-	"lsp_test.h"
-	"utils_test.cpp"
-	"characters_test.cpp"
-	"clipboard_test.cpp"
-	"features_v01_test.cpp"
-	"highlighter_test.cpp"
-	"search_test.cpp"
-	"query_test.cpp"
-)
+target_sources(edgotest PRIVATE config_test.cpp)
+target_sources(edgotest PRIVATE selection_test.cpp)
+target_sources(edgotest PRIVATE lsp_client_test.cpp)
+target_sources(edgotest PRIVATE lsp_test.h)
+target_sources(edgotest PRIVATE utils_test.cpp)
+target_sources(edgotest PRIVATE characters_test.cpp)
+target_sources(edgotest PRIVATE clipboard_test.cpp)
+target_sources(edgotest PRIVATE features_v01_test.cpp)
+target_sources(edgotest PRIVATE highlighter_test.cpp)
+target_sources(edgotest PRIVATE search_test.cpp)
+target_sources(edgotest PRIVATE query_test.cpp)
 
 # tree-sitter language bindings
-set(TS_LANGUAGE_LIBS
-	tree-sitter-java
-	tree-sitter-bash
-	tree-sitter-cpp
-	tree-sitter-html
-	tree-sitter-css
-	tree-sitter-go
-	tree-sitter-c
-	tree-sitter-javascript
-	tree-sitter-rust
-	tree-sitter-python
-)
+set(TS_LANGUAGE_LIBS)
+list(APPEND TS_LANGUAGE_LIBS tree-sitter-java)
+list(APPEND TS_LANGUAGE_LIBS tree-sitter-bash)
+list(APPEND TS_LANGUAGE_LIBS tree-sitter-cpp)
+list(APPEND TS_LANGUAGE_LIBS tree-sitter-html)
+list(APPEND TS_LANGUAGE_LIBS tree-sitter-css)
+list(APPEND TS_LANGUAGE_LIBS tree-sitter-go)
+list(APPEND TS_LANGUAGE_LIBS tree-sitter-c)
+list(APPEND TS_LANGUAGE_LIBS tree-sitter-javascript)
+list(APPEND TS_LANGUAGE_LIBS tree-sitter-rust)
+list(APPEND TS_LANGUAGE_LIBS tree-sitter-python)
 
 # target and test builds
-target_link_libraries(edgo PUBLIC glog pthread boost_filesystem SDL2 tree-sitter ${TS_LANGUAGE_LIBS})
-target_link_libraries(edgotest PUBLIC ${GTEST_LIBRARIES} gtest_main pthread edgo)
+target_link_libraries(edgo PUBLIC glog)
+target_link_libraries(edgo PUBLIC pthread)
+target_link_libraries(edgo PUBLIC boost_filesystem)
+target_link_libraries(edgo PUBLIC SDL2 tree-sitter)
+target_link_libraries(edgo PUBLIC  ${TS_LANGUAGE_LIBS})
+target_link_libraries(edgotest PUBLIC ${GTEST_LIBRARIES})
+target_link_libraries(edgotest PUBLIC gtest_main)
+target_link_libraries(edgotest PUBLIC pthread)
+target_link_libraries(edgotest PUBLIC edgo)
