@@ -22,12 +22,12 @@
 extern "C" {
 #endif
 struct screen {
-	char *filename;
-	char *language;
-	char *content;
-	int cursor_x;
-	int cursor_y;
-	bool changed;
+	char *filename; // name of the file currently opened
+	char *language; // langauge identifier of the file
+	char *content;  // terminal screen content to be displayed
+	int  cursor_x;  // cursor position
+	int  cursor_y;  // cursor position
+	bool changed;   // flag for file modification
 };
 
 //
