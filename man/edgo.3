@@ -7,50 +7,50 @@ edgo \- text editor library with native lsp support
 .SS Screen printing functions
 Functions that are manipulating the text buffer while printing the screen content.
 .TP
-char* \f3add_text\fP(size_t \fIline\fP, size_t \fIpos\fP, const char* \fIbuf\fP, size_t \fIlength\fP);
+struct screen \f3add_text\fP(size_t \fIline\fP, size_t \fIpos\fP, const char *\fIbuf\fP, size_t \fIlength\fP);
 Adds character or text to the buffer.
 .TP
-char* \f3remove_text\fP(size_t \fIline\fP, size_t \fIpos\fP, size_t \fIlength\fP);
+struct screen \f3remove_text\fP(size_t \fIline\fP, size_t \fIpos\fP, size_t \fIlength\fP);
 Removes character or text from the buffer.
 .TP
-char* \f3replace_text\fP(size_t \fIline\fP, size_t \fIfrom\fP, size_t \fIend\fP, const char* \fIbuf\fP, size_t \fIlength\fP);
+struct screen \f3replace_text\fP(size_t \fIline\fP, size_t \fIfrom\fP, size_t \fIend\fP, const char *\fIbuf\fP, size_t \fIlength\fP);
 Replaces text between ranges.
 .TP
-char* \f3shift_with_tabs\fP(size_t \fIline\fP, size_t \fIpos\fP, int* \fIarr\fP, size_t \fIarr_len\fP);
+struct screen \f3shift_with_tabs\fP(size_t \fIline\fP, size_t \fIpos\fP, int *\fIarr\fP, size_t \fIarr_len\fP);
 Shifting with tabs to the right using integer array of lines.
 .TP
-char* \f3display_screen_report\fP(const char* \fIdirpath\fP, size_t \fIlength\fP);
+struct screen \f3display_screen_report\fP(const char *\fIdirpath\fP, size_t \fIlength\fP);
 Displaying screen report of the current working folder.
 .TP
-char* \f3clipboard\fP(enum clipboard_ops \fIops\fP);
+struct screen \f3clipboard\fP(enum clipboard_ops \fIops\fP);
 Clipboard operations are handled according the parameter.
 .TP
-char* \f3duplicate\fP(void);
+struct screen \f3duplicate\fP(void);
 Duplicates the currently selected line under cursor.
 .TP
-char* \f3commentline\fP(void);
+struct screen \f3commentline\fP(void);
 Adds comment character(s) to the beginning of the line.
 .TP
-char* \f3swaplinesup\fP(void);
+struct screen \f3swaplinesup\fP(void);
 Moves current line up under the cursor.
 .TP
-char* \f3swaplinesdn\fP(void);
+struct screen \f3swaplinesdn\fP(void);
 Moves current line down under the cursor.
 .SS Navigation keys
 Navigation handler functions are also printing screen content.
 .TP
-char* \f3on_keypress\fP(enum nav_keys \fIkeys\fP, void* \fIis_paging\fP);
+struct screen \f3on_keypress\fP(enum nav_keys \fIkeys\fP, void *\fIis_paging\fP);
 Handles key presses according to the parameter.
 .TP
-char* \f3on_scroll\fP(enum nav_keys \fIkeys\fP);
+struct screen \f3on_scroll\fP(enum nav_keys \fIkeys\fP);
 This is only for UP and DOWN scrolling for mouse inputs.
 .SS File operations
 File operations have to be invoked at the start for initializing the library.
 .TP
-char* \f3open_file\fP(const char* \fIfilepath\fP);
+struct screen \f3open_file\fP(const char *\fIfilepath\fP);
 Opens file providing the file path in the argument.
 .TP
-int \f3new_file\fP(const char* \fIfilename\fP);
+int \f3new_file\fP(const char *\fIfilename\fP);
 Creates a new file in the current working directory by providing the name only.
 .TP
 int \f3save_file\fP(void);

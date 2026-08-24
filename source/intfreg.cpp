@@ -138,7 +138,7 @@ struct screen open_file(const char *filepath) {
 	return __export_screen(e.code_str(), e.y);
 }
 
-int new_file(const char* filename) {
+int new_file(const char *filename) {
 	return (int)HandleFile(filename, false) == 1;
 }
 
