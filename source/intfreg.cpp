@@ -61,12 +61,14 @@ struct screen shift_with_tabs(size_t line, size_t pos, int *arr, size_t arr_len)
 }
 
 struct screen display_screen_report(const char *dirpath, size_t length) {
-	std::string dirpath_s;
+	std::string dirpath_s, report;
 	switch (length) {
 	case 0: dirpath_s = e.cwd; break;
 	default: dirpath_s = dirpath;
 	}
-	std::string report = OnLangLinesCount(dirpath_s);
+	try {
+		report = OnLangLinesCount(dirpath_s);
+	} catch (...) {}
 	return __export_screen(report, 0, false);
 }
 
