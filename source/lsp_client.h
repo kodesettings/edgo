@@ -55,6 +55,7 @@ typedef struct {
 
 	bp::child c; // child process
 	bool (*changed)(bp::ipstream *stdout);
+	std::thread stderr_thread;
 
 	int id;
 	std::map<std::string, diagnosticparams_t> file2diagnostic;

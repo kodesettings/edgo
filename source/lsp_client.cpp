@@ -30,7 +30,7 @@ bool StartLspClient(const std::string &cmd, std::string args...) {
 		bp::std_out > lspclient.stdout, bp::std_err > lspclient.stderr, ec);
 	lspclient.changed = receiveDiagnostics;
 
-	std::thread stderr_thread([&] {
+	lspclient.stderr_thread = std::thread([&] {
 		std::string line;
 		while (std::getline(lspclient.stderr, line)) {
 			LOG(INFO) << "lsp:" << line;
@@ -43,7 +43,7 @@ bool StartLspClient(const std::string &cmd, std::string args...) {
 	} else {
 		usleep(SLEEP_INTERVAL); // sleep for 500ms
 		LOG(INFO) << "lsp started success " << cmd << " " << args;
-		stderr_thread.detach();
+		lspclient.stderr_thread.detach();
 	}
 
 	return true;
