@@ -19,20 +19,25 @@
 
 config_t ParseLang(const ptree& pt) {
 	config_t conf;
+	size_t count = 0;
 
-	for (const auto& item : pt.get_child("langs")) {
+	for (const auto& item : pt) {
+		if (item.first.compare(0, 6, "langs.") != 0) {
+			continue;
+		}
+
 		lang_t lang;
-		lang.name     = item.second.get<std::string>("name");
-		lang.lsp      = item.second.get<std::string>("lsp");
-		lang.comment  = item.second.get<std::string>("comment");
-		lang.tabwidth = item.second.get<int>("tabwidth");
-		lang.cmd      = item.second.get<std::string>("cmd");
-		lang.cmdargs  = item.second.get<std::string>("cmdargs");
+		lang.name     = item.second.get<std::string>("name", "");
+		lang.lsp      = item.second.get<std::string>("lsp", "");
+		lang.comment  = item.second.get<std::string>("comment", "//");
+		lang.tabwidth = item.second.get<int>("tabwidth", 2);
+		lang.cmd      = item.second.get<std::string>("cmd", "");
+		lang.cmdargs  = item.second.get<std::string>("cmdargs", "");
 		conf.langs[item.first] = lang;
+		count++;
 	}
 
-	conf.theme = pt.get<std::string>("theme");
-	size_t count = pt.get_child("langs").size();
+	conf.theme = pt.get<std::string>("theme", default_config.theme);
 	return count == 0 ? default_config : conf;
 }
 

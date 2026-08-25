@@ -93,6 +93,7 @@ typedef struct {
 } coloredbyterange_t;
 
 inline uint32_t GetColorCode(std::string colorcode) {
+	if (colorcode.empty()) return 0; // color not found
 	const char* str = colorcode.substr(1).data();
 	return std::strtol(str, NULL, 16); // converting hex to int
 }
