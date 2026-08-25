@@ -4,8 +4,8 @@ CHANGELOG
 Version 0.0.2 - WIP
 
 == complete refactor and rewrite in cpp as a library module
+== featuring complete library manual and header files
 == TODO:some user input cursor positions have to be fixed on the undo stack
-== TODO:tree-sitter highlighter breaks on special ascii characters???
 == TODO:debug C API functions
 == TODO:add multifile support for diagnostics??
 
