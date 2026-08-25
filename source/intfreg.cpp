@@ -64,7 +64,7 @@ struct screen display_screen_report(const char *dirpath, size_t length) {
 	std::string dirpath_s, report;
 	switch (length) {
 	case 0: dirpath_s = e.cwd; break;
-	default: dirpath_s = dirpath;
+	default: dirpath_s = dirpath == NULL ? e.cwd : dirpath;
 	}
 	try {
 		report = OnLangLinesCount(dirpath_s);
