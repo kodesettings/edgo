@@ -36,6 +36,7 @@ std::string OnLangLinesCount(const std::string &dirpath) {
 	LangCount(files, &results);
 
 	std::stringstream report;
+	report << std::endl << std::endl << std::endl << std::endl;
 	report << "      " << "Language and File Statistics Report" << std::endl;
 	report << std::endl;
 	report << LONG_W << "Total Files : " << SHORT_W << fpc << std::endl;
