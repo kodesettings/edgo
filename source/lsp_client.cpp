@@ -26,8 +26,16 @@ bool StartLspClient(const std::string &cmd, std::string args...) {
 	if (exe.empty()) { LOG(ERROR) << "lsp not found cmd" << cmd; return -1; }
 
 	std::error_code ec;
-	lspclient.c = bp::child(cmd, bp::std_in < lspclient.stdin, bp::std_out > lspclient.stdout, ec);
+	lspclient.c = bp::child(cmd, bp::std_in < lspclient.stdin,
+		bp::std_out > lspclient.stdout, bp::std_err > lspclient.stderr, ec);
 	lspclient.changed = receiveDiagnostics;
+
+	std::thread stderr_thread([&] {
+		std::string line;
+		while (std::getline(lspclient.stderr, line)) {
+			LOG(INFO) << "lsp:" << line;
+		}
+	});
 
 	if (ec) {
 		LOG(ERROR) << "error starting lsp err" << ec.message();
@@ -35,6 +43,7 @@ bool StartLspClient(const std::string &cmd, std::string args...) {
 	} else {
 		usleep(SLEEP_INTERVAL); // sleep for 500ms
 		LOG(INFO) << "lsp started success " << cmd << " " << args;
+		stderr_thread.detach();
 	}
 
 	return true;

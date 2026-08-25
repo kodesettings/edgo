@@ -109,11 +109,13 @@ void SetFileAttributes(const std::string &file, std::string *content, bool isOpe
 }
 
 bool HandleFile(const std::string &filepath, bool isOpen) {
+	EDGO_LOGGING_INIT       // init google logging system
+	EDGO_LOGGING_TO_FILE;   // make sure it doesn't print to stderr
+
 	std::string content;
 	SetFileAttributes(filepath, &content, isOpen);
 	std::string log_text = isOpen ? "open file:" : "new file:";
 	LOG(INFO) << log_text << e.absoluteFilePath;
-
 
 	// Set language and content
 	e.lang = DetectLang(e.absoluteFilePath);

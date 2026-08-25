@@ -48,7 +48,7 @@ typedef struct {
 	bool isReady; // flag for lsp initialization
 
 	bp::opstream stdin;
-	bp::ipstream stdout;
+	bp::ipstream stdout, stderr;
 
 	std::queue<std::string> userMessages;
 	std::queue<std::string> diagnosticsChannel;
