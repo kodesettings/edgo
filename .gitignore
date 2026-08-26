@@ -1,7 +1,11 @@
 # ignoring build targets from repo
+build/
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
 edgotest
 libedgo.so
-build/
 
 # ignoring log files
 *.log
