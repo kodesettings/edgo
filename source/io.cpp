@@ -109,8 +109,10 @@ void SetFileAttributes(const std::string &file, std::string *content, bool isOpe
 }
 
 bool HandleFile(const std::string &filepath, bool isOpen) {
-	EDGO_LOGGING_INIT       // init google logging system
-	EDGO_LOGGING_TO_FILE;   // make sure it doesn't print to stderr
+	EDGO_LOGGING_INIT;      // init google logging system
+	EDGO_LOGGING_NO_STDERR; // make sure it doesn't print to stderr
+	if (!e.isLogging)       // only log if enabled via env variable
+		EDGO_LOGGING_SUPPRESS;
 
 	std::string content;
 	SetFileAttributes(filepath, &content, isOpen);

@@ -32,6 +32,38 @@
 // using the namespace for simplicity
 using __gnu_cxx::rope;
 
+// character manipulation routines
+void AddCharacter(char ch);
+void InsertCharacter(int line, int pos, char ch);
+void InsertString(int line, int pos, std::string linestring);
+void DeleteCharacter(int line, int pos);
+void ReplaceString(int line, int from, int end, std::string instext);
+void ShiftWithTabsToRight(int line, int pos, std::set<int> selectedLines);
+bool MaybeAddPair(int line, int pos, char ch, char *ret);
+
+// clipboard routines
+void OnCopy(void);
+void OnPaste(void);
+void Cut(bool isCopySelected);
+void Duplicate(void);
+void OnUndo(void);
+void OnRedo(void);
+
+// features v01 routines
+void OnCommentLine(void);
+void OnSwapLinesUp(void);
+void OnSwapLinesDown(void);
+
+// io routines
+void UpdateLsp(const std::string &text, bool isOpen);
+void FindTests(void);
+int GetColor(char ch, int col, int row, colorindexer_t *indexer);
+void Colorize(char b, std::string *line, bool colorize, colorindexer_t *indexer);
+void SetTerminalDims(int *rows, int *cols);
+void SetFileAttributes(const std::string &file, std::string *content, bool isOpen);
+bool HandleFile(const std::string &filepath, bool isOpen);
+bool SaveFile(void);
+
 typedef struct editor_t {
 	int COLUMNS;                        // terminal size columns
 	int ROWS;                           // terminal size rows
@@ -65,14 +97,20 @@ typedef struct editor_t {
 	bool isColorize = true;             // colorize text is true by default
 	bool isOverlay;                     // true if overlay is active (completion, hover, errors...)
 	bool isStartupScreen;               // true if no file was opened
+	bool isLogging;                     // true if EDGO_LOG environment variable is set
 
 	bool isContentSearch;
 	std::string searchPattern;          // pattern for search in a buffer
 	searchresult_v searchResults;
 	int searchResultIndex = 0;
 
-	// registering callback for content change
-	editor_t() { isContentChanged = { /* registering dummy callback */ };}
+	editor_t() {
+		isContentChanged = { /* registering dummy callback */ };
+		try {
+			isLogging = std::stoi(getenv("EDGO_LOG"));
+		} catch (...) {}
+	}
+
 	std::map<std::string, lspclient_t> lsp2lang;
 	std::map<std::string, int> lspver; // version number sequencing
 
@@ -85,41 +123,9 @@ typedef struct editor_t {
 
 extern editor_t e;
 
-// character manipulation routines
-void AddCharacter(char ch);
-void InsertCharacter(int line, int pos, char ch);
-void InsertString(int line, int pos, std::string linestring);
-void DeleteCharacter(int line, int pos);
-void ReplaceString(int line, int from, int end, std::string instext);
-void ShiftWithTabsToRight(int line, int pos, std::set<int> selectedLines);
-bool MaybeAddPair(int line, int pos, char ch, char *ret);
-
 // cursor routines
 void Focus(void);
 void FocusCenter(void);
-
-// clipboard routines
-void OnCopy(void);
-void OnPaste(void);
-void Cut(bool isCopySelected);
-void Duplicate(void);
-void OnUndo(void);
-void OnRedo(void);
-
-// features v01 routines
-void OnCommentLine(void);
-void OnSwapLinesUp(void);
-void OnSwapLinesDown(void);
-
-// io routines
-void UpdateLsp(const std::string &text, bool isOpen);
-void FindTests(void);
-int GetColor(char ch, int col, int row, colorindexer_t *indexer);
-void Colorize(char b, std::string *line, bool colorize, colorindexer_t *indexer);
-void SetTerminalDims(int *rows, int *cols);
-void SetFileAttributes(const std::string &file, std::string *content, bool isOpen);
-bool HandleFile(const std::string &filepath, bool isOpen);
-bool SaveFile(void);
 
 // keyboard routines
 void OnDown(bool isPaging);
