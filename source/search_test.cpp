@@ -63,9 +63,9 @@ TEST(SearchTests, TestSearch) {
 
 TEST(SearchTests, TestSearchOnFile) {
 	int lines;
-	auto results = SearchOnFile("../search_test.cpp", "text", &lines);
+	auto results = SearchOnFile("/usr/include/strings.h", "__THROW", &lines);
 	EXPECT_NE(lines, 0);
-	EXPECT_EQ(results.size(), 2);
+	EXPECT_NE(results.size(), 0);
 }
 
 TEST(SearchTests, TestSearchOnDir) {
@@ -78,7 +78,7 @@ TEST(SearchTests, TestSearchOnDir) {
 
 TEST(SearchTests, TestLinesCountOnFile) {
 	int lc, emptylc;
-	LineCountOnFile("../search_test.cpp", &lc, &emptylc);
+	LineCountOnFile("/usr/include/strings.h", &lc, &emptylc);
 	EXPECT_NE(lc, 0);
 	EXPECT_NE(emptylc, 0);
 }

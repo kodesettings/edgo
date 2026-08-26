@@ -28,13 +28,10 @@ protected:
 		started = StartLspClient("clangd", "");
 
 		// finding current working directory
-		char currentdir[PATH_MAX];
-		getcwd(currentdir, sizeof(currentdir));
-		InitLspClient(currentdir);
+		InitLspClient("/usr/include");
 
 		// reading file content
-		filepath.append(currentdir);
-		filepath.append("/../lsp_test.h");
+		filepath.append("/usr/include/threads.h");
 		content = ReadFileToString(filepath);
 
 		// accessing didOpen event

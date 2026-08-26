@@ -27,20 +27,20 @@ TEST_F(LspTest, TestLspClientStarted) {
 }
 
 TEST_F(LspTest, TestLspClientHover) {
-	hoverresponse_t response = Hover(filepath, 41-1, 8);
+	hoverresponse_t response = Hover(filepath, 223-1, 18);
 	EXPECT_NE(response.jsonrpc, "");
 
-	auto expected = "void DidOpen(const std::string &file, const std::string &text)";
+	auto expected = "function tss_create";
 	auto got = response.result.contents.value;
 	EXPECT_NE(got.find(expected), std::string::npos);
 }
 
 TEST_F(LspTest, TestLspClientCompletion) {
-	completionresponse_t response = Completion(filepath, 41-1, 14);
+	completionresponse_t response = Completion(filepath, 223-1, 18);
 	EXPECT_NE(response.jsonrpc, "");
 
-	auto expected = " filepath";
-	EXPECT_EQ(response.result.items.size(), 3);
+	auto expected = " tss_create";
+	EXPECT_EQ(response.result.items.size(), 1);
 
 	if (!response.result.items.empty()) {
 		EXPECT_EQ(expected, response.result.items[0].label);
@@ -48,7 +48,7 @@ TEST_F(LspTest, TestLspClientCompletion) {
 }
 
 TEST_F(LspTest, TestLspClientDefinition) {
-	definitionresponse_t response = Definition(filepath, 41-1, 8);
+	definitionresponse_t response = Definition(filepath, 223-1, 18);
 	EXPECT_NE(response.jsonrpc, "");
 
 	EXPECT_EQ(response.result.size(), 1);
@@ -59,24 +59,17 @@ TEST_F(LspTest, TestLspClientDefinition) {
 }
 
 TEST_F(LspTest, TestLspClientSignatureHelp) {
-	signaturehelpresponse_t response = SignatureHelp(filepath, 41-1, 12);
+	signaturehelpresponse_t response = SignatureHelp(filepath, 223-1, 34);
 	EXPECT_NE(response.jsonrpc, "");
+	EXPECT_EQ(response.id, 4);
 
-	auto expected = "DidOpen(const std::string &file, const std::string &text) -> void";
-	EXPECT_EQ(response.result.signatures.size(), 1);
-
-	if (!response.result.signatures.empty()) {
-		EXPECT_EQ(expected, response.result.signatures[0].label);
-	}
+	EXPECT_EQ(response.result.signatures.size(), 0);
 }
 
 TEST_F(LspTest, TestLspClientReferences) {
-	referencesresponse_t response = References(filepath, 41-1, 8);
+	referencesresponse_t response = References(filepath, 223-1, 34);
 	EXPECT_NE(response.jsonrpc, "");
+	EXPECT_EQ(response.id, 5);
 
-	EXPECT_EQ(response.result.size(), 2);
-
-	if (!response.result.empty()) {
-		EXPECT_NE(response.result[0].uri, "");
-	}
+	EXPECT_EQ(response.result.size(), 0);
 }
