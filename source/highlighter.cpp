@@ -86,7 +86,7 @@ void InsertTextEdit(const std::string &code, int offset, int length) {
 		new_end_point: TSPoint{row: 0, column: 0},
 	};
 	if (h.tree != nullptr) { ts_tree_edit(h.tree, &input_edit); }
-	h.tree = ts_parser_parse_string(h.parser, h.tree, code.c_str(), length);
+	h.tree = ts_parser_parse_string(h.parser, h.tree, code.c_str(), code.size());
 	LOG(INFO) << "inserttextedit offset:" << offset << " len:" << length;
 }
 
@@ -100,7 +100,7 @@ void RemoveTextEdit(const std::string &code, int offset, int length) {
 		new_end_point: TSPoint{row: 0, column: 0},
 	};
 	if (h.tree != nullptr) { ts_tree_edit(h.tree, &input_edit); }
-	h.tree = ts_parser_parse_string(h.parser, h.tree, code.c_str(), length);
+	h.tree = ts_parser_parse_string(h.parser, h.tree, code.c_str(), code.size());
 	LOG(INFO) << "removetextedit offset:" << offset << " len:" << length;
 }
 
