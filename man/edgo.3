@@ -113,7 +113,8 @@ It is also providing functionality for text manipulation, search, selection and 
 Edgo uses EDGO_CONF and EDGO_LOG environment variables to alter the editor behaviour or to produce
 diagnostic logs for debugging. Once the config file path is set you can change themes for the editor
 and configure custom LSP servers. Please note however we aim to provide builtin LSP server configurations
-for every languages that are supported by the editor.
+for every languages that are supported by the editor. For logging use EDGO_LOG value 1 to enable or 0
+to disable logging. All logs are written into system temporary folder.
 .SH THEMES
 A set of themes are included in the editor and available to be changed in the configuration file.
 Some of the themes are darcula, edgo, edgo-new, material-darker, vesper.
