@@ -1,7 +1,24 @@
-# ignoring build targets from repo
 edgotest
 libedgo.so
 build/
-
-# ignoring log files
 *.log
+build/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+install_manifest.txt
+CMakeUserPresets.json
+compile_commands.json
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dll
+*.dylib
+*.exe
+.vscode/
+.idea/
