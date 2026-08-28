@@ -22,4 +22,4 @@
 // By default we have to log into files on disk.
 #define EDGO_LOGGING_INIT google::InitGoogleLogging("edgo");
 #define EDGO_LOGGING_NO_STDERR FLAGS_logtostderr = 0;
-#define EDGO_LOGGING_SUPPRESS FLAGS_minloglevel = 2; // FATAL ONLY
+#define EDGO_LOGGING_SUPPRESS FLAGS_minloglevel = 3; // FATAL ONLY
