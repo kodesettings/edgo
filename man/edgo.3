@@ -10,14 +10,8 @@ Functions that are manipulating the text buffer while printing the screen conten
 struct screen \f3add_text\fP(const char *\fIbuf\fP, size_t \fIlength\fP);
 Adds character or text to the buffer.
 .TP
-struct screen \f3remove_text\fP(size_t \fIlength\fP);
-Removes character or text from the buffer.
-.TP
 struct screen \f3replace_text\fP(size_t \fIps\fP, size_t \fIpe\fP, const char *\fIbuf\fP, size_t \fIlength\fP);
 Replaces text between ranges of character positions.
-.TP
-struct screen \f3shift_with_tabs\fP(void);
-Shifting with tabs to the right of selected lines.
 .TP
 struct screen \f3display_screen_report\fP(const char *\fIdirpath\fP, size_t \fIlength\fP);
 Displaying screen report of the current working folder.

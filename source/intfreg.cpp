@@ -31,18 +31,6 @@ struct screen add_text(const char *buf, size_t length) {
 	return __export_screen(e.code_str(), e.y);
 }
 
-struct screen remove_text(size_t length) {
-	switch (length) {
-	case 0: break;
-	case 1: DeleteCharacter(e.row, e.col); break;
-	default:
-		if (e.__selection.is_selected)
-			Cut(false); // don't copy to clipboard
-	break;
-	}
-	return __export_screen(e.code_str(), e.y);
-}
-
 struct screen replace_text(size_t ps, size_t pe, const char *buf, size_t length) {
 	switch (length) {
 	case 0: break;
@@ -51,24 +39,6 @@ struct screen replace_text(size_t ps, size_t pe, const char *buf, size_t length)
 		int end_ch = pe == 0 ? e.__selection.sex : pe;
 		ReplaceString(e.row, start_ch, end_ch, buf);
 	}
-	return __export_screen(e.code_str(), e.y);
-}
-
-struct screen shift_with_tabs(void) {
-	int line_s = e.__selection.ssy;
-	int line_e = e.__selection.sey;
-
-	std::set<int> lines;
-	for (int i = line_s; i <= line_e; i++) {
-		lines.insert(i);
-	}
-
-	if (lines.empty()) {
-		return screen;
-	} else {
-		ShiftWithTabsToRight(e.row, e.col, lines);
-	}
-
 	return __export_screen(e.code_str(), e.y);
 }
 
@@ -130,8 +100,8 @@ struct screen swaplinesdn(void) {
 	}
 
 struct screen on_keypress(enum nav_keys keys, bool is_paging, bool is_shift) {
+	e.lines = __build_line_vec(e.code_str(), -1, false);
 	switch (keys) {
-	default: e.lines = __build_line_vec(e.code_str(), -1, false);
 	case DOWN:
 		if (is_shift)
 			SELECT_START
@@ -166,6 +136,7 @@ struct screen on_keypress(enum nav_keys keys, bool is_paging, bool is_shift) {
 	case DEL: OnDelete(); break;
 	case TAB: OnTab(); break;
 	case BACKTAB: OnBackTab(); break;
+	default: break;
 	}
 	return __export_screen(e.code_str(), e.y);
 }

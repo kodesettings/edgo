@@ -35,9 +35,7 @@ struct screen {
 //
 
 struct screen add_text(const char *buf, size_t length);
-struct screen remove_text(size_t length);
 struct screen replace_text(size_t ps, size_t pe, const char *buf, size_t length);
-struct screen shift_with_tabs(void);
 
 //
 // Screen report
