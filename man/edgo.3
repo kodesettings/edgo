@@ -7,17 +7,17 @@ edgo \- text editor library with native lsp support
 .SS Screen printing functions
 Functions that are manipulating the text buffer while printing the screen content.
 .TP
-struct screen \f3add_text\fP(size_t \fIline\fP, size_t \fIpos\fP, const char *\fIbuf\fP, size_t \fIlength\fP);
+struct screen \f3add_text\fP(const char *\fIbuf\fP, size_t \fIlength\fP);
 Adds character or text to the buffer.
 .TP
-struct screen \f3remove_text\fP(size_t \fIline\fP, size_t \fIpos\fP, size_t \fIlength\fP);
+struct screen \f3remove_text\fP(size_t \fIlength\fP);
 Removes character or text from the buffer.
 .TP
-struct screen \f3replace_text\fP(size_t \fIline\fP, size_t \fIfrom\fP, size_t \fIend\fP, const char *\fIbuf\fP, size_t \fIlength\fP);
-Replaces text between ranges.
+struct screen \f3replace_text\fP(size_t \fIps\fP, size_t \fIpe\fP, const char *\fIbuf\fP, size_t \fIlength\fP);
+Replaces text between ranges of character positions.
 .TP
-struct screen \f3shift_with_tabs\fP(size_t \fIline\fP, size_t \fIpos\fP, int *\fIarr\fP, size_t \fIarr_len\fP);
-Shifting with tabs to the right using integer array of lines.
+struct screen \f3shift_with_tabs\fP(void);
+Shifting with tabs to the right of selected lines.
 .TP
 struct screen \f3display_screen_report\fP(const char *\fIdirpath\fP, size_t \fIlength\fP);
 Displaying screen report of the current working folder.
@@ -39,7 +39,7 @@ Moves current line down under the cursor.
 .SS Navigation keys
 Navigation handler functions are also printing screen content.
 .TP
-struct screen \f3on_keypress\fP(enum nav_keys \fIkeys\fP, void *\fIis_paging\fP);
+struct screen \f3on_keypress\fP(enum nav_keys \fIkeys\fP, bool \fIis_paging\fP, bool \fIis_shift\fP);
 Handles key presses according to the parameter.
 .TP
 struct screen \f3on_scroll\fP(enum nav_keys \fIkeys\fP);

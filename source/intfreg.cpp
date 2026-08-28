@@ -21,40 +21,52 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-struct screen add_text(size_t line, size_t pos, const char *buf, size_t length) {
+struct screen add_text(const char *buf, size_t length) {
 	switch (length) {
 	case 0: break;
 	case 1: AddCharacter(buf[0]); break; // line and pos ignored
-	default: InsertString(line, pos, buf); break;
+	default: InsertString(e.row, e.col, buf); break;
 	}
 
 	return __export_screen(e.code_str(), e.y);
 }
 
-struct screen remove_text(size_t line, size_t pos, size_t length) {
+struct screen remove_text(size_t length) {
 	switch (length) {
 	case 0: break;
-	case 1: DeleteCharacter(line, pos); break;
-	default: Cut(false); break; // don't copy to clipboard
+	case 1: DeleteCharacter(e.row, e.col); break;
+	default:
+		if (e.__selection.is_selected)
+			Cut(false); // don't copy to clipboard
+	break;
 	}
 	return __export_screen(e.code_str(), e.y);
 }
 
-struct screen replace_text(size_t line, size_t from, size_t end, const char *buf, size_t length) {
+struct screen replace_text(size_t ps, size_t pe, const char *buf, size_t length) {
 	switch (length) {
 	case 0: break;
-	default: ReplaceString(line, from, end, buf);
+	default:
+		int start_ch = ps == 0 ? e.__selection.ssx : ps;
+		int end_ch = pe == 0 ? e.__selection.sex : pe;
+		ReplaceString(e.row, start_ch, end_ch, buf);
 	}
 	return __export_screen(e.code_str(), e.y);
 }
 
-struct screen shift_with_tabs(size_t line, size_t pos, int *arr, size_t arr_len) {
-	if (!arr_len) {
-		printf("third argument must be an array");
+struct screen shift_with_tabs(void) {
+	int line_s = e.__selection.ssy;
+	int line_e = e.__selection.sey;
+
+	std::set<int> lines;
+	for (int i = line_s; i <= line_e; i++) {
+		lines.insert(i);
+	}
+
+	if (lines.empty()) {
 		return screen;
 	} else {
-		auto lines = std::set<int>(arr, arr + arr_len);
-		ShiftWithTabsToRight(line, pos, lines);
+		ShiftWithTabsToRight(e.row, e.col, lines);
 	}
 
 	return __export_screen(e.code_str(), e.y);
@@ -104,14 +116,50 @@ struct screen swaplinesdn(void) {
 	return __export_screen(e.code_str(), e.y);
 }
 
-struct screen on_keypress(enum nav_keys keys, void *is_paging) {
-	bool isp = is_paging == NULL ? false : static_cast<bool>(is_paging);
+#define SELECT_START \
+	if (e.__selection.ssx < 0) { \
+		e.__selection.ssx = e.col; \
+		e.__selection.ssy = e.row; \
+	}
+
+#define SELECT_END \
+	if (e.__selection.ssx >= 0) { \
+		e.__selection.sex = e.col; \
+		e.__selection.sey = e.row; \
+		e.__selection.is_selected = true; \
+	}
+
+struct screen on_keypress(enum nav_keys keys, bool is_paging, bool is_shift) {
 	switch (keys) {
 	default: e.lines = __build_line_vec(e.code_str(), -1, false);
-	case DOWN: OnDown(isp); break;
-	case UP: OnUp(isp); break;
-	case LEFT: OnLeft(); break;
-	case RIGHT: OnRight(); break;
+	case DOWN:
+		if (is_shift)
+			SELECT_START
+		OnDown(is_paging);
+		if (is_shift)
+			SELECT_END
+	break;
+	case UP:
+		if (is_shift)
+			SELECT_START
+		OnUp(is_paging);
+		if (is_shift)
+			SELECT_END
+	break;
+	case LEFT:
+		if (is_shift)
+			SELECT_START
+		OnLeft();
+		if (is_shift)
+			SELECT_END
+	break;
+	case RIGHT:
+		if (is_shift)
+			SELECT_START
+		OnRight();
+		if (is_shift)
+			SELECT_END
+	break;
 	case TOP: GoTop(); break;
 	case BOTTOM: GoBottom(); break;
 	case ENTER: OnEnter(); break;

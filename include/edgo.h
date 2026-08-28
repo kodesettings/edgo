@@ -34,10 +34,10 @@ struct screen {
 // Text manipulators
 //
 
-struct screen add_text(size_t line, size_t pos, const char *buf, size_t length);
-struct screen remove_text(size_t line, size_t pos, size_t length);
-struct screen replace_text(size_t line, size_t from, size_t end, const char *buf, size_t length);
-struct screen shift_with_tabs(size_t line, size_t pos, int *arr, size_t arr_len);
+struct screen add_text(const char *buf, size_t length);
+struct screen remove_text(size_t length);
+struct screen replace_text(size_t ps, size_t pe, const char *buf, size_t length);
+struct screen shift_with_tabs(void);
 
 //
 // Screen report
@@ -85,7 +85,7 @@ enum nav_keys {
 // Navigation keys
 //
 
-struct screen on_keypress(enum nav_keys keys, void *is_paging);
+struct screen on_keypress(enum nav_keys keys, bool is_paging, bool is_shift);
 struct screen on_scroll(enum nav_keys keys);
 
 //
