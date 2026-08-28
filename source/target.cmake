@@ -38,7 +38,6 @@ target_sources(edgo PRIVATE lang_rust.h)
 
 target_sources(edgo PRIVATE langs.h)
 target_sources(edgo PRIVATE themes.h)
-target_sources(edgo PRIVATE test_languages.h)
 target_sources(edgo PRIVATE search.cpp)
 target_sources(edgo PRIVATE search.h)
 target_sources(edgo PRIVATE query.cpp)

@@ -1,6 +1,5 @@
 edgotest
 libedgo.so
-build/
 *.log
 build/
 cmake-build-*/
