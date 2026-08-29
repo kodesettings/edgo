@@ -121,7 +121,9 @@ coloredbyterange_v ColorRanges(const int from, const int to);
 
 typedef struct {
 	coloredbyterange_v ranges;
-	uint32_t counter;
+	uint32_t counter = 0;
+	uint32_t row = 0;
+	uint32_t col = 0;
 } colorindexer_t;
 
 //--------------------------------------------------------------------------------

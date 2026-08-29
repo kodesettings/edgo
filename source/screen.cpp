@@ -66,7 +66,6 @@ line_v BuildLineVec(const std::string &data, int lineNum, bool colorize) {
 
 	if (colorize) {
 		indexer.ranges = ColorRanges(e.y, e.y + e.TERMINAL_HEIGHT);
-		indexer.counter = 0;
 	}
 
 	for (auto b : data) {
@@ -74,10 +73,14 @@ line_v BuildLineVec(const std::string &data, int lineNum, bool colorize) {
 			lines.push_back(line_t{line});
 			line.erase();
 			indexer.counter++;
+			indexer.row++;
+			indexer.col = 0;
 		} else if (lineNum == (int)lines.size()) {
 			break;
 		} else {
-			Colorize(b, &line, colorize, &indexer);
+			Colorize(b, &line, colorize, indexer);
+			indexer.counter++;
+			indexer.col++;
 		}
 	}
 

@@ -39,17 +39,17 @@ void FindTests(void) {
 	TestFinder(e.absoluteFilePath, &e.tests);
 }
 
-int GetColor(char ch, int col, int row, colorindexer_t *indexer) {
+int GetColor(char ch, colorindexer_t indexer) {
 	int style = 0;
 
-	for (auto i : indexer->ranges) {
-		if (i.startbyte <= indexer->counter && indexer->counter < i.endbyte) {
+	for (auto i : indexer.ranges) {
+		if (i.startbyte <= indexer.counter && indexer.counter < i.endbyte) {
 			style = i.color;
 			break;
 		}
 	}
 
-	if (e.__selection.IsUnderSelection(col, row)) {
+	if (e.__selection.IsUnderSelection(indexer.col, indexer.row)) {
 		style = SELECTIONCOLOR;
 	}
 
@@ -57,16 +57,15 @@ int GetColor(char ch, int col, int row, colorindexer_t *indexer) {
 		style = ACCENTCOLOR;
 	}
 
-	indexer->counter += sizeof(ch);
 	return style;
 }
 
-void Colorize(char b, std::string *line, bool colorize, colorindexer_t *indexer) {
+void Colorize(char b, std::string *line, bool colorize, colorindexer_t indexer) {
 	std::string str;
 	int style;
 
 	if (colorize) {
-		style = GetColor(b, e.col, e.row, indexer);
+		style = GetColor(b, indexer);
 		if (style == 0) goto nocolor;
 		str = std::string(1, b);
 		ColorizeTextChunk(style, &str);
