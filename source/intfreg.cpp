@@ -42,6 +42,12 @@ struct screen replace_text(size_t ps, size_t pe, const char *buf, size_t length)
 	return __export_screen(e.code_str(), e.y);
 }
 
+struct screen move_cursor(size_t line, size_t pos) {
+	e.row = line; e.col = pos;
+	e.__selection.CleanSelection();
+	return __export_screen(e.code_str(), e.y);
+}
+
 struct screen display_screen_report(const char *dirpath, size_t length) {
 	std::string dirpath_s, report;
 	switch (length) {

@@ -13,6 +13,9 @@ Adds character or text to the buffer.
 struct screen \f3replace_text\fP(size_t \fIps\fP, size_t \fIpe\fP, const char *\fIbuf\fP, size_t \fIlength\fP);
 Replaces text between ranges of character positions.
 .TP
+struct screen \f3move_cursor\fP(size_t \fIline\fP, size_t \fIpos\fP);
+Moves cursor to position.
+.TP
 struct screen \f3display_screen_report\fP(const char *\fIdirpath\fP, size_t \fIlength\fP);
 Displaying screen report of the current working folder.
 .TP
