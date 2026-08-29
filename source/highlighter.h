@@ -53,12 +53,10 @@ typedef struct {
 extern treesitterhighlighter_t h;
 
 // Hardcoded colors that are fixed in style
-#define SELECTIONCOLOR 246 // gray
-#define HIGHLIGHTCOLOR 238 // gray
-#define OVERLAYCOLOR -1 // transparent
-#define ACCENTCOLOR 303 // pink
-#define ACCENTCOLOR2 = 30 // aqua
-#define ACCENTCOLOR3 -1 // aqua
+#define SELECTIONCOLOR 9737364 // gray
+#define HIGHLIGHTCOLOR 158561124 // gray
+#define ACCENTCOLOR 16761035 // pink
+#define ACCENTCOLOR2 = 65535 // aqua
 
 using colormap = std::map<std::string, std::string>;
 

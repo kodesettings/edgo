@@ -39,36 +39,32 @@ void FindTests(void) {
 	TestFinder(e.absoluteFilePath, &e.tests);
 }
 
-int GetColor(char ch, colorindexer_t indexer) {
-	int style = 0;
-
+void GetColor(char ch, int *fg, int *bg, colorindexer_t indexer) {
 	for (auto i : indexer.ranges) {
 		if (i.startbyte <= indexer.counter && indexer.counter < i.endbyte) {
-			style = i.color;
+			*fg = i.color;
 			break;
 		}
 	}
 
 	if (e.__selection.IsUnderSelection(indexer.col, indexer.row)) {
-		style = SELECTIONCOLOR;
+		*bg = SELECTIONCOLOR;
 	}
 
 	if (ch == '\t' && e.x == 0) { // draw big cursor for tab
-		style = ACCENTCOLOR;
+		*bg = ACCENTCOLOR;
 	}
-
-	return style;
 }
 
 void Colorize(char b, std::string *line, bool colorize, colorindexer_t indexer) {
 	std::string str;
-	int style;
+	int fg = 0, bg = 0;
 
 	if (colorize) {
-		style = GetColor(b, indexer);
-		if (style == 0) goto nocolor;
+		GetColor(b, &fg, &bg, indexer);
+		if (fg == 0) goto nocolor;
 		str = std::string(1, b);
-		ColorizeTextChunk(style, &str);
+		ColorizeTextChunk(fg, bg, &str);
 		line->append(str);
 	} else {
 nocolor:

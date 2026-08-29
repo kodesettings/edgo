@@ -57,7 +57,7 @@ void OnSwapLinesDown(void);
 // io routines
 void UpdateLsp(const std::string &text, bool isOpen);
 void FindTests(void);
-int GetColor(char ch, colorindexer_t indexer);
+void GetColor(char ch, int *fg, int *bg, colorindexer_t indexer);
 void Colorize(char b, std::string *line, bool colorize, colorindexer_t indexer);
 void SetTerminalDims(int *rows, int *cols);
 void SetFileAttributes(const std::string &file, std::string *content, bool isOpen);

@@ -45,6 +45,9 @@ TEST(UtilsTests, TestFoundCharacterOccurances) {
 
 TEST(UtilsTests, TestColorizeTextChunk) {
 	std::string str("some text");
-	ColorizeTextChunk(16755251, &str);
+	ColorizeTextChunk(16755251, 0, &str);
 	EXPECT_EQ(str, "\x1B[38;2;255;170;51msome text\x1B[0m");
+	str = "colored text";
+	ColorizeTextChunk(16755251, 9498256, &str);
+	EXPECT_EQ(str, "\x1B[38;2;255;170;51;48;2;144;238;144mcolored text\x1B[0m");
 }

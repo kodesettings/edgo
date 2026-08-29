@@ -108,11 +108,16 @@ bool IsMatchExt(const std::string &path, string_v ignoreExts) {
 	return false;
 }
 
-void ColorizeTextChunk(uint32_t color, std::string *str) {
+void ColorizeTextChunk(int fg, int bg, std::string *str) {
 	int r, g, b;
 	std::stringstream ss;
 
-	ColorToRGB(color, &r, &g, &b);
-	ss << "\033[38;2;" << r << ";" << g << ";" << b << "m" << *str << "\033[0m";
+	ColorToRGB(fg, &r, &g, &b);
+	ss << "\033[38;2;" << r << ";" << g << ";" << b;
+	if (bg > 0) {
+		ColorToRGB(bg, &r, &g, &b);
+		ss << ";48;2;" << r << ";" << g << ";" << b;
+	}
+	ss << "m" << *str << "\033[0m";
 	*str = ss.str();
 }
