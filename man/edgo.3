@@ -16,8 +16,8 @@ Replaces text between ranges of character positions.
 struct screen \f3move_cursor\fP(size_t \fIline\fP, size_t \fIpos\fP);
 Moves cursor to position.
 .TP
-struct screen \f3display_screen_report\fP(const char *\fIdirpath\fP, size_t \fIlength\fP);
-Displaying screen report of the current working folder.
+struct screen \f3files_report\fP(const char *\fIdirpath\fP, size_t \fIlength\fP);
+Shows files report of the current working folder or the provided path.
 .TP
 struct screen \f3clipboard\fP(enum clipboard_ops \fIops\fP);
 Clipboard operations are handled according the parameter.
