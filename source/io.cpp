@@ -52,23 +52,48 @@ void GetColor(char ch, int *fg, int *bg, colorindexer_t indexer) {
 	}
 
 	if (ch == '\t' && e.x == 0) { // draw big cursor for tab
-		*bg = ACCENTCOLOR;
+		if ((int)indexer.row == e.row && (int)indexer.col == e.col) {
+			*bg = ACCENTCOLOR;
+			*fg = -1;
+		}
+	}
+}
+
+void TabsSpaces(int fg, int bg, std::string *line, std::string *str) {
+	// TODO: handling tab spaces when we write into the tab area:
+	// we need to count the characters and move our tab forward
+	// when it reaches the last character inside tab width
+	for (int i = 0; i < e.langTabWidth; i++) {
+		if (fg == -1)
+			ColorizeTextChunk(0, bg, str);
+		line->append(*str);
 	}
 }
 
 void Colorize(char b, std::string *line, bool colorize, colorindexer_t indexer) {
-	std::string str;
+	std::string str = " ";
 	int fg = 0, bg = 0;
 
 	if (colorize) {
 		GetColor(b, &fg, &bg, indexer);
-		if (fg == 0) goto nocolor;
+
+		if (fg == 0 && b != '\t') goto nocolor;
+		if (fg == 0 && b == '\t') goto nocolortabs;
+		if (fg > 0 && b != '\t') goto color;
+
+		// coloring tabs if cursor is there
+		TabsSpaces(fg, bg, line, &str);
+		return;
+color:
 		str = std::string(1, b);
 		ColorizeTextChunk(fg, bg, &str);
 		line->append(str);
 	} else {
 nocolor:
 		line->append(std::string(1, b));
+		return;
+nocolortabs:
+		TabsSpaces(fg, bg, line, &str);
 	}
 }
 
@@ -118,6 +143,9 @@ bool HandleFile(const std::string &filepath, bool isOpen) {
 	e.lang = DetectLang(e.absoluteFilePath);
 	e.config = GetConfig();
 	e.code = rope<char>(content.c_str());
+	e.langConf = e.config.langs[e.lang.name];
+	e.langTabWidth = e.langConf.tabwidth;
+
 	switch (e.lang.name.empty()) {
 	case true:
 		LOG(INFO) << "unknown language";
@@ -125,9 +153,7 @@ bool HandleFile(const std::string &filepath, bool isOpen) {
 	break;
 	case false:
 		LOG(INFO) << "new language is " << e.lang.name;
-		config_t config = GetConfig();
-		lang_t lsp = config.langs[e.lang.name];
-		StartLspClient(lsp.cmd, lsp.lsp);
+		StartLspClient(e.langConf.cmd, e.langConf.lsp);
 		InitLspClient(e.cwd);
 		SetTerminalDims(&e.ROWS, &e.COLUMNS);
 		SetLang(e.lang.lang);
