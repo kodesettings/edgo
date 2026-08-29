@@ -87,53 +87,53 @@ struct screen swaplinesdn(void) {
 }
 
 #define SELECT_START \
+{ \
 	if (e.__selection.ssx < 0) { \
 		e.__selection.ssx = e.col; \
 		e.__selection.ssy = e.row; \
-	}
+	} \
+}
 
 #define SELECT_END \
+{ \
 	if (e.__selection.ssx >= 0) { \
 		e.__selection.sex = e.col; \
 		e.__selection.sey = e.row; \
 		e.__selection.is_selected = true; \
-	}
+	} \
+}
+
+#define CLEAN_SELECT \
+	e.__selection.CleanSelection();
 
 struct screen on_keypress(enum nav_keys keys, bool is_paging, bool is_shift) {
 	e.lines = __build_line_vec(e.code_str(), -1, false);
 	switch (keys) {
 	case DOWN:
-		if (is_shift)
-			SELECT_START
+		if (is_shift) SELECT_START else CLEAN_SELECT
 		OnDown(is_paging);
-		if (is_shift)
-			SELECT_END
+		if (is_shift) SELECT_END
 	break;
 	case UP:
-		if (is_shift)
-			SELECT_START
+		if (is_shift) SELECT_START else CLEAN_SELECT
 		OnUp(is_paging);
-		if (is_shift)
-			SELECT_END
+		if (is_shift) SELECT_END
 	break;
 	case LEFT:
-		if (is_shift)
-			SELECT_START
+		if (is_shift) SELECT_START else CLEAN_SELECT
 		OnLeft();
-		if (is_shift)
-			SELECT_END
+		if (is_shift) SELECT_END
 	break;
 	case RIGHT:
-		if (is_shift)
-			SELECT_START
+		if (is_shift) SELECT_START else CLEAN_SELECT
 		OnRight();
-		if (is_shift)
-			SELECT_END
+		if (is_shift) SELECT_END
 	break;
 	case TOP: GoTop(); break;
 	case BOTTOM: GoBottom(); break;
 	case ENTER: OnEnter(); break;
 	case DEL: OnDelete(); break;
+	case ESC: CLEAN_SELECT; break;
 	case TAB: OnTab(); break;
 	case BACKTAB: OnBackTab(); break;
 	default: break;

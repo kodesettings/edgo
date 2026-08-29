@@ -75,6 +75,7 @@ enum nav_keys {
 	BOTTOM  = 0x06DF,
 	ENTER   = 0x01FC,
 	DEL     = 0x02FC,
+	ESC     = 0x03FC,
 	TAB     = 0x01FF,
 	BACKTAB = 0x02FF
 };
