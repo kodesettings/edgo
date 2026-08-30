@@ -8,6 +8,8 @@ Version 0.0.2 - WIP
 == TODO:some user input cursor positions have to be fixed on the undo stack
 == TODO:debug C API functions
 == TODO:add multifile support for diagnostics??
+== TODO:update tabs spaces handling in io.cpp
+== TODO:fix scrolling in screen output
 
 -------------------------------------------------------------------
 Version 0.0.1 - Modifications done on the original Go repository
