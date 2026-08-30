@@ -48,7 +48,7 @@ struct screen move_cursor(size_t line, size_t pos) {
 	return __export_screen(e.code_str(), e.y);
 }
 
-struct screen files_report(const char *dirpath, size_t length) {
+struct screen display_screen_report(const char *dirpath, size_t length) {
 	std::string dirpath_s, report;
 	switch (length) {
 	case 0: dirpath_s = e.cwd; break;

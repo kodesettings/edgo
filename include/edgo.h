@@ -36,18 +36,13 @@ struct screen {
 
 struct screen add_text(const char *buf, size_t length);
 struct screen replace_text(size_t ps, size_t pe, const char *buf, size_t length);
-
-//
-// Cursor position
-//
-
 struct screen move_cursor(size_t line, size_t pos);
 
 //
-// Files report
+// Screen report
 //
 
-struct screen files_report(const char *dirpath, size_t length);
+struct screen display_screen_report(const char *dirpath, size_t length);
 
 enum clipboard_ops {
 	COPY  = 0x034FC,
