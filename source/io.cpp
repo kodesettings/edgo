@@ -74,16 +74,19 @@ void Colorize(char b, std::string *line, bool colorize, colorindexer_t indexer) 
 	std::string str = " ";
 	int fg = 0, bg = 0;
 
-	if (colorize)
+	if (colorize) {
 		GetColor(b, &fg, &bg, indexer);
+	}
 
-	if (b == '\t')
+	if (b == '\t') {
 		TabsSpaces(fg, bg, line, &str);
-	else
+	} else {
 		str = std::string(1, b);
+	}
 
-	if (colorize && (fg != 0 || bg != 0))
+	if (colorize && (fg != 0 || bg != 0)) {
 		ColorizeTextChunk(fg, bg, &str);
+	}
 
 	line->append(str);
 }
