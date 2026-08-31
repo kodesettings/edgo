@@ -56,7 +56,7 @@ extern treesitterhighlighter_t h;
 #define SELECTIONCOLOR 9737364 // gray
 #define HIGHLIGHTCOLOR 158561124 // gray
 #define ACCENTCOLOR 16761035 // pink
-#define ACCENTCOLOR2 = 65535 // aqua
+#define ACCENTCOLOR2 65535 // aqua
 
 using colormap = std::map<std::string, std::string>;
 

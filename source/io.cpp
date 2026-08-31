@@ -74,27 +74,18 @@ void Colorize(char b, std::string *line, bool colorize, colorindexer_t indexer) 
 	std::string str = " ";
 	int fg = 0, bg = 0;
 
-	if (colorize) {
+	if (colorize)
 		GetColor(b, &fg, &bg, indexer);
 
-		if (fg == 0 && b != '\t') goto nocolor;
-		if (fg == 0 && b == '\t') goto nocolortabs;
-		if (fg > 0 && b != '\t') goto color;
-
-		// coloring tabs if cursor is there
+	if (b == '\t')
 		TabsSpaces(fg, bg, line, &str);
-		return;
-color:
+	else
 		str = std::string(1, b);
+
+	if (colorize && (fg != 0 || bg != 0))
 		ColorizeTextChunk(fg, bg, &str);
-		line->append(str);
-	} else {
-nocolor:
-		line->append(std::string(1, b));
-		return;
-nocolortabs:
-		TabsSpaces(fg, bg, line, &str);
-	}
+
+	line->append(str);
 }
 
 void SetTerminalDims(int *rows, int *cols) {
