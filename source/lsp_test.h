@@ -24,18 +24,9 @@
 class LspTest : public ::testing::Test {
 protected:
 	static void SetUpTestSuite() {
-		lspclient.lang = "cpp";
-		started = StartLspClient("clangd", "");
-
-		// finding current working directory
-		InitLspClient("/usr/include");
-
-		// reading file content
-		filepath.append("/usr/include/threads.h");
-		content = ReadFileToString(filepath);
-
-		// accessing didOpen event
-		DidOpen(filepath, content);
+		filepath = "/usr/include/threads.h";
+		content = open_file(filepath.c_str()).content;
+		started = true;
 	}
 
 	static void TearDownTestSuite() { lspclient.isReady = false; }

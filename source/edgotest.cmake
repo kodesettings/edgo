@@ -3,6 +3,7 @@
 target_sources(edgotest PRIVATE config_test.cpp)
 target_sources(edgotest PRIVATE selection_test.cpp)
 target_sources(edgotest PRIVATE lsp_client_test.cpp)
+target_sources(edgotest PRIVATE lsp_test.cpp)
 target_sources(edgotest PRIVATE lsp_test.h)
 target_sources(edgotest PRIVATE utils_test.cpp)
 target_sources(edgotest PRIVATE characters_test.cpp)
