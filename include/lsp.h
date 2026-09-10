@@ -19,7 +19,9 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 //
 // Basic types
 //
@@ -219,3 +221,6 @@ struct lsp_code_action {
 	size_t code_action_count;
 	struct lsp_code_action_item *items;
 };
+#ifdef __cplusplus
+}
+#endif
