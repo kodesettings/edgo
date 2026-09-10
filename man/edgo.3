@@ -1,4 +1,4 @@
-.TH edgo 3 "2026-08-03"
+.TH edgo 3 "2026-09-10"
 .SH NAME
 edgo \- text editor library with native lsp support
 .SH SYNOPSIS
@@ -17,7 +17,7 @@ struct screen \f3move_cursor\fP(size_t \fIline\fP, size_t \fIpos\fP);
 Moves cursor to position.
 .TP
 struct screen \f3display_screen_report\fP(const char *\fIdirpath\fP, size_t \fIlength\fP);
-Displaying screen report of the current working folder.
+Displays screen report of the current working folder or the provided path.
 .TP
 struct screen \f3clipboard\fP(enum clipboard_ops \fIops\fP);
 Clipboard operations are handled according the parameter.
@@ -105,13 +105,17 @@ Specifies the navigation keys pressed such as
 etc.
 .SH DESCRIPTION
 Edgo is a library for text editors providing syntax highlighting and language server protocol (LSP).
-It is also providing functionality for text manipulation, search, selection and language queries.
+The library acts as an engine between client rendering terminal applications and the underlying
+functionalities while providing capability also for text manipulation, search, selection and
+language queries.
 .SH CONFIGURATION
 Edgo uses EDGO_CONF and EDGO_LOG environment variables to alter the editor behaviour or to produce
-diagnostic logs for debugging. Once the config file path is set you can change themes for the editor
-and configure custom LSP servers. Please note however we aim to provide builtin LSP server configurations
-for every languages that are supported by the editor. For logging use EDGO_LOG value 1 to enable or 0
-to disable logging. All logs are written into system temporary folder.
+diagnostic logs for debugging. By default the configuration file is located at /etc/edgo.conf.
+However you can direct to any other config file location with EDGO_CONF variable. Once the config file
+is located or the path is set you can change themes for your editor and configure custom LSP servers.
+Please note however we aim to provide built-in LSP server configurations for every languages that are
+supported by the library. For logging use EDGO_LOG value 1 to enable or 0 to disable logging. All
+logs are written into system temporary folder.
 .SH THEMES
 A set of themes are included in the editor and available to be changed in the configuration file.
 Some of the themes are darcula, edgo, edgo-new, material-darker, vesper.
