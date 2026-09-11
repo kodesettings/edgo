@@ -468,7 +468,6 @@ typedef struct {
 	string_t   label;
 	int        kind;
 	string_t   detail;
-	bool       preselect;
 	string_t   sortText;
 	string_t   insertText;
 	string_t   filterText;
@@ -480,7 +479,6 @@ typedef struct {
 		ar & CEREAL_NVP(label);
 		ar & CEREAL_NVP(kind);
 		ar & CEREAL_NVP(detail);
-		ar & CEREAL_NVP(preselect);
 		ar & CEREAL_NVP(sortText);
 		ar & CEREAL_NVP(insertText);
 		ar & CEREAL_NVP(filterText);

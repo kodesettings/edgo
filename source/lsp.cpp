@@ -30,6 +30,12 @@
 	lsp_text_edit.range = lsp_range;                                   \
 	lsp_text_edit.new_text = edit.newText.c_str();                     \
 	destination = lsp_text_edit;
+#define ALLOC_STRING(name, value)                                      \
+	static char name[2048];                                            \
+	strcpy(name, value.c_str());
+#define ALLOC_STRING_L(name, value)                                    \
+	static char name[24128];                                           \
+	strcpy(name, value.c_str());
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,10 +46,8 @@ void lsp_client_hover(struct lsp_hover* lsp_hover) {
 	struct lsp_range lsp_range;
 	CONVERT_LSP_RANGE(lsp_range, hover.result.range);
 
-	static char language[32], contents[104128];
-
-	strcpy(language, hover.result.contents.kind.c_str());
-	strcpy(contents, hover.result.contents.value.c_str());
+	ALLOC_STRING(language, hover.result.contents.kind);
+	ALLOC_STRING_L(contents, hover.result.contents.value);
 
 	lsp_hover->contents.language = language;
 	lsp_hover->contents.value = contents;
@@ -64,11 +68,16 @@ void lsp_client_completion(struct lsp_completion* lsp_completion) {
 		struct lsp_completion_item lsp_completion_item;
 		completionitem_t item = completion.result.items[i];;
 
-		lsp_completion_item.label = item.label.c_str();
+		ALLOC_STRING(label, item.label);
+		ALLOC_STRING(detail, item.detail);
+		ALLOC_STRING(documentation, item.sortText);
+		ALLOC_STRING(insert_text, item.insertText);
+
+		lsp_completion_item.label = label;
 		lsp_completion_item.kind = (lsp_completion_item_kind)item.kind;
-		lsp_completion_item.detail = item.label.c_str();
-		lsp_completion_item.documentation = item.sortText.c_str();
-		lsp_completion_item.insert_text = item.insertText.c_str();
+		lsp_completion_item.detail = detail;
+		lsp_completion_item.documentation = documentation;
+		lsp_completion_item.insert_text = insert_text;
 
 		struct lsp_range lsp_range;
 		textedit_t text_edit = item.textEdit;
@@ -93,7 +102,9 @@ void lsp_client_definition(struct lsp_definition* lsp_definition) {
 		struct lsp_location lsp_location;
 		definitionresult_t result = definition.result[i];
 
-		lsp_location.uri = result.uri.c_str();
+		ALLOC_STRING(uri, result.uri);
+
+		lsp_location.uri = uri;
 		CONVERT_LSP_RANGE(lsp_location.range, result.range);
 		locations[i] = lsp_location;
 	}
@@ -114,7 +125,10 @@ void lsp_client_signature_help(struct lsp_signature_help* lsp_signature_help) {
 	for (size_t i = 0; i < lsp_signature_help->signature_count; i++) {
 		signatureinformation_t signature = signaturehelp.result.signatures[i];
 		struct lsp_signature_information lsp_signature_information;
-		lsp_signature_information.label = signature.label.c_str();
+
+		ALLOC_STRING(label, signature.label);
+
+		lsp_signature_information.label = label;
 		lsp_signature_information.parameter_count = signature.parameters.size();
 
 		size_t parameter_count = lsp_signature_information.parameter_count;
@@ -124,8 +138,12 @@ void lsp_client_signature_help(struct lsp_signature_help* lsp_signature_help) {
 		for (size_t j = 0; j < parameter_count; j++) {
 			parameterinformation_t parameter = signature.parameters[j];
 			struct lsp_parameter_information lsp_parameter_information;
-			lsp_parameter_information.label = parameter.label.c_str();
-			lsp_parameter_information.documentation = parameter.documentation.c_str();
+
+			ALLOC_STRING(label, parameter.label);
+			ALLOC_STRING(documentation, parameter.documentation);
+
+			lsp_parameter_information.label = label;
+			lsp_parameter_information.documentation = documentation;
 			parameters[j] = lsp_parameter_information;
 		}
 
@@ -146,7 +164,9 @@ void lsp_client_references(struct lsp_references* lsp_references) {
 		struct lsp_location lsp_location;
 		referencesrange_t result = references.result[i];
 
-		lsp_location.uri = result.uri.c_str();
+		ALLOC_STRING(uri, result.uri);
+
+		lsp_location.uri = uri;
 		CONVERT_LSP_RANGE(lsp_location.range, result.range);
 		locations[i] = lsp_location;
 	}
@@ -157,7 +177,9 @@ void lsp_client_prepare_rename(struct lsp_prepare_rename* lsp_prepare_rename) {
 	preparerename = PrepareRename(e.absoluteFilePath, e.row, e.col);
 
 	CONVERT_LSP_RANGE(lsp_prepare_rename->range, preparerename.result.range);
-	lsp_prepare_rename->placeholder = preparerename.result.placeholder.c_str();
+	ALLOC_STRING(placeholder, preparerename.result.placeholder);
+
+	lsp_prepare_rename->placeholder = placeholder;
 }
 
 void lsp_client_rename(const char* newname, struct lsp_rename* lsp_rename) {
@@ -173,7 +195,10 @@ void lsp_client_rename(const char* newname, struct lsp_rename* lsp_rename) {
 	for (size_t i = 0; i < lsp_rename->document_change_count; i++) {
 		struct lsp_versioned_text_document_identifier text_document;
 		documentchange_t documentchange = rename.result.documentChanges[i];
-		text_document.uri = documentchange.textDocument.uri.c_str();
+
+		ALLOC_STRING(uri, documentchange.textDocument.uri);
+
+		text_document.uri = uri;
 		text_document.version = documentchange.textDocument.version;
 		document_changes[i].text_document = text_document;
 
@@ -204,9 +229,14 @@ void lsp_client_code_action(struct lsp_code_action* lsp_code_action) {
 	for (size_t i = 0; i < lsp_code_action->code_action_count; i++) {
 		struct lsp_code_action_item lsp_code_action_item;
 		codeactionresult_t result = codeaction.result[i];
-		lsp_code_action_item.title = result.title.c_str();
-		lsp_code_action_item.kind = result.kind.c_str();
+
+		ALLOC_STRING(title, result.title);
+		ALLOC_STRING(kind, result.kind);
+
+		lsp_code_action_item.title = title;
+		lsp_code_action_item.kind = kind;
 		lsp_code_action_item.edit.edit_count = 1;
+
 		LSP_TEXT_EDIT(lsp_code_action_item.edit.edits[0], result.edit);
 		items[i] = lsp_code_action_item;
 	}
@@ -220,7 +250,9 @@ void lsp_diagnostics(struct lsp_publish_diagnostics* lsp_publish_diagnostics) {
 
 	diagnosticparams_t diagnosticparams = it->second;
 	lsp_publish_diagnostics->count = diagnosticparams.diagnostics.size();
-	lsp_publish_diagnostics->uri = diagnosticparams.uri.c_str();
+
+	ALLOC_STRING(uri, diagnosticparams.uri);
+	lsp_publish_diagnostics->uri = uri;
 
 	struct lsp_diagnostic diagnostics[lsp_publish_diagnostics->count];
 	lsp_publish_diagnostics->diagnostics = &(*diagnostics);
@@ -230,6 +262,10 @@ void lsp_diagnostics(struct lsp_publish_diagnostics* lsp_publish_diagnostics) {
 		diagnostic_t diagnostic = diagnosticparams.diagnostics[i];
 		CONVERT_LSP_RANGE(lsp_diagnostic.range, diagnostic.range);
 		lsp_diagnostic.severity = (lsp_diagnostic_severity)diagnostic.severity;
+
+		ALLOC_STRING(source, diagnostic.source);
+		ALLOC_STRING(message, diagnostic.message);
+
 		lsp_diagnostic.source = diagnostic.source.c_str();
 		lsp_diagnostic.message = diagnostic.message.c_str();
 		diagnostics[i] = lsp_diagnostic;
