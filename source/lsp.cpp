@@ -23,16 +23,11 @@
 	range.start.character = orig.start.character;                      \
 	range.end.line        = orig.end.line;                             \
 	range.end.character   = orig.end.character;
-#define LSP_TEXT_EDIT(destination, edit)                               \
-	struct lsp_text_edit lsp_text_edit;                                \
-	struct lsp_range lsp_range;                                        \
-	CONVERT_LSP_RANGE(lsp_range, edit.range);                          \
-	lsp_text_edit.range = lsp_range;                                   \
-	lsp_text_edit.new_text = edit.newText.c_str();                     \
-	destination = lsp_text_edit;
+
 #define ALLOC_STRING(name, value)                                      \
 	static char name[2048];                                            \
 	strcpy(name, value.c_str());
+
 #define ALLOC_STRING_L(name, value)                                    \
 	static char name[24128];                                           \
 	strcpy(name, value.c_str());
@@ -181,6 +176,14 @@ void lsp_client_prepare_rename(struct lsp_prepare_rename* lsp_prepare_rename) {
 
 	lsp_prepare_rename->placeholder = placeholder;
 }
+
+#define LSP_TEXT_EDIT(destination, edit)                               \
+	struct lsp_text_edit lsp_text_edit;                                \
+	struct lsp_range lsp_range;                                        \
+	CONVERT_LSP_RANGE(lsp_range, edit.range);                          \
+	lsp_text_edit.range = lsp_range;                                   \
+	lsp_text_edit.new_text = edit.newText.c_str();                     \
+	destination = lsp_text_edit;
 
 void lsp_client_rename(const char* newname, struct lsp_rename* lsp_rename) {
 	renameresponse_t rename;
