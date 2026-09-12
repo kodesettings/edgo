@@ -80,6 +80,7 @@ void Colorize(char b, std::string *line, bool colorize, colorindexer_t indexer) 
 
 	if (b == '\t') {
 		TabsSpaces(fg, bg, line, &str);
+		return;
 	} else {
 		str = std::string(1, b);
 	}
