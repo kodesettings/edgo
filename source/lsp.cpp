@@ -15,8 +15,8 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "../include/edgo.h"
-#include "../include/lsp.h"
+#include "edgo.h"
+#include "lsp.h"
 #include "editor.h"
 #define CONVERT_LSP_RANGE(range, orig)                                 \
 	range.start.line      = orig.start.line;                           \

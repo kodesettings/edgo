@@ -15,9 +15,9 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "edgo.h"
+#include "lsp.h"
 #include "lsp_test.h"
-#include "../include/edgo.h"
-#include "../include/lsp.h"
 
 TEST_F(LspTest, TestLspApiClientHover) {
 	move_cursor(223-1, 18);

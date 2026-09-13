@@ -15,7 +15,7 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "../include/edgo.h"
+#include "edgo.h"
 #include "editor.h"
 #include "utils.h"
 #ifdef __cplusplus
