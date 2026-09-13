@@ -14,6 +14,10 @@ add_executable(edgotest)
 # list of files for test target
 include("edgotest.cmake")
 
+# add include directory to targets
+target_include_directories(edgo PRIVATE "../include")
+target_include_directories(edgotest PRIVATE "../include")
+
 set(TS_LANGUAGE_LIBS tree-sitter)
 
 # tree-sitter language bindings are going to be
