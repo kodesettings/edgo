@@ -18,6 +18,7 @@
 #include "editor.h"
 #include "query.h"
 #include "highlighter.h"
+#include "sdl2_init.h"
 
 void UpdateLsp(const std::string &text, bool isOpen) {
 	if (!lspclient.isReady) return;
@@ -128,6 +129,7 @@ bool HandleFile(const std::string &filepath, bool isOpen) {
 	EDGO_LOGGING_NO_STDERR; // make sure it doesn't print to stderr
 	if (!e.isLogging)       // only log if enabled via env variable
 		EDGO_LOGGING_SUPPRESS;
+	SDL2_INIT;              // initializing sdl2 clipboard
 
 	std::string content;
 	SetFileAttributes(filepath, &content, isOpen);

@@ -21,7 +21,7 @@
 #include <SDL2/SDL.h>
 #include <glog/logging.h>
 
-#define __init_clipboard__ { \
+#define SDL2_INIT { \
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) { \
 		LOG(ERROR) << "SDL_Init failed: " << SDL_GetError(); \
 		return 1;\

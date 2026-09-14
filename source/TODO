@@ -1,6 +1,8 @@
 0.0.2:
 - some user input cursor positions have to be fixed on the undo stack
 - debug C API functions
+- duplicate api call fails
+- clipboard ops don't work yet, needs to be fixed
 
 0.0.3:
 - add multifile support for C API for diagnostics??
