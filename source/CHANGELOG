@@ -1,13 +1,14 @@
 CHANGELOG
 
 -------------------------------------------------------------------
-Version 0.0.2 - WIP
+Version 0.0.2 - Major refactor for a native library module
 
 == complete refactor and rewrite in cpp as a library module
-== featuring complete library manual and header files
-== TODO:some user input cursor positions have to be fixed on the undo stack
-== TODO:debug C API functions
-== TODO:add multifile support for diagnostics??
+== entirely rewrote architecture and internal rendering for screen output
+== added and updated manual page for library manual
+== added C API header files edgo.h and lsp.h for client programs
+== supports full logging via glog system
+== new configuration file format for unix systems
 
 -------------------------------------------------------------------
 Version 0.0.1 - Modifications done on the original Go repository
