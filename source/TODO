@@ -2,7 +2,7 @@
 - some user input cursor positions have to be fixed on the undo stack
 - debug C API functions
 - duplicate api call fails
-- clipboard ops don't work yet, needs to be fixed
+- clipboard seem to only work inside the session using sdl2
 
 0.0.3:
 - add multifile support for C API for diagnostics??
