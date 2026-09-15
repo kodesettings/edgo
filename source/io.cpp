@@ -128,9 +128,7 @@ bool HandleFile(const std::string &filepath, bool isOpen) {
 	EDGO_LOGGING_INIT;      // init google logging system
 	EDGO_LOGGING_NO_STDERR; // make sure it doesn't print to stderr
 	EDGO_SDL2_INIT;         // initializing sdl2 clipboard
-
-	if (!e.isLogging)       // only log if enabled via env variable
-		EDGO_LOGGING_SUPPRESS;
+	EDGO_LOGGING_SUPPRESS;  // only log if enabled via env variable
 
 	std::string content;
 	SetFileAttributes(filepath, &content, isOpen);
