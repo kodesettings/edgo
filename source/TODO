@@ -1,3 +1,4 @@
 - some user input cursor positions have to be fixed on the undo stack
 - add multifile support for C API for diagnostics??
-- we have to change cereal serializer to manual serialization because it cannot handle several cases
+- do we have to change cereal serializer to manual serialization???
+- add search API call and screen rendering
