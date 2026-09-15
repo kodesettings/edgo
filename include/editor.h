@@ -55,7 +55,7 @@ void OnSwapLinesUp(void);
 void OnSwapLinesDown(void);
 
 // io routines
-void UpdateLsp(const std::string &text, bool isOpen);
+void UpdateLsp(const std::string &file, const std::string &text, bool isOpen);
 void FindTests(void);
 void TabsSpaces(int fg, int bg, std::string *line, std::string *str);
 void GetColor(char ch, int *fg, int *bg, colorindexer_t indexer);
@@ -94,7 +94,7 @@ typedef struct editor_t {
 	std::string inputFile;              // exact user input
 	std::string filename;               // current file name
 	std::string absoluteFilePath;       // current file name and directory
-	bool (*isContentChanged)(void);     // shows * if file is changed
+	bool isContentChanged;              // shows * if file is changed
 	bool isColorize = true;             // colorize text is true by default
 	bool isOverlay;                     // true if overlay is active (completion, hover, errors...)
 	bool isStartupScreen;               // true if no file was opened
@@ -106,7 +106,6 @@ typedef struct editor_t {
 	int searchResultIndex = 0;
 
 	editor_t() {
-		isContentChanged = { /* registering dummy callback */ };
 		try {
 			isLogging = std::stoi(getenv("EDGO_LOG"));
 		} catch (...) {}

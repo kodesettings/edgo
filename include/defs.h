@@ -53,3 +53,10 @@
 	lsp_text_edit.new_text = edit.newText.c_str();                     \
 	destination = lsp_text_edit;
 
+///
+/// Macro for calling LSP document changed events while scanning
+/// for tests in current source file
+///
+#define DOCUMENT_CHANGED                                               \
+	UpdateLsp(e.absoluteFilePath, e.code_str(), false);                \
+	FindTests();

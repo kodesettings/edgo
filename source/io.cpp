@@ -20,16 +20,18 @@
 #include "highlighter.h"
 #include "sdl2_init.h"
 
-void UpdateLsp(const std::string &text, bool isOpen) {
+void UpdateLsp(const std::string &file, const std::string &text, bool isOpen) {
 	if (!lspclient.isReady) return;
 
 	if (!isOpen) {
-		e.lspver[e.absoluteFilePath]++;
-		auto version = e.lspver[e.absoluteFilePath];
-		DidChange(e.absoluteFilePath, text, version);
+		e.lspver[file]++;
+		auto version = e.lspver[file];
+		DidChange(file, text, version);
+		e.isContentChanged = true;
 	} else {
-		e.lspver[e.absoluteFilePath] = 1;
-		DidOpen(e.absoluteFilePath, text);
+		e.lspver[file] = 1;
+		DidOpen(file, text);
+		e.isContentChanged = false;
 	}
 }
 
@@ -159,7 +161,7 @@ bool HandleFile(const std::string &filepath, bool isOpen) {
 	}
 
 	// Opening file for LSP
-	UpdateLsp(e.code_str(), true);
+	UpdateLsp(e.absoluteFilePath, e.code_str(), true);
 	FindTests();
 	return true;
 }
@@ -170,7 +172,7 @@ bool SaveFile(void) {
 		return false;
 	}
 
-	UpdateLsp(e.code_str(), false);
+	UpdateLsp(e.absoluteFilePath, e.code_str(), false);
 	FindTests();
 	return true;
 }

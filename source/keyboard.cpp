@@ -17,6 +17,7 @@
 
 #include "editor.h"
 #include "operations.h"
+#include "defs.h"
 
 void OnDown(bool isPaging) {
 	int numberOfLines;
@@ -184,8 +185,8 @@ void OnEnter(void) {
 	}
 
 	Focus();
-	UpdateLsp(e.code_str(), false);
-	FindTests();
+
+	DOCUMENT_CHANGED
 }
 
 void OnDelete(void) {
@@ -205,8 +206,8 @@ void OnDelete(void) {
 		e.redo.clear();
 
 	Focus();
-	UpdateLsp(e.code_str(), false);
-	FindTests();
+
+	DOCUMENT_CHANGED
 }
 
 void OnTab(void) {
@@ -223,8 +224,8 @@ void OnTab(void) {
 		e.redo.clear();
 
 	Focus();
-	UpdateLsp(e.code_str(), false);
-	FindTests();
+
+	DOCUMENT_CHANGED
 }
 
 void OnBackTab(void) {
@@ -251,6 +252,6 @@ void OnBackTab(void) {
 		e.redo.clear();
 
 	Focus();
-	UpdateLsp(e.code_str(), false);
-	FindTests();
+
+	DOCUMENT_CHANGED
 }

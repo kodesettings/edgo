@@ -19,6 +19,7 @@
 #include "operations.h"
 #include "utils.h"
 #include "highlighter.h"
+#include "defs.h"
 
 editor_t e;
 
@@ -35,8 +36,7 @@ void API_AddCharacter(char ch) {
 		INTERNAL_InsertCharacter(e.row, e.col, val);
 	}
 
-	UpdateLsp(e.code_str(), false);
-	FindTests();
+	DOCUMENT_CHANGED
 }
 
 void INTERNAL_InsertCharacter(int line, int pos, char ch) {
@@ -71,8 +71,7 @@ void API_InsertString(int line, int pos, std::string linestring) {
 	// and adding all the Operations to it
 	e.undo.push_back({operation_t{INSERT, l, offset, cursormove_t{line, pos}}});
 
-	UpdateLsp(e.code_str(), false);
-	FindTests();
+	DOCUMENT_CHANGED
 }
 
 void KEYBOARD_DeleteCharacter(int line, int pos) {
@@ -107,8 +106,7 @@ void API_ReplaceString(int line, int from, int end, std::string instext) {
 		operation_t{INSERT, instext_str, begin_idx, cursormove_t{line, from}}
 	});
 
-	UpdateLsp(e.code_str(), false);
-	FindTests();
+	DOCUMENT_CHANGED
 }
 
 void KEYBOARD_ShiftWithTabsToRight(int line, int pos, std::set<int> selectedLines) {
