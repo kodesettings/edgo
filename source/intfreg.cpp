@@ -24,8 +24,8 @@ extern "C" {
 struct screen add_text(const char *buf, size_t length) {
 	switch (length) {
 	case 0: break;
-	case 1: AddCharacter(buf[0]); break; // line and pos ignored
-	default: InsertString(e.row, e.col, buf); break;
+	case 1: API_AddCharacter(buf[0]); break; // line and pos ignored
+	default: API_InsertString(e.row, e.col, buf); break;
 	}
 
 	return __export_screen(e.code_str(), e.y);
@@ -37,7 +37,7 @@ struct screen replace_text(size_t ps, size_t pe, const char *buf, size_t length)
 	default:
 		int start_ch = ps == 0 ? e.__selection.ssx : ps;
 		int end_ch = pe == 0 ? e.__selection.sex : pe;
-		ReplaceString(e.row, start_ch, end_ch, buf);
+		API_ReplaceString(e.row, start_ch, end_ch, buf);
 	}
 	return __export_screen(e.code_str(), e.y);
 }

@@ -34,9 +34,8 @@ void OnPaste(void) {
 	char* text = __get_clipboard_text();
 
 	if (strlen(text) == 0) { return; }
-	InsertString(e.row, e.col, std::string(text));
+	API_InsertString(e.row, e.col, std::string(text));
 	__free_clipboard(text);
-	FindTests();
 }
 
 void Cut(bool isCopySelected) {

@@ -22,26 +22,24 @@
 
 editor_t e;
 
-void AddCharacter(char ch) {
+void API_AddCharacter(char ch) {
 	if (e.__selection.GetSelectionString(e.code_str()).length() != 0) { Cut(false); }
 
 	Focus();
-	InsertCharacter(e.row, e.col, ch);
+	INTERNAL_InsertCharacter(e.row, e.col, ch);
 	e.col++;
 
 	char val;
-	bool found = MaybeAddPair(e.row, e.col, ch, &val);
+	bool found = INTERNAL_MaybeAddPair(e.row, e.col, ch, &val);
 	if (found) {
-		InsertCharacter(e.row, e.col, val);
+		INTERNAL_InsertCharacter(e.row, e.col, val);
 	}
 
-	if (e.isContentChanged) {
-		UpdateLsp(e.code_str(), false);
-		FindTests();
-	}
+	UpdateLsp(e.code_str(), false);
+	FindTests();
 }
 
-void InsertCharacter(int line, int pos, char ch) {
+void INTERNAL_InsertCharacter(int line, int pos, char ch) {
 	int offset = LineOffset(e.code_str(), line) + pos;
 
 	// adding one character offset after first line
@@ -62,7 +60,7 @@ void InsertCharacter(int line, int pos, char ch) {
 	e.undo.push_back({operation_t{op, std::string(1, ch), offset, cursormove_t{line, pos}}});
 }
 
-void InsertString(int line, int pos, std::string linestring) {
+void API_InsertString(int line, int pos, std::string linestring) {
 	// modify string to remove tabs and space from beginning
 	std::string l = RemoveLeadingTabsSpaces(linestring);
 	int offset = LineOffset(e.code_str(), line) + pos + 1;
@@ -72,9 +70,12 @@ void InsertString(int line, int pos, std::string linestring) {
 	// record the operation on the undo stack. Note that we're creating a new EditOperation
 	// and adding all the Operations to it
 	e.undo.push_back({operation_t{INSERT, l, offset, cursormove_t{line, pos}}});
+
+	UpdateLsp(e.code_str(), false);
+	FindTests();
 }
 
-void DeleteCharacter(int line, int pos) {
+void KEYBOARD_DeleteCharacter(int line, int pos) {
 	int offset = LineOffset(e.code_str(), line) + pos;
 	char ch = e.code.at(offset);
 	e.code.erase(offset, 1);
@@ -85,7 +86,7 @@ void DeleteCharacter(int line, int pos) {
 	e.undo.push_back({operation_t{DELETE, std::string(1, ch), offset, cursormove_t{line, pos}}});
 }
 
-void ReplaceString(int line, int from, int end, std::string instext) {
+void API_ReplaceString(int line, int from, int end, std::string instext) {
 	int offset = LineOffset(e.code_str(), line);
 	int begin_idx = offset + from + 1;
 
@@ -105,9 +106,12 @@ void ReplaceString(int line, int from, int end, std::string instext) {
 		operation_t{DELETE, deltext_str, begin_idx, cursormove_t{line, from}},
 		operation_t{INSERT, instext_str, begin_idx, cursormove_t{line, from}}
 	});
+
+	UpdateLsp(e.code_str(), false);
+	FindTests();
 }
 
-void ShiftWithTabsToRight(int line, int pos, std::set<int> selectedLines) {
+void KEYBOARD_ShiftWithTabsToRight(int line, int pos, std::set<int> selectedLines) {
 	e.__selection.ssx = 0;
 
 	editoperation_t ops{};
@@ -121,7 +125,7 @@ void ShiftWithTabsToRight(int line, int pos, std::set<int> selectedLines) {
 	e.undo.push_back(ops);
 }
 
-bool MaybeAddPair(int line, int pos, char ch, char *ret) {
+bool INTERNAL_MaybeAddPair(int line, int pos, char ch, char *ret) {
 	std::map<char, char> pairMap = {
 		{'(', ')'}, {'{', '}'}, {'[', ']'}, {'"', '"'}, {'\\', '\\'}, {'`', '`'},
 	};

@@ -101,10 +101,10 @@ TEST(ClipboardTests, TestUndoRedoStack) {
 	e.undo.clear();
 	e.redo.clear();
 
-	AddCharacter('a');
-	AddCharacter('b');
-	AddCharacter('c');
-	AddCharacter('d');
+	API_AddCharacter('a');
+	API_AddCharacter('b');
+	API_AddCharacter('c');
+	API_AddCharacter('d');
 
 	auto expected = "abcd";
 	EXPECT_EQ(expected, e.code_str());

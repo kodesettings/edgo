@@ -26,7 +26,7 @@ TEST(CharacterTests, TestAddCharacter) {
 	e.col = 11;
 
 	APPLY_HIGHLIGHTER
-	AddCharacter('g');
+	API_AddCharacter('g');
 
 	const auto text = "this is a sample text";
 	const auto expected = "this is a sgample text";
@@ -46,7 +46,7 @@ TEST(CharacterTests, TestInsertCharacter) {
 	e.col = 2;
 
 	APPLY_HIGHLIGHTER
-	InsertCharacter(0, 2, 'f');
+	INTERNAL_InsertCharacter(0, 2, 'f');
 
 	const auto text = "this is a sample text";
 	const auto expected = "thfis is a sample text";
@@ -66,7 +66,7 @@ TEST(CharacterTests, TestInsertString) {
 	e.col = 1;
 
 	APPLY_HIGHLIGHTER
-	InsertString(0, 1, "some");
+	API_InsertString(0, 1, "some");
 
 	const auto text = "this is a sample text";
 	const auto expected = "thsomeis is a sample text";
@@ -86,7 +86,7 @@ TEST(CharacterTests, TestInsertLines) {
 	e.col = 10;
 
 	APPLY_HIGHLIGHTER
-	InsertString(0, 10, "new line\nanother line\n");
+	API_InsertString(0, 10, "new line\nanother line\n");
 
 	const auto text = "this is a sample text";
 	const auto expected = "this is a snew line\nanother line\nample text";
@@ -106,7 +106,7 @@ TEST(CharacterTests, TestDeleteCharacter) {
 	e.col = 2;
 
 	APPLY_HIGHLIGHTER
-	DeleteCharacter(0, 2);
+	KEYBOARD_DeleteCharacter(0, 2);
 
 	const auto text = "this is a sample text";
 	const auto expected = "ths is a sample text";
@@ -123,7 +123,7 @@ TEST(CharacterTests, TestReplaceString) {
 	e.code = rope<char>("this is a sample text");
 
 	APPLY_HIGHLIGHTER
-	ReplaceString(0, 3, 11, "asd");
+	API_ReplaceString(0, 3, 11, "asd");
 
 	const auto text = "this is a sample text";
 	const auto expected = "thisasdmple text";
@@ -140,7 +140,7 @@ TEST(CharacterTests, TestDeleteLine) {
 	e.code = rope<char>("this is a sample text\n");
 
 	APPLY_HIGHLIGHTER
-	DeleteCharacter(0, e.code.size() - 1);
+	KEYBOARD_DeleteCharacter(0, e.code.size() - 1);
 
 	const auto text = "this is a sample text\n";
 	const auto expected = "this is a sample text";
@@ -157,7 +157,7 @@ TEST(CharacterTests, TestInsertLine) {
 	e.code = rope<char>("this is a sample text\n");
 
 	APPLY_HIGHLIGHTER
-	InsertCharacter(0, e.code.size() - 1, '\n');
+	INTERNAL_InsertCharacter(0, e.code.size() - 1, '\n');
 
 	const auto text = "this is a sample text\n";
 	const auto expected = "this is a sample text\n\n";
@@ -183,7 +183,7 @@ TEST(CharacterTests, TestShiftWithTabsToRight) {
 	EXPECT_EQ(text, got);
 
 	const auto selectedLines = e.__selection.GetSelectedLines(e.code_str());
-	ShiftWithTabsToRight(0, 0, selectedLines);
+	KEYBOARD_ShiftWithTabsToRight(0, 0, selectedLines);
 
 	const auto expected = "\tthis is a sample text\t\none more line";
 	EXPECT_EQ(e.code_str(), expected);
@@ -199,7 +199,7 @@ TEST(CharacterTests, TestMaybeAddPair) {
 	e.code = rope<char>("test[");
 
 	char val;
-	bool found = MaybeAddPair(0, 4, '[', &val);
+	bool found = INTERNAL_MaybeAddPair(0, 4, '[', &val);
 
 	EXPECT_EQ(val, ']');
 	EXPECT_EQ(found, true);

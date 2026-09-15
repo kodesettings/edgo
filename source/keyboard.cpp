@@ -171,7 +171,7 @@ void OnEnter(void) {
 		Cut(false);
 	}
 
-	InsertCharacter(e.row, e.col, '\n');
+	INTERNAL_InsertCharacter(e.row, e.col, '\n');
 	e.row++;
 	e.col = 0;
 
@@ -194,7 +194,7 @@ void OnDelete(void) {
 		return;
 	}
 
-	DeleteCharacter(e.row, e.col);
+	KEYBOARD_DeleteCharacter(e.row, e.col);
 	if (e.col > 0) {
 		e.col--;
 	} else if (e.row > 0) {
@@ -213,10 +213,10 @@ void OnTab(void) {
 	auto selectedLines = e.__selection.GetSelectedLines(e.code_str());
 
 	if (selectedLines.empty()) {
-		InsertCharacter(e.row, e.col, '\t');
+		INTERNAL_InsertCharacter(e.row, e.col, '\t');
 		e.col++;
 	} else  {
-		ShiftWithTabsToRight(e.row, e.col, selectedLines);
+		KEYBOARD_ShiftWithTabsToRight(e.row, e.col, selectedLines);
 	}
 
 	if (!e.redo.empty())
@@ -233,7 +233,7 @@ void OnBackTab(void) {
 	// deleting tabs from beginning
 	if (selectedLines.empty()) {
 		if (e.lines[e.row].buf[0] == '\t')  {
-			DeleteCharacter(e.row, 0);
+			KEYBOARD_DeleteCharacter(e.row, 0);
 			e.col--;
 		}
 	} else {
@@ -241,7 +241,7 @@ void OnBackTab(void) {
 		for (auto linenumber : selectedLines) {
 			e.row = linenumber;
 			if (!e.lines[e.row].buf.empty() && e.lines[e.row].buf[0] == '\t') {
-				DeleteCharacter(e.row, 0);
+				KEYBOARD_DeleteCharacter(e.row, 0);
 				e.col = e.lines[e.row].buf.size();
 			}
 		}

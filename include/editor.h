@@ -33,13 +33,13 @@
 using __gnu_cxx::rope;
 
 // character manipulation routines
-void AddCharacter(char ch);
-void InsertCharacter(int line, int pos, char ch);
-void InsertString(int line, int pos, std::string linestring);
-void DeleteCharacter(int line, int pos);
-void ReplaceString(int line, int from, int end, std::string instext);
-void ShiftWithTabsToRight(int line, int pos, std::set<int> selectedLines);
-bool MaybeAddPair(int line, int pos, char ch, char *ret);
+void API_AddCharacter(char ch);
+void INTERNAL_InsertCharacter(int line, int pos, char ch);
+void API_InsertString(int line, int pos, std::string linestring);
+void KEYBOARD_DeleteCharacter(int line, int pos);
+void API_ReplaceString(int line, int from, int end, std::string instext);
+void KEYBOARD_ShiftWithTabsToRight(int line, int pos, std::set<int> selectedLines);
+bool INTERNAL_MaybeAddPair(int line, int pos, char ch, char *ret);
 
 // clipboard routines
 void OnCopy(void);
