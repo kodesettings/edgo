@@ -1,9 +1,3 @@
-0.0.2:
 - some user input cursor positions have to be fixed on the undo stack
-- debug C API functions
-- duplicate api call fails
-- clipboard seem to only work inside the session using sdl2
-
-0.0.3:
 - add multifile support for C API for diagnostics??
 - we have to change cereal serializer to manual serialization because it cannot handle several cases

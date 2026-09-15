@@ -84,7 +84,7 @@ void Duplicate(void) {
 	auto syd = LineOffset(e.code_str(), e.row) + 1;
 	auto eyd = LineOffset(e.code_str(), e.row + 1) + 1;
 	if (e.row == 0) { syd--; } // this is required for first line only
-	auto duplicatedSlice = e.code.substr(syd, eyd);
+	auto duplicatedSlice = e.code.substr(syd, eyd - syd);
 
 	e.code.insert(eyd, duplicatedSlice);
 	e.row++;
