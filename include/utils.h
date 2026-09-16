@@ -47,6 +47,7 @@ static struct screen screen;
 // screen helper methods
 
 #include "screen.h"
+#include "version.h"
 
 #define __export_screen ExportScreen
 #define __build_line_vec BuildLineVec

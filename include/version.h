@@ -15,17 +15,10 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef _SCREEN_H_
-#define _SCREEN_H_
+#pragma once
 
-#include <string>
-#include <iomanip>
+#define PATCH_VERSION 3
+#define MINOR_VERSION 0
+#define MAJOR_VERSION 0
 
-#include "utils.h"
-#include "version.h"
-
-std::string OnLangLinesCount(const std::string &dirpath);
-line_v BuildLineVec(const std::string &data, int lineNum, bool colorize);
-struct screen ExportScreen(const std::string &s, int offset, bool colorize = true);
-
-#endif // _SCREEN_H_
+#define VERSION ((MAJOR_VERSION * 10000) + (MINOR_VERSION * 100) + PATCH_VERSION)
