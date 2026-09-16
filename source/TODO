@@ -1,4 +1,5 @@
-- some user input cursor positions have to be fixed on the undo stack
-- add multifile support for C API for diagnostics??
-- do we have to change cereal serializer to manual serialization???
+- undo stack cursor positions have to be fixed
+- lsp rename is causing error in serialization because cereal can only map std::maps to named key/pair values
+- add more lsp functions: declaration and implementation, and temporarily remove rename
 - add search API call and screen rendering
+- add select all API call
