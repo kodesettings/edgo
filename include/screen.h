@@ -26,7 +26,7 @@
                                  \
 "
 
-#define DESCRIPTION "editor library for client applications v0.0.2"
+#define DESCRIPTION "editor library for client applications v0.0.3"
 
 #include <string>
 #include <iomanip>
