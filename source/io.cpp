@@ -172,7 +172,6 @@ bool SaveFile(void) {
 		return false;
 	}
 
-	UpdateLsp(e.absoluteFilePath, e.code_str(), false);
-	FindTests();
+	e.isContentChanged = false;
 	return true;
 }
