@@ -1,6 +1,12 @@
 CHANGELOG
 
 -------------------------------------------------------------------
+Version 0.0.3 - Completion of API design and bugfixes
+
+== added select_all API function
+== TODO: find list in in TODO file for this version
+
+-------------------------------------------------------------------
 Version 0.0.2 - Major refactor for a native library module
 
 == complete refactor and rewrite in cpp as a library module

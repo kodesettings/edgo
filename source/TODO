@@ -1,5 +1,3 @@
 - undo stack cursor positions have to be fixed
-- lsp rename is causing error in serialization because cereal can only map std::maps to named key/pair values
-- add more lsp functions: declaration and implementation, and temporarily remove rename
-- add search API call and screen rendering
-- add select all API call
+- custom parsing of lsp rename is needed because it has unnamed key/pair values
+- add search API call and screen rendering for search input

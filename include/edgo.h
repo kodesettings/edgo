@@ -30,17 +30,18 @@ struct screen {
 	bool changed;   // flag for file modification
 };
 
-//
-// Text manipulators
-//
+///
+/// Text manipulators
+///
 
 struct screen add_text(const char *buf, size_t length);
 struct screen replace_text(size_t ps, size_t pe, const char *buf, size_t length);
 struct screen move_cursor(size_t line, size_t pos);
+struct screen select_all(void);
 
-//
-// Screen report
-//
+///
+/// Screen report
+///
 
 struct screen display_screen_report(const char *dirpath, size_t length);
 
@@ -52,15 +53,15 @@ enum clipboard_ops {
 	REDO  = 0x044FB
 };
 
-//
-// Clipboard operations
-//
+///
+/// Clipboard operations
+///
 
 struct screen clipboard(enum clipboard_ops ops);
 
-//
-// Editor features
-//
+///
+/// Editor features
+///
 
 struct screen duplicate(void);
 struct screen commentline(void);
@@ -81,24 +82,24 @@ enum nav_keys {
 	BACKTAB = 0x02FF
 };
 
-//
-// Navigation keys
-//
+///
+/// Navigation keys
+///
 
 struct screen on_keypress(enum nav_keys keys, bool is_paging, bool is_shift);
 struct screen on_scroll(enum nav_keys keys);
 
-//
-// File handling
-//
+///
+/// File handling
+///
 
 struct screen open_file(const char *filepath);
 int new_file(const char *filename);
 int save_file(void);
 
-//
-// LSP functions
-//
+///
+/// LSP functions
+///
 
 void lsp_client_hover(struct lsp_hover*);
 void lsp_client_completion(struct lsp_completion*);
@@ -109,9 +110,9 @@ void lsp_client_prepare_rename(struct lsp_prepare_rename*);
 void lsp_client_rename(const char* newname, struct lsp_rename*);
 void lsp_client_code_action(struct lsp_code_action*);
 
-//
-// LSP diagnostics
-//
+///
+/// LSP diagnostics
+///
 
 void lsp_diagnostics(struct lsp_publish_diagnostics*);
 #ifdef __cplusplus

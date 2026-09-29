@@ -33,6 +33,7 @@ private:
 	typedef struct {int x = 0; int y = 0; } indices_t;
 public:
 	void CleanSelection(void);
+	void SelectAll(int last_elem, int nrows);
 	bool IsSelectionNonEmpty(void);
 	bool IsUnderSelection(int x, int y);
 	bool GreaterThan(int x, int y, int x1, int y1);

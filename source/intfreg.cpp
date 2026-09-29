@@ -48,6 +48,17 @@ struct screen move_cursor(size_t line, size_t pos) {
 	return __export_screen(e.code_str(), e.y);
 }
 
+struct screen select_all(void) {
+	e.lines = __build_line_vec(e.code_str(), -1, false);
+	int last_elem, nrows;
+	if (e.lines.empty()) goto exit_0;
+	last_elem = e.lines[e.lines.size()-1].buf.size();
+	nrows = e.lines.size();
+	e.__selection.SelectAll(last_elem, nrows);
+exit_0:
+	return __export_screen(e.code_str(), e.y);
+}
+
 struct screen display_screen_report(const char *dirpath, size_t length) {
 	std::string dirpath_s, report;
 	switch (length) {

@@ -24,6 +24,12 @@ void selection::CleanSelection(void) {
 	this->ssx = -1, this->ssy = -1, this->sex = -1, this->sey = -1;
 }
 
+void selection::SelectAll(int last_elem, int nrows) {
+	if (nrows == 0) return;
+	this->is_selected = true;
+	this->ssx = 0; this->ssy = 0; this->sex = last_elem; this->sey = nrows;
+}
+
 bool selection::IsSelectionNonEmpty(void) {
 	if (this->ssx == -1 || this->ssy == -1  || this->sex == -1 || this->sey == -1) { return false; }
 	if (Equal(this->ssx, this->ssy, this->sex, this->sey)) {
