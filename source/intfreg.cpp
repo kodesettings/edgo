@@ -81,23 +81,14 @@ exit_0:
 	return __export_screen(e.code_str(), e.y);
 }
 
-struct screen duplicate(void) {
-	Duplicate();
-	return __export_screen(e.code_str(), e.y);
-}
-
-struct screen commentline(void) {
-	OnCommentLine();
-	return __export_screen(e.code_str(), e.y);
-}
-
-struct screen swaplinesup(void) {
-	OnSwapLinesUp();
-	return __export_screen(e.code_str(), e.y);
-}
-
-struct screen swaplinesdn(void) {
-	OnSwapLinesDown();
+struct screen features(enum features_ops ops) {
+	switch (ops) {
+	case DUPLICATE: Duplicate(); break;
+	case COMMENT: OnCommentLine(); break;
+	case SWAPLNUP: OnSwapLinesUp(); break;
+	case SWAPLNDN: OnSwapLinesDown(); break;
+	default: break;
+	}
 	return __export_screen(e.code_str(), e.y);
 }
 

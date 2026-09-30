@@ -22,19 +22,8 @@ Displays screen report of the current working folder or the provided path.
 struct screen \f3clipboard\fP(enum clipboard_ops \fIops\fP);
 Clipboard operations are handled according the parameter.
 .TP
-struct screen \f3duplicate\fP(void);
-Duplicates the currently selected line under cursor.
-.TP
-struct screen \f3commentline\fP(void);
-Adds comment character(s) to the beginning of the line.
-.TP
-struct screen \f3swaplinesup\fP(void);
-Moves current line up under the cursor.
-.TP
-struct screen \f3swaplinesdn\fP(void);
-Moves current line down under the cursor.
-.SS Navigation keys
-Navigation handler functions are also printing screen content.
+struct screen \f3features\fP(enum features_ops \fIops\fP);
+Features operations are handled according the parameter.
 .TP
 struct screen \f3on_keypress\fP(enum nav_keys \fIkeys\fP, bool \fIis_paging\fP, bool \fIis_shift\fP);
 Handles key presses according to the parameter.
@@ -95,6 +84,15 @@ Symbolic constants
 \%\f3REDO\fP,
 and
 \%\f3SELECT_ALL\fP are accepted.
+.TP
+\f2ops\fP
+Specifies editor features operation.
+Symbolic constants
+\%\f3DUPLICATE\fP,
+\%\f3COMMENT\fP,
+\%\f3SWAPLNUP\fP,
+and
+\%\f3SWAPLNDN\fP are accepted.
 .TP
 \f2keys\fP
 Specifies the navigation keys pressed such as

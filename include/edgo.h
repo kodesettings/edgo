@@ -59,14 +59,18 @@ enum clipboard_ops {
 
 struct screen clipboard(enum clipboard_ops ops);
 
+enum features_ops {
+	DUPLICATE = 0x01FF,
+	COMMENT   = 0x02FF,
+	SWAPLNUP  = 0x03FF,
+	SWAPLNDN  = 0x04FF
+};
+
 ///
 /// Editor features
 ///
 
-struct screen duplicate(void);
-struct screen commentline(void);
-struct screen swaplinesup(void);
-struct screen swaplinesdn(void);
+struct screen features(enum features_ops ops);
 
 enum nav_keys {
 	UP      = 0x01DF,
