@@ -37,7 +37,6 @@ struct screen {
 struct screen add_text(const char *buf, size_t length);
 struct screen replace_text(size_t ps, size_t pe, const char *buf, size_t length);
 struct screen move_cursor(size_t line, size_t pos);
-struct screen select_all(void);
 
 ///
 /// Screen report
@@ -46,11 +45,12 @@ struct screen select_all(void);
 struct screen display_screen_report(const char *dirpath, size_t length);
 
 enum clipboard_ops {
-	COPY  = 0x034FC,
-	PASTE = 0x035FC,
-	CUT   = 0x036FD,
-	UNDO  = 0x044FD,
-	REDO  = 0x044FB
+	COPY       = 0x034FC,
+	PASTE      = 0x035FC,
+	CUT        = 0x036FD,
+	UNDO       = 0x044FD,
+	REDO       = 0x044FB,
+	SELECT_ALL = 0x045DD
 };
 
 ///

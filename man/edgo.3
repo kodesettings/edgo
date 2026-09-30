@@ -1,4 +1,4 @@
-.TH edgo 3 "2026-09-10"
+.TH edgo 3 "2026-09-30"
 .SH NAME
 edgo \- text editor library with native lsp support
 .SH SYNOPSIS
@@ -15,9 +15,6 @@ Replaces text between ranges of character positions.
 .TP
 struct screen \f3move_cursor\fP(size_t \fIline\fP, size_t \fIpos\fP);
 Moves cursor to position.
-.TP
-struct screen \f3select_all\fP(void);
-Selects all text content.
 .TP
 struct screen \f3display_screen_report\fP(const char *\fIdirpath\fP, size_t \fIlength\fP);
 Displays screen report of the current working folder or the provided path.
@@ -95,8 +92,9 @@ Symbolic constants
 \%\f3PASTE\fP,
 \%\f3CUT\fP,
 \%\f3UNDO\fP,
+\%\f3REDO\fP,
 and
-\%\f3REDO\fP are accepted.
+\%\f3SELECT_ALL\fP are accepted.
 .TP
 \f2keys\fP
 Specifies the navigation keys pressed such as
