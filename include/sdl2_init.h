@@ -21,15 +21,23 @@
 #include <SDL2/SDL.h>
 #include <glog/logging.h>
 
+static std::string clpbd;
+static bool x11enabled = false;
+
 #define EDGO_SDL2_INIT { \
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) { \
 		LOG(ERROR) << "SDL_Init failed: " << SDL_GetError(); \
-		return 1;\
+		LOG(INFO) << "fallback to internal clipboard"; \
+	} else { \
+		x11enabled = true; \
 	} \
 }
 
-#define __set_clipboard_text(text) SDL_SetClipboardText(text)
-#define __get_clipboard_text() SDL_GetClipboardText()
-#define __free_clipboard(text) SDL_free(text)
+#define __set_clipboard_text(text) \
+	if (x11enabled) SDL_SetClipboardText(text); else clpbd = text;
+#define __get_clipboard_text() \
+	x11enabled ? SDL_GetClipboardText() : clpbd.data();
+#define __free_clipboard(text) \
+	if (x11enabled) SDL_free(text); else clpbd.clear();
 
 #endif // _SDL2_INIT_H_
