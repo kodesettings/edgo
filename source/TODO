@@ -1,0 +1,4 @@
+- if two lines are identical lsp update fails to receive response
+- undo stack cursor positions have to be fixed
+- custom parsing of lsp rename is needed because it has unnamed key/pair values
+- add search API function and search input screen rendering

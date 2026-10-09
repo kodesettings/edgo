@@ -1,14 +1,11 @@
 CHANGELOG
 
 -------------------------------------------------------------------
-Version 0.0.3 - Completion of API design and bugfixes
+Version 0.0.3 - Completion of API design
 
-== added SELECT_ALL API function into clipboard ops
+== implemented select all API function into clipboard ops
 == consolidated editor features into features ops
-== TODO:fixing swapping lines it is stuck in the lsp somewhere
-== TODO:undo stack cursor positions have to be fixed
-== TODO:custom parsing of lsp rename is needed because it has unnamed key/pair values
-== TODO:add search API call and screen rendering for search input
+== implemented clipboard internal fallback if there's no video driver
 
 -------------------------------------------------------------------
 Version 0.0.2 - Major refactor for a native library module
