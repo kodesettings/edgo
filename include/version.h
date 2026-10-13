@@ -17,7 +17,7 @@
 
 #pragma once
 
-#define PATCH_VERSION 3
+#define PATCH_VERSION 4
 #define MINOR_VERSION 0
 #define MAJOR_VERSION 0
 

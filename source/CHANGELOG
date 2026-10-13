@@ -1,6 +1,12 @@
 CHANGELOG
 
 -------------------------------------------------------------------
+Version 0.0.4 - Upgrade of language standard
+
+== upgraded project for c++20 standard
+== updated structures to avoid typedef linkage warnings
+
+-------------------------------------------------------------------
 Version 0.0.3 - Completion of API design
 
 == implemented select all API function into clipboard ops

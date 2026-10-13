@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(edgo VERSION 0.0.3 LANGUAGES CXX)
+project(edgo VERSION 0.0.4 LANGUAGES CXX)
 
 add_library(edgo SHARED)
 
