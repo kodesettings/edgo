@@ -31,10 +31,11 @@ static std::vector<char> matched {
 };
 
 // Inner struct to contain a line of text
-typedef struct {
+struct line_t {
 	std::string buf;
-} line_t;
+};
 
+typedef std::string string_t;
 typedef std::vector<line_t> line_v;
 typedef std::vector<std::string> string_v;
 

@@ -38,7 +38,7 @@
 
 //--------------------------------------------------------------------------------
 
-typedef struct {
+struct treesitterhighlighter_t {
 	struct TSParser       *parser;
 	struct TSTree         *tree;
 	std::string           lines;
@@ -48,7 +48,7 @@ typedef struct {
 	struct TSQuery        *testquery;
 	std::map<std::string, std::string> colorsmap;
 	std::string           themepath;
-} treesitterhighlighter_t;
+};
 
 extern treesitterhighlighter_t h;
 
@@ -84,11 +84,11 @@ inline treesitterhighlighter_t NewTreeSitter(void) {
 	};
 }
 
-typedef struct {
+struct coloredbyterange_t {
 	uint32_t startbyte;
 	uint32_t endbyte;
 	uint32_t color;
-} coloredbyterange_t;
+};
 
 inline uint32_t GetColorCode(std::string colorcode) {
 	if (colorcode.empty()) return 0; // color not found
@@ -117,12 +117,12 @@ void Parse(const std::string &code);
 typedef std::vector<coloredbyterange_t> coloredbyterange_v;
 coloredbyterange_v ColorRanges(const int from, const int to);
 
-typedef struct {
+struct colorindexer_t {
 	coloredbyterange_v ranges;
 	uint32_t counter = 0;
 	uint32_t row = 0;
 	uint32_t col = 0;
-} colorindexer_t;
+};
 
 //--------------------------------------------------------------------------------
 // treesitterhighlighter_t getters
@@ -139,19 +139,19 @@ inline enum languages GetLangStr(void) {
 	return h.lang;
 }
 
-typedef struct {
+struct noderange_t {
 	uint32_t ssy;
 	uint32_t ssx;
 	uint32_t sey;
 	uint32_t sex;
-} noderange_t;
+};
 
-typedef struct {
+struct path_t {
 	uint32_t         atx;
 	uint32_t         aty;
 	std::vector<noderange_t> nodes;
 	uint32_t         current;
-} path_t;
+};
 
 extern path_t p;
 

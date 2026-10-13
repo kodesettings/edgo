@@ -35,9 +35,9 @@
 #include "lang_java.h"
 #include "lang_bash.h"
 
-typedef struct {
+struct query_t {
 	std::string query;
-} query_t;
+};
 
 // Supported languages for syntax highlighting
 enum languages {
@@ -83,10 +83,10 @@ static std::string MatchTestQueryLang(enum languages &lang) {
 	return tests[lang];
 }
 
-typedef struct {
+struct langsbyname_t {
 	enum languages lang;
 	std::string name;
-} langsbyname_t;
+};
 
 static std::map<std::string, langsbyname_t> extensions = {
 	{".js",   langsbyname_t{.lang = JAVASCRIPT, .name = "javascript"}},

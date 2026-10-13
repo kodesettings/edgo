@@ -29,17 +29,17 @@ typedef enum {
 	END        = 0x05 // flag for end operation
 } action_t;
 
-typedef struct {
+struct cursormove_t {
 	int line;
 	int column;
-} cursormove_t;
+};
 
-typedef struct {
+struct operation_t {
 	action_t action;
 	std::string text;
 	int offset;
 	cursormove_t cursor;
-} operation_t;
+};
 
 typedef std::vector<operation_t> editoperation_t;
 

@@ -65,7 +65,7 @@ void SetFileAttributes(const std::string &file, std::string *content, bool isOpe
 bool HandleFile(const std::string &filepath, bool isOpen);
 bool SaveFile(void);
 
-typedef struct editor_t {
+struct editor_t {
 	int COLUMNS;                        // terminal size columns
 	int ROWS;                           // terminal size rows
 	int LINES_WIDTH;                    // draw file lines number
@@ -119,7 +119,7 @@ typedef struct editor_t {
 	std::string code_str(void) { return std::string(code.begin(), code.end()); }
 
 	std::map<int, testdata_t> tests;
-} editor_t;
+};
 
 extern editor_t e;
 

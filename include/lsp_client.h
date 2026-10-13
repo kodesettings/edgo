@@ -43,7 +43,7 @@ namespace bp = boost::process::v1;
 #include "logging.h"
 #include "lsp_model.h"
 
-typedef struct {
+struct lspclient_t {
 	std::string lang;
 	bool isReady; // flag for lsp initialization
 
@@ -59,7 +59,7 @@ typedef struct {
 
 	int id;
 	std::map<std::string, diagnosticparams_t> file2diagnostic;
-} lspclient_t;
+};
 
 extern lspclient_t lspclient;
 

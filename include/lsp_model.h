@@ -15,16 +15,17 @@
     with this program; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef _LSP_MODEL_H_
-#define _LSP_MODEL_H_
+#pragma once
 
 #include <string>
 #include <vector>
 #include <map>
 #include <cereal/cereal.hpp>
 
-typedef std::string string_t;
-typedef struct {
+#include "lsp_types.h"
+#include "utils.h"
+
+struct clientinfo_t {
 	string_t name;
 	string_t version;
 
@@ -33,9 +34,9 @@ typedef struct {
 		ar & CEREAL_NVP(name);
 		ar & CEREAL_NVP(version);
 	}
-} clientinfo_t;
+};
 
-typedef struct {
+struct workspacefolder_t {
 	string_t name;
 	string_t uri;
 
@@ -44,19 +45,18 @@ typedef struct {
 		ar & CEREAL_NVP(name);
 		ar & CEREAL_NVP(uri);
 	}
-} workspacefolder_t;
+};
 
-typedef std::vector<std::string> string_v;
-typedef struct {
+struct resolvesupport_t {
 	string_v properties;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
 		ar & CEREAL_NVP(properties);
 	}
-} resolvesupport_t;
+};
 
-typedef struct {
+struct capabilitiescompletionitem_t {
 	bool             resolveProvider;
 	bool             snippetSupport;
 	bool             insertReplaceSupport;
@@ -70,36 +70,36 @@ typedef struct {
 		ar & CEREAL_NVP(insertReplaceSupport);
 		ar & CEREAL_NVP(labelDetailsSupport);
 	}
-} capabilitiescompletionitem_t;
+};
 
-typedef struct {
+struct completion_t {
 	capabilitiescompletionitem_t completionItem;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
 		ar & CEREAL_NVP(completionItem);
 	}
-} completion_t;
+};
 
-typedef struct {
+struct signatureinformation2_t {
 	string_v documentationFormat;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
 		ar & CEREAL_NVP(documentationFormat);
 	}
-} signatureinformation2_t;
+};
 
-typedef struct {
+struct signaturehelp_t {
 	signatureinformation2_t signatureInformation;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
 		ar & CEREAL_NVP(signatureInformation);
 	}
-} signaturehelp_t;
+};
 
-typedef struct {
+struct publishdiagnostics_t {
 	bool relatedInformation;
 	bool versionSupport;
 	bool codeDescriptionSupport;
@@ -112,18 +112,18 @@ typedef struct {
 		ar & CEREAL_NVP(codeDescriptionSupport);
 		ar & CEREAL_NVP(dataSupport);
 	}
-} publishdiagnostics_t;
+};
 
-typedef struct {
+struct hover_t {
 	string_v contentFormat;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
 		ar & CEREAL_NVP(contentFormat);
 	}
-} hover_t;
+};
 
-typedef struct {
+struct capabilitiestextdocument_t {
 	hover_t              hover;
 	publishdiagnostics_t publishDiagnostics;
 	signaturehelp_t      signatureHelp;
@@ -136,24 +136,23 @@ typedef struct {
 		ar & CEREAL_NVP(signatureHelp);
 		ar & CEREAL_NVP(completion);
 	}
-} capabilitiestextdocument_t;
+};
 
-typedef struct {
+struct capabilities_t {
 	capabilitiestextdocument_t textDocument;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
 		ar & CEREAL_NVP(textDocument);
 	}
-} capabilities_t;
+};
 
 //===========================================================
 // the capabilities initalizer is added in this section
 // this is for setting the default values
 #include "lsp_capabilities.h"
 
-typedef std::vector<workspacefolder_t> workspacefolder_v;
-typedef struct {
+struct initializeparams_t {
 	int               processId;
 	string_t          rootUri;
 	string_t          rootPath;
@@ -176,9 +175,9 @@ typedef struct {
 		ar & CEREAL_NVP(clientInfo);
 		ar & CEREAL_NVP(workDoneToken);
 	}
-} initializeparams_t;
+};
 
-typedef struct {
+struct initializerequest_t {
 	int                id;
 	string_t           jsonrpc;
 	string_t           method;
@@ -191,14 +190,14 @@ typedef struct {
 		ar & CEREAL_NVP(method);
 		ar & CEREAL_NVP(params);
 	}
-} initializerequest_t;
+};
 
-typedef struct {
+struct initializedparams_t {
 	template <class Archive>
 	void serialize(Archive& ar) {}
-} initializedparams_t;
+};
 
-typedef struct {
+struct initializedrequest_t {
 	string_t            jsonrpc;
 	string_t            method;
 	initializedparams_t params;
@@ -209,9 +208,9 @@ typedef struct {
 		ar & CEREAL_NVP(method);
 		ar & CEREAL_NVP(params);
 	}
-} initializedrequest_t;
+};
 
-typedef struct {
+struct serverinfo_t {
 	string_t name;
 	string_t version;
 
@@ -220,9 +219,9 @@ typedef struct {
 		ar & CEREAL_NVP(name);
 		ar & CEREAL_NVP(version);
 	}
-} serverinfo_t;
+};
 
-typedef struct {
+struct initializeparams2_t {
 //	capabilities_t capabilities;
 	serverinfo_t serverInfo;
 
@@ -231,9 +230,9 @@ typedef struct {
 //		ar & CEREAL_NVP(capabilities);
 		ar & CEREAL_NVP(serverInfo);
 	}
-} initializeparams2_t;
+};
 
-typedef struct {
+struct initializeresponse_t {
 	int                 id;
 	string_t            jsonrpc;
 	initializeparams2_t result;
@@ -244,9 +243,9 @@ typedef struct {
 		ar & CEREAL_NVP(jsonrpc);
 		ar & CEREAL_NVP(result);
 	}
-} initializeresponse_t;
+};
 
-typedef struct {
+struct context_t {
 	bool     includeDeclaration;
 	string_v only;
 	int      triggerKind;
@@ -257,9 +256,9 @@ typedef struct {
 		ar & CEREAL_NVP(only);
 		ar & CEREAL_NVP(triggerKind);
 	}
-} context_t;
+};
 
-typedef struct {
+struct textdocument_t {
 	string_t languageId;
 	string_t text;
 	string_t uri;
@@ -272,9 +271,9 @@ typedef struct {
 		ar & CEREAL_NVP(uri);
 		ar & CEREAL_NVP(version);
 	}
-} textdocument_t;
+};
 
-typedef struct {
+struct position_t {
 	int line;
 	int character;
 
@@ -283,9 +282,9 @@ typedef struct {
 		ar & CEREAL_NVP(line);
 		ar & CEREAL_NVP(character);
 	}
-} position_t;
+};
 
-typedef struct {
+struct params_t {
 	textdocument_t textDocument;
 	position_t     position;
 	context_t      context;
@@ -296,18 +295,18 @@ typedef struct {
 		ar & CEREAL_NVP(position);
 		ar & CEREAL_NVP(context);
 	}
-} params_t;
+};
 
-typedef  struct {
+struct didopentextdocumentparams_t {
 	textdocument_t textDocument;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
 		ar & CEREAL_NVP(textDocument);
 	}
-} didopentextdocumentparams_t;
+};
 
-typedef struct {
+struct didopenrequest_t {
 	string_t                    jsonrpc;
 	string_t                    method;
 	didopentextdocumentparams_t params;
@@ -318,27 +317,27 @@ typedef struct {
 		ar & CEREAL_NVP(method);
 		ar & CEREAL_NVP(params);
 	}
-} didopenrequest_t;
+};
 
-typedef struct {
+struct textdocumentidentifier_t {
 	string_t uri;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
 		ar & CEREAL_NVP(uri);
 	}
-} textdocumentidentifier_t;
+};
 
-typedef struct {
+struct didclosetextdocumentparams_t {
 	textdocumentidentifier_t textDocument;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
 		ar & CEREAL_NVP(textDocument);
 	}
-} didclosetextdocumentparams_t;
+};
 
-typedef struct {
+struct didcloserequest_t {
 	string_t                     jsonrpc;
 	string_t                     method;
 	didclosetextdocumentparams_t params;
@@ -349,9 +348,9 @@ typedef struct {
 		ar & CEREAL_NVP(method);
 		ar & CEREAL_NVP(params);
 	}
-} didcloserequest_t;
+};
 
-typedef struct {
+struct shutdownrequest_t {
 	int      id;
 	string_t jsonrpc;
 	string_t method;
@@ -362,9 +361,9 @@ typedef struct {
 		ar & CEREAL_NVP(jsonrpc);
 		ar & CEREAL_NVP(method);
 	}
-} shutdownrequest_t;
+};
 
-typedef struct {
+struct exitrequest_t {
 	string_t jsonrpc;
 	string_t method;
 
@@ -373,9 +372,9 @@ typedef struct {
 		ar & CEREAL_NVP(jsonrpc);
 		ar & CEREAL_NVP(method);
 	}
-} exitrequest_t;
+};
 
-typedef struct {
+struct baserequest_t {
 	int      id;
 	string_t jsonrpc;
 	string_t method;
@@ -388,9 +387,9 @@ typedef struct {
 		ar & CEREAL_NVP(method);
 		ar & CEREAL_NVP(params);
 	}
-} baserequest_t;
+};
 
-typedef struct {
+struct versionedtextdocumentidentifier_t {
 	string_t uri;
 	int      version;
 
@@ -399,10 +398,10 @@ typedef struct {
 		ar & CEREAL_NVP(uri);
 		ar & CEREAL_NVP(version);
 	}
-} versionedtextdocumentidentifier_t;
+};
 
 // NOTE: range argument is temporarily disabled
-typedef struct {
+struct textdocumentcontentchangeevent_t {
 //	range_t  range;
 	string_t text;
 
@@ -411,10 +410,9 @@ typedef struct {
 //		ar & CEREAL_NVP(range);
 		ar & CEREAL_NVP(text);
 	}
-} textdocumentcontentchangeevent_t;
+};
 
-typedef std::vector<textdocumentcontentchangeevent_t> textdocumentcontentchangeevent_v;
-typedef struct {
+struct didchangetextdocumentparams_t {
 	textdocumentcontentchangeevent_v contentChanges;
 	versionedtextdocumentidentifier_t textDocument;
 
@@ -423,9 +421,9 @@ typedef struct {
 		ar & CEREAL_NVP(contentChanges);
 		ar & CEREAL_NVP(textDocument);
 	}
-} didchangetextdocumentparams_t;
+};
 
-typedef struct {
+struct didchangerequest_t {
 	string_t                      jsonrpc;
 	string_t                      method;
 	didchangetextdocumentparams_t params;
@@ -436,9 +434,9 @@ typedef struct {
 		ar & CEREAL_NVP(method);
 		ar & CEREAL_NVP(params);
 	}
-} didchangerequest_t;
+};
 
-typedef struct {
+struct range_t {
 	position_t start;
 	position_t end;
 
@@ -447,9 +445,9 @@ typedef struct {
 		ar & CEREAL_NVP(start);
 		ar & CEREAL_NVP(end);
 	}
-} range_t;
+};
 
-typedef struct {
+struct textedit_t {
 	range_t  range;
 	range_t  replace;
 	range_t  insert;
@@ -462,9 +460,9 @@ typedef struct {
 		ar & CEREAL_NVP(insert);
 		ar & CEREAL_NVP(newText);
 	}
-} textedit_t;
+};
 
-typedef struct {
+struct completionitem_t {
 	string_t   label;
 	int        kind;
 	string_t   detail;
@@ -485,10 +483,9 @@ typedef struct {
 		ar & CEREAL_NVP(insertTextFormat);
 		ar & CEREAL_NVP(textEdit);
 	}
-} completionitem_t;
+};
 
-typedef std::vector<completionitem_t> completionitem_v;
-typedef struct {
+struct completionresult_t {
 	bool isIncomplete;
 	completionitem_v items;
 
@@ -497,9 +494,9 @@ typedef struct {
 		ar & CEREAL_NVP(isIncomplete);
 		ar & CEREAL_NVP(items);
 	}
-} completionresult_t;
+};
 
-typedef struct {
+struct completionresponse_t {
 	string_t           jsonrpc;
 	completionresult_t result;
 	int                id;
@@ -510,9 +507,9 @@ typedef struct {
 		ar & CEREAL_NVP(result);
 		ar & CEREAL_NVP(id);
 	}
-} completionresponse_t;
+};
 
-typedef struct {
+struct contents_t {
 	string_t kind;
 	string_t value;
 
@@ -521,9 +518,9 @@ typedef struct {
 		ar & CEREAL_NVP(kind);
 		ar & CEREAL_NVP(value);
 	}
-} contents_t;
+};
 
-typedef struct {
+struct hoverresult_t {
 	contents_t contents;
 	range_t    range;
 
@@ -532,9 +529,9 @@ typedef struct {
 		ar & CEREAL_NVP(contents);
 		ar & CEREAL_NVP(range);
 	}
-} hoverresult_t;
+};
 
-typedef struct {
+struct hoverresponse_t {
 	string_t      jsonrpc;
 	hoverresult_t result;
 	int           id;
@@ -545,9 +542,9 @@ typedef struct {
 		ar & CEREAL_NVP(result);
 		ar & CEREAL_NVP(id);
 	}
-} hoverresponse_t;
+};
 
-typedef struct {
+struct parameterinformation_t {
 	string_t label;
 	string_t documentation;
 
@@ -556,10 +553,9 @@ typedef struct {
 		ar & CEREAL_NVP(label);
 		ar & CEREAL_NVP(documentation);
 	}
-} parameterinformation_t;
+};
 
-typedef std::vector<parameterinformation_t> parameterinformation_v;
-typedef struct {
+struct signatureinformation_t {
 	string_t               label;
 	parameterinformation_v parameters;
 
@@ -568,10 +564,9 @@ typedef struct {
 		ar & CEREAL_NVP(label);
 		ar & CEREAL_NVP(parameters);
 	}
-} signatureinformation_t;
+};
 
-typedef std::vector<signatureinformation_t> signatureinformation_v;
-typedef struct {
+struct signaturehelpresult_t {
 	signatureinformation_v signatures;
 	int                    activeSignature;
 	int                    activeParameter;
@@ -582,9 +577,9 @@ typedef struct {
 		ar & CEREAL_NVP(activeSignature);
 		ar & CEREAL_NVP(activeParameter);
 	}
-} signaturehelpresult_t;
+};
 
-typedef struct {
+struct signaturehelpresponse_t {
 	string_t              jsonrpc;
 	signaturehelpresult_t result;
 	int                   id;
@@ -595,27 +590,27 @@ typedef struct {
 		ar & CEREAL_NVP(result);
 		ar & CEREAL_NVP(id);
 	}
-} signaturehelpresponse_t;
+};
 
-typedef struct {
+struct lspsettings_t {
 	std::map<string_t, string_t> langs;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
 		ar & CEREAL_NVP(langs);
 	}
-} lspsettings_t;
+};
 
-typedef struct {
+struct codedescription_t {
 	string_t href;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
 		ar & CEREAL_NVP(href);
 	}
-} codedescription_t;
+};
 
-typedef struct {
+struct diagnostic_t {
 	range_t           range;
 	int               severity;
 	string_t          code;
@@ -632,10 +627,9 @@ typedef struct {
 		ar & CEREAL_NVP(source);
 		ar & CEREAL_NVP(message);
 	}
-} diagnostic_t;
+};
 
-typedef std::vector<diagnostic_t> diagnostic_v;
-typedef struct {
+struct diagnosticparams_t {
 	string_t      uri;
 	int           version;
 	diagnostic_v  diagnostics;
@@ -646,9 +640,9 @@ typedef struct {
 		ar & CEREAL_NVP(version);
 		ar & CEREAL_NVP(diagnostics);
 	}
-} diagnosticparams_t;
+};
 
-typedef struct {
+struct definitionparams_t {
 	textdocument_t textDocument;
 	position_t     position;
 
@@ -657,9 +651,9 @@ typedef struct {
 		ar & CEREAL_NVP(textDocument);
 		ar & CEREAL_NVP(position);
 	}
-} definitionparams_t;
+};
 
-typedef struct {
+struct diagnosticresponse_t {
 	string_t           jsonrpc;
 	string_t           method;
 	diagnosticparams_t params;
@@ -670,9 +664,9 @@ typedef struct {
 		ar & CEREAL_NVP(method);
 		ar & CEREAL_NVP(params);
 	}
-} diagnosticresponse_t;
+};
 
-typedef struct {
+struct definitionrequest_t {
 	int                id;
 	string_t           jsonrpc;
 	string_t           method;
@@ -685,9 +679,9 @@ typedef struct {
 		ar & CEREAL_NVP(method);
 		ar & CEREAL_NVP(params);
 	}
-} definitionrequest_t;
+};
 
-typedef struct {
+struct definitionresult_t {
 	string_t uri;
 	range_t  range;
 
@@ -696,10 +690,9 @@ typedef struct {
 		ar & CEREAL_NVP(uri);
 		ar & CEREAL_NVP(range);
 	}
-} definitionresult_t;
+};
 
-typedef std::vector<definitionresult_t> definitionresult_v;
-typedef struct {
+struct definitionresponse_t {
 	string_t           jsonrpc;
 	definitionresult_v result;
 	int                id;
@@ -710,9 +703,9 @@ typedef struct {
 		ar & CEREAL_NVP(result);
 		ar & CEREAL_NVP(id);
 	}
-} definitionresponse_t;
+};
 
-typedef struct {
+struct definitionresponse2_t {
 	string_t           jsonrpc;
 	definitionresult_t result;
 	int                id;
@@ -723,9 +716,9 @@ typedef struct {
 		ar & CEREAL_NVP(result);
 		ar & CEREAL_NVP(id);
 	}
-} definitionresponse2_t;
+};
 
-typedef  struct {
+struct character_t {
 	int character;
 	int line;
 
@@ -734,9 +727,9 @@ typedef  struct {
 		ar & CEREAL_NVP(character);
 		ar & CEREAL_NVP(line);
 	}
-} character_t;
+};
 
-typedef struct {
+struct changerange_t {
 	character_t start;
 	character_t end;
 
@@ -745,18 +738,18 @@ typedef struct {
 		ar & CEREAL_NVP(start);
 		ar & CEREAL_NVP(end);
 	}
-} changerange_t;
+};
 
-typedef struct {
+struct didsaveparams_t {
 	textdocument_t textDocument;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
 		ar & CEREAL_NVP(textDocument);
 	}
-} didsaveparams_t;
+};
 
-typedef struct {
+struct didsaverequest_t {
 	string_t        jsonrpc;
 	string_t        method;
 	didsaveparams_t params;
@@ -767,9 +760,9 @@ typedef struct {
 		ar & CEREAL_NVP(method);
 		ar & CEREAL_NVP(params);
 	}
-} didsaverequest_t;
+};
 
-typedef struct {
+struct referencesrange_t {
 	string_t uri;
 	range_t  range;
 
@@ -778,10 +771,9 @@ typedef struct {
 		ar & CEREAL_NVP(uri);
 		ar & CEREAL_NVP(range);
 	}
-} referencesrange_t;
+};
 
-typedef std::vector<referencesrange_t> referencesrange_v;
-typedef struct {
+struct referencesresponse_t {
 	string_t          jsonrpc;
 	referencesrange_v result;
 	int               id;
@@ -792,9 +784,9 @@ typedef struct {
 		ar & CEREAL_NVP(result);
 		ar & CEREAL_NVP(id);
 	}
-} referencesresponse_t;
+};
 
-typedef struct {
+struct preparerenamerequest_t {
 	int      id;
 	string_t jsonrpc;
 	string_t method;
@@ -807,9 +799,9 @@ typedef struct {
 		ar & CEREAL_NVP(method);
 		ar & CEREAL_NVP(params);
 	}
-} preparerenamerequest_t;
+};
 
-typedef struct {
+struct preparerenameresponse_t {
 	int      id;
 	string_t jsonrpc;
 	struct {
@@ -829,9 +821,9 @@ typedef struct {
 		ar & CEREAL_NVP(jsonrpc);
 		ar & CEREAL_NVP(result);
 	}
-} preparerenameresponse_t;
+};
 
-typedef struct {
+struct renameparams_t {
 	string_t       newName;
 	position_t     position;
 	textdocument_t textDocument;
@@ -842,9 +834,9 @@ typedef struct {
 		ar & CEREAL_NVP(position);
 		ar & CEREAL_NVP(textDocument);
 	}
-} renameparams_t;
+};
 
-typedef struct {
+struct renamerequest_t {
 	int            id;
 	string_t       jsonrpc;
 	string_t       method;
@@ -857,9 +849,9 @@ typedef struct {
 		ar & CEREAL_NVP(method);
 		ar & CEREAL_NVP(params);
 	}
-} renamerequest_t;
+};
 
-typedef struct {
+struct edit_t {
 	range_t  range;
 	string_t newText;
 
@@ -868,10 +860,9 @@ typedef struct {
 		ar & CEREAL_NVP(range);
 		ar & CEREAL_NVP(newText);
 	}
-} edit_t;
+};
 
-typedef std::vector<edit_t> edit_v;
-typedef struct {
+struct documentchange_t {
 	textdocument_t textDocument;
 	edit_v         edits;
 
@@ -880,19 +871,18 @@ typedef struct {
 		ar & CEREAL_NVP(textDocument);
 		ar & CEREAL_NVP(edits);
 	}
-} documentchange_t;
+};
 
-typedef std::vector<documentchange_t> documentchange_v;
-typedef struct {
+struct changesresult_t {
 	documentchange_v documentChanges;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
 		ar & CEREAL_NVP(documentChanges);
 	}
-} changesresult_t;
+};
 
-typedef struct {
+struct renameresponse_t {
 	string_t        jsonrpc;
 	changesresult_t result;
 	int             id;
@@ -903,9 +893,9 @@ typedef struct {
 		ar & CEREAL_NVP(result);
 		ar & CEREAL_NVP(id);
 	}
-} renameresponse_t;
+};
 
-typedef struct {
+struct requestrange_t {
 	position_t start;
 	position_t end;
 
@@ -914,9 +904,9 @@ typedef struct {
 		ar & CEREAL_NVP(start);
 		ar & CEREAL_NVP(end);
 	}
-} requestrange_t;
+};
 
-typedef struct {
+struct codeactionparams_t {
 	textdocument_t textDocument;
 	context_t      context;
 	requestrange_t range;
@@ -927,9 +917,9 @@ typedef struct {
 		ar & CEREAL_NVP(context);
 		ar & CEREAL_NVP(range);
 	}
-} codeactionparams_t;
+};
 
-typedef struct {
+struct codeactionrequest_t {
 	int                id;
 	string_t           jsonrpc;
 	string_t           method;
@@ -942,9 +932,9 @@ typedef struct {
 		ar & CEREAL_NVP(method);
 		ar & CEREAL_NVP(params);
 	}
-} codeactionrequest_t;
+};
 
-typedef struct {
+struct argument_t {
 	string_t fix;
 	string_t uri;
 	range_t range;
@@ -955,10 +945,9 @@ typedef struct {
 		ar & CEREAL_NVP(uri);
 		ar & CEREAL_NVP(range);
 	}
-} argument_t;
+};
 
-typedef std::vector<argument_t> argument_v;
-typedef struct {
+struct command_t {
 	string_t   title;
 	string_t   command;
 	argument_v arguments;
@@ -969,9 +958,9 @@ typedef struct {
 		ar & CEREAL_NVP(command);
 		ar & CEREAL_NVP(arguments);
 	}
-} command_t;
+};
 
-typedef struct {
+struct codeactionresult_t {
 	string_t  title;
 	string_t  kind;
 	edit_t    edit;
@@ -984,10 +973,9 @@ typedef struct {
 		ar & CEREAL_NVP(edit);
 		ar & CEREAL_NVP(command);
 	}
-} codeactionresult_t;
+};
 
-typedef std::vector<codeactionresult_t> codeactionresult_v;
-typedef struct {
+struct codeactionresponse_t {
 	string_t           jsonrpc;
 	codeactionresult_v result;
 	int                id;
@@ -998,6 +986,4 @@ typedef struct {
 		ar & CEREAL_NVP(result);
 		ar & CEREAL_NVP(id);
 	}
-} codeactionresponse_t;
-
-#endif // _LSP_MODEL_H_
+};

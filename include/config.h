@@ -26,19 +26,19 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 
-typedef struct {
+struct lang_t {
 	std::string name;
 	std::string lsp;
 	std::string comment;
 	int tabwidth;
 	std::string cmd;
 	std::string cmdargs;
-} lang_t;
+};
 
-typedef struct {
+struct config_t {
 	std::map<std::string, lang_t> langs;
 	std::string theme;
-} config_t;
+};
 
 static config_t default_config { .langs = {
 	{ "go",         { lsp: "gopls", comment: "//", tabwidth: 4, cmd: "go", cmdargs: "run" }},

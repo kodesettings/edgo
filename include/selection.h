@@ -30,7 +30,7 @@ public:
 	int sey = 0;          // selection end y
 	bool is_selected;     // true if selection is active
 private:
-	typedef struct {int x = 0; int y = 0; } indices_t;
+	struct indices_t {int x = 0; int y = 0; };
 public:
 	void CleanSelection(void);
 	void SelectAll(int last_elem, int nrows);

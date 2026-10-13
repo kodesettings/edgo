@@ -25,20 +25,20 @@
 
 namespace fs = boost::filesystem;
 
-typedef struct  {
+struct searchresult_t {
 	int line;
 	int position;
-} searchresult_t;
+};
 typedef std::vector<searchresult_t> searchresult_v;
 
 searchresult_v Search(const line_v lines, const std::string &pattern);
 searchresult_v SearchOnFile(const std::string &filename, const std::string &pattern, int *lineindex);
 void LineCountOnFile(const std::string &filename, int *lines, int *emptylines);
 
-typedef struct {
+struct filesearchresult_t {
 	std::string file;
 	searchresult_v results;
-} filesearchresult_t;
+};
 typedef std::vector<filesearchresult_t> filesearchresult_v;
 
 void ParsePattern(const std::string &pattern, string_v *extensions);
@@ -62,22 +62,22 @@ static std::vector<std::string> ignoreexts {
 	".ttf", ".otf",
 };
 
-typedef struct {
+struct linescountresult_t {
 	std::string file;
 	int count;
 	int emptycount;
-} linescountresult_t;
+};
 typedef std::vector<linescountresult_t> linescountresult_v;
 
 linescountresult_v LinesCountOnDir(const std::string &dir, int *filesprocessedcount,
                                    int *totallinescount);
 
-typedef struct {
+struct langlinescountresult_t {
 	std::string lang;
 	int filescount;
 	int linescount;
 	int emptylinescount;
-} langlinescountresult_t;
+};
 typedef std::vector<langlinescountresult_t> langlinescountresult_v;
 
 // counting number of languages in folder

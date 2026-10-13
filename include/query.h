@@ -20,11 +20,11 @@
 
 #include "highlighter.h"
 
-typedef struct {
+struct testdata_t {
 	std::string name; // NOTE: unused for now
 	std::string filename;
 	int line;
-} testdata_t;
+};
 
 typedef std::map<int, testdata_t> testdata_m;
 
