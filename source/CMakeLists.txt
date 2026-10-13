@@ -8,6 +8,7 @@ add_library(edgo SHARED)
 include("target.cmake")
 
 find_package(GTest REQUIRED)
+find_package(glog CONFIG REQUIRED)
 
 add_executable(edgotest)
 
@@ -36,5 +37,5 @@ list(APPEND TS_LANGUAGE_LIBS tree-sitter-rust)
 list(APPEND TS_LANGUAGE_LIBS tree-sitter-python)
 
 # target and test builds
-target_link_libraries(edgo PUBLIC glog pthread boost_filesystem SDL2 ${TS_LANGUAGE_LIBS})
+target_link_libraries(edgo PUBLIC glog::glog pthread boost_filesystem SDL2 ${TS_LANGUAGE_LIBS})
 target_link_libraries(edgotest PUBLIC ${GTEST_LIBRARIES} gtest_main pthread edgo)

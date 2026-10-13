@@ -20,7 +20,7 @@
 #include "lsp_test.h"
 
 TEST_F(LspTest, TestLspApiClientHover) {
-	move_cursor(223-1, 18);
+	move_cursor(220, 18);
 
 	struct lsp_hover lsp_hover;
 	lsp_client_hover(&lsp_hover);
@@ -28,14 +28,14 @@ TEST_F(LspTest, TestLspApiClientHover) {
 	EXPECT_STREQ(lsp_hover.contents.language, "plaintext");
 	EXPECT_NE(strlen(lsp_hover.contents.value), 0);
 
-	EXPECT_EQ(lsp_hover.range.start.line, 222);
+	EXPECT_EQ(lsp_hover.range.start.line, 220);
 	EXPECT_EQ(lsp_hover.range.start.character, 11);
-	EXPECT_EQ(lsp_hover.range.end.line, 222);
+	EXPECT_EQ(lsp_hover.range.end.line, 220);
 	EXPECT_EQ(lsp_hover.range.end.character, 21);
 }
 
 TEST_F(LspTest, TestLspApiClientCompletion) {
-	move_cursor(223-1, 18);
+	move_cursor(220, 18);
 
 	struct lsp_completion lsp_completion;
 	lsp_client_completion(&lsp_completion);
@@ -54,14 +54,14 @@ TEST_F(LspTest, TestLspApiClientCompletion) {
 	EXPECT_STREQ(item.insert_text,
 		"tss_create(${1:tss_t *tss_id}, ${2:tss_dtor_t destructor})");
 
-	EXPECT_EQ(item.text_edit.range.start.line, 222);
+	EXPECT_EQ(item.text_edit.range.start.line, 220);
 	EXPECT_EQ(item.text_edit.range.start.character, 11);
-	EXPECT_EQ(item.text_edit.range.end.line, 222);
+	EXPECT_EQ(item.text_edit.range.end.line, 220);
 	EXPECT_EQ(item.text_edit.range.end.character, 18);
 }
 
 TEST_F(LspTest, TestLspApiClientDefinition) {
-	move_cursor(223-1, 18);
+	move_cursor(220, 18);
 
 	struct lsp_definition lsp_definition;
 	lsp_client_definition(&lsp_definition);
@@ -71,14 +71,14 @@ TEST_F(LspTest, TestLspApiClientDefinition) {
 	auto location = lsp_definition.locations[0];
 	EXPECT_STREQ(location.uri, "file:///usr/include/threads.h");
 
-	EXPECT_EQ(location.range.start.line, 222);
+	EXPECT_EQ(location.range.start.line, 220);
 	EXPECT_EQ(location.range.start.character, 11);
-	EXPECT_EQ(location.range.end.line, 222);
+	EXPECT_EQ(location.range.end.line, 220);
 	EXPECT_EQ(location.range.end.character, 21);
 }
 
 TEST_F(LspTest, TestLspApiClientSignatureHelp) {
-	move_cursor(223-1, 18);
+	move_cursor(220, 18);
 
 	struct lsp_signature_help lsp_signature_help;
 	lsp_client_signature_help(&lsp_signature_help);
@@ -89,7 +89,7 @@ TEST_F(LspTest, TestLspApiClientSignatureHelp) {
 }
 
 TEST_F(LspTest, TestLspApiClientReferences) {
-	move_cursor(223-1, 18);
+	move_cursor(220, 18);
 
 	struct lsp_references lsp_references;
 	lsp_client_references(&lsp_references);
@@ -98,20 +98,20 @@ TEST_F(LspTest, TestLspApiClientReferences) {
 }
 
 TEST_F(LspTest, TestLspApiClientPrepareRename) {
-	move_cursor(223-1, 18);
+	move_cursor(220, 18);
 
 	struct lsp_prepare_rename lsp_prepare_rename;
 	lsp_client_prepare_rename(&lsp_prepare_rename);
 
 	EXPECT_STREQ(lsp_prepare_rename.placeholder, "tss_create");
-	EXPECT_EQ(lsp_prepare_rename.range.start.line, 222);
+	EXPECT_EQ(lsp_prepare_rename.range.start.line, 220);
 	EXPECT_EQ(lsp_prepare_rename.range.start.character, 11);
-	EXPECT_EQ(lsp_prepare_rename.range.end.line, 222);
+	EXPECT_EQ(lsp_prepare_rename.range.end.line, 220);
 	EXPECT_EQ(lsp_prepare_rename.range.end.character, 21);
 }
 
 TEST_F(LspTest, TestLspApiClientRename) {
-	move_cursor(223-1, 18);
+	move_cursor(220, 18);
 
 	struct lsp_rename lsp_rename;
 	lsp_client_rename("tss_create2", &lsp_rename);
@@ -132,15 +132,15 @@ TEST_F(LspTest, TestLspApiClientRename) {
 		auto edits = workspace_edit.edits[j];
 		EXPECT_STREQ(edits.new_text, "tss_create2");
 
-		EXPECT_EQ(edits.range.start.line, 222);
+		EXPECT_EQ(edits.range.start.line, 220);
 		EXPECT_EQ(edits.range.start.character, 11);
-		EXPECT_EQ(edits.range.end.line, 222);
+		EXPECT_EQ(edits.range.end.line, 220);
 		EXPECT_EQ(edits.range.end.character, 21);
 	}
 }
 
 TEST_F(LspTest, TestLspApiClientCodeAction) {
-	move_cursor(223-1, 18);
+	move_cursor(220, 18);
 
 	struct lsp_code_action lsp_code_action;
 	lsp_client_code_action(&lsp_code_action);

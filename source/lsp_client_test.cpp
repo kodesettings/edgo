@@ -27,7 +27,7 @@ TEST_F(LspTest, TestLspClientStarted) {
 }
 
 TEST_F(LspTest, TestLspClientHover) {
-	hoverresponse_t response = Hover(filepath, 223-1, 18);
+	hoverresponse_t response = Hover(filepath, 220, 18);
 	EXPECT_NE(response.jsonrpc, "");
 
 	auto expected = "function tss_create";
@@ -36,7 +36,7 @@ TEST_F(LspTest, TestLspClientHover) {
 }
 
 TEST_F(LspTest, TestLspClientCompletion) {
-	completionresponse_t response = Completion(filepath, 223-1, 18);
+	completionresponse_t response = Completion(filepath, 220, 18);
 	EXPECT_NE(response.jsonrpc, "");
 
 	auto expected = " tss_create";
@@ -48,7 +48,7 @@ TEST_F(LspTest, TestLspClientCompletion) {
 }
 
 TEST_F(LspTest, TestLspClientDefinition) {
-	definitionresponse_t response = Definition(filepath, 223-1, 18);
+	definitionresponse_t response = Definition(filepath, 220, 18);
 	EXPECT_NE(response.jsonrpc, "");
 
 	EXPECT_EQ(response.result.size(), 1);
@@ -59,7 +59,7 @@ TEST_F(LspTest, TestLspClientDefinition) {
 }
 
 TEST_F(LspTest, TestLspClientSignatureHelp) {
-	signaturehelpresponse_t response = SignatureHelp(filepath, 223-1, 34);
+	signaturehelpresponse_t response = SignatureHelp(filepath, 220, 34);
 	EXPECT_NE(response.jsonrpc, "");
 	EXPECT_EQ(response.id, 4);
 
@@ -67,7 +67,7 @@ TEST_F(LspTest, TestLspClientSignatureHelp) {
 }
 
 TEST_F(LspTest, TestLspClientReferences) {
-	referencesresponse_t response = References(filepath, 223-1, 34);
+	referencesresponse_t response = References(filepath, 220, 34);
 	EXPECT_NE(response.jsonrpc, "");
 	EXPECT_EQ(response.id, 5);
 

@@ -22,6 +22,7 @@
 #include <string>
 #include <fnmatch.h>
 #include <boost/filesystem.hpp>
+#include <sys/ioctl.h>
 
 // Matched characters
 static std::vector<char> matched {

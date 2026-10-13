@@ -44,7 +44,7 @@ const auto capabilities = capabilities_t {
 				.snippetSupport = true,
 				.insertReplaceSupport = true,
 				.labelDetailsSupport = true,
-				resolvesupport_t {
+				.resolveSupport = resolvesupport_t {
 					.properties = string_v{"documentation", "detail", "additionalTextEdits"},
 				}
 			}
