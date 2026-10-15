@@ -69,6 +69,7 @@ struct capabilitiescompletionitem_t {
 		ar & CEREAL_NVP(snippetSupport);
 		ar & CEREAL_NVP(insertReplaceSupport);
 		ar & CEREAL_NVP(labelDetailsSupport);
+		ar & CEREAL_NVP(resolveSupport);
 	}
 };
 
